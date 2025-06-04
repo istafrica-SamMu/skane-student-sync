@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,17 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// IKE Custom Colors
+				'ike-primary': 'hsl(var(--ike-primary))',
+				'ike-primary-light': 'hsl(var(--ike-primary-light))',
+				'ike-primary-dark': 'hsl(var(--ike-primary-dark))',
+				'ike-success': 'hsl(var(--ike-success))',
+				'ike-warning': 'hsl(var(--ike-warning))',
+				'ike-error': 'hsl(var(--ike-error))',
+				'ike-neutral-light': 'hsl(var(--ike-neutral-light))',
+				'ike-neutral': 'hsl(var(--ike-neutral))',
+				'ike-neutral-dark': 'hsl(var(--ike-neutral-dark))',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +95,25 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+				'fade-in': {
+					"0%": {
+						opacity: "0",
+						transform: "translateY(10px)"
+					},
+					"100%": {
+						opacity: "1",
+						transform: "translateY(0)"
+					}
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.3s ease-out',
+			},
+			fontFamily: {
+				sans: ['Inter', 'system-ui', 'sans-serif'],
 			}
 		}
 	},
