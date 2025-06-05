@@ -3,14 +3,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, Users, CheckCircle, Clock, MessageSquare, User } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const StudentConflicts = () => {
+  const { t } = useLanguage();
+  
   const conflicts = [
     {
       id: 1,
       studentName: "Maria Johansson",
       personalNumber: "200403-5678",
-      conflictType: "Dubbelregistrering",
+      conflictType: "conflicts.double.registration",
       school1: "Katedralskolan, Lund",
       school2: "Malmö Gymnasium, Malmö",
       program1: "Samhällsvetenskapsprogrammet",
@@ -24,7 +27,7 @@ const StudentConflicts = () => {
       id: 2,
       studentName: "Johan Svensson",
       personalNumber: "200505-9876",
-      conflictType: "Felaktig kommun",
+      conflictType: "conflicts.wrong.municipality",
       school1: "Helsingborg Gymnasium, Helsingborg",
       school2: null,
       program1: "Teknikprogrammet",
@@ -38,7 +41,7 @@ const StudentConflicts = () => {
       id: 3,
       studentName: "Emma Karlsson",
       personalNumber: "200404-3456",
-      conflictType: "Datum konflikt",
+      conflictType: "conflicts.date.conflict",
       school1: "Kristianstad Gymnasium, Kristianstad",
       school2: "Jensen Gymnasium, Malmö",
       program1: "Ekonomiprogrammet",
@@ -53,26 +56,26 @@ const StudentConflicts = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
-        return <Badge className="bg-ike-error text-white">Väntande</Badge>;
+        return <Badge className="bg-ike-error text-white">{t('conflicts.pending')}</Badge>;
       case "investigating":
-        return <Badge className="bg-ike-warning text-white">Utreds</Badge>;
+        return <Badge className="bg-ike-warning text-white">{t('conflicts.investigating')}</Badge>;
       case "resolved":
-        return <Badge className="bg-ike-success text-white">Löst</Badge>;
+        return <Badge className="bg-ike-success text-white">{t('conflicts.resolved')}</Badge>;
       default:
-        return <Badge variant="secondary">Okänd</Badge>;
+        return <Badge variant="secondary">{t('conflicts.unknown')}</Badge>;
     }
   };
 
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case "high":
-        return <Badge variant="destructive">Hög</Badge>;
+        return <Badge variant="destructive">{t('conflicts.priority.high')}</Badge>;
       case "medium":
-        return <Badge className="bg-ike-warning text-white">Medium</Badge>;
+        return <Badge className="bg-ike-warning text-white">{t('conflicts.priority.medium')}</Badge>;
       case "low":
-        return <Badge variant="secondary">Låg</Badge>;
+        return <Badge variant="secondary">{t('conflicts.priority.low')}</Badge>;
       default:
-        return <Badge variant="secondary">Okänd</Badge>;
+        return <Badge variant="secondary">{t('conflicts.unknown')}</Badge>;
     }
   };
 
@@ -81,14 +84,14 @@ const StudentConflicts = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ike-neutral-dark">Konfliktlösning</h1>
+          <h1 className="text-3xl font-bold text-ike-neutral-dark">{t('conflicts.title')}</h1>
           <p className="text-ike-neutral mt-2">
-            Identifiera och lösa konflikter i studentregistret
+            {t('conflicts.subtitle')}
           </p>
         </div>
         <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
           <AlertTriangle className="w-4 h-4 mr-2" />
-          Kör Konfliktanalys
+          {t('conflicts.run.analysis')}
         </Button>
       </div>
 
@@ -97,48 +100,48 @@ const StudentConflicts = () => {
         <Card className="border-l-4 border-l-ike-error">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Aktiva Konflikter
+              {t('conflicts.active.conflicts')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">12</div>
-            <div className="text-xs text-ike-error">Kräver uppmärksamhet</div>
+            <div className="text-xs text-ike-error">{t('conflicts.requires.attention')}</div>
           </CardContent>
         </Card>
         
         <Card className="border-l-4 border-l-ike-warning">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Under Utredning
+              {t('conflicts.under.investigation')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">5</div>
-            <div className="text-xs text-ike-neutral">Pågående process</div>
+            <div className="text-xs text-ike-neutral">{t('conflicts.ongoing.process')}</div>
           </CardContent>
         </Card>
         
         <Card className="border-l-4 border-l-ike-success">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Lösta denna månad
+              {t('conflicts.resolved.this.month')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">23</div>
-            <div className="text-xs text-ike-success">94% lösningsgrad</div>
+            <div className="text-xs text-ike-success">{t('conflicts.resolution.rate')}</div>
           </CardContent>
         </Card>
         
         <Card className="border-l-4 border-l-ike-primary">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Genomsnittlig Lösningstid
+              {t('conflicts.average.resolution.time')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">2.3</div>
-            <div className="text-xs text-ike-neutral">dagar</div>
+            <div className="text-xs text-ike-neutral">{t('conflicts.days')}</div>
           </CardContent>
         </Card>
       </div>
@@ -148,10 +151,10 @@ const StudentConflicts = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <AlertTriangle className="w-5 h-5 mr-2 text-ike-error" />
-            Aktiva Konflikter
+            {t('conflicts.active.conflicts.list')}
           </CardTitle>
           <CardDescription>
-            Konflikter som kräver omedelbar uppmärksamhet och åtgärd
+            {t('conflicts.requires.immediate.attention')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -176,14 +179,14 @@ const StudentConflicts = () => {
                     
                     <div className="bg-ike-neutral-light rounded-lg p-3 mb-3">
                       <h4 className="font-medium text-ike-error mb-2">
-                        {conflict.conflictType}
+                        {t(conflict.conflictType)}
                       </h4>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
                           <div className="space-y-2">
                             <div>
-                              <span className="font-medium text-ike-neutral">Skola 1:</span>
+                              <span className="font-medium text-ike-neutral">{t('conflicts.school')} 1:</span>
                               <p className="text-ike-neutral-dark">{conflict.school1}</p>
                               {conflict.program1 && (
                                 <p className="text-xs text-ike-neutral">{conflict.program1}</p>
@@ -196,7 +199,7 @@ const StudentConflicts = () => {
                           <div>
                             <div className="space-y-2">
                               <div>
-                                <span className="font-medium text-ike-neutral">Skola 2:</span>
+                                <span className="font-medium text-ike-neutral">{t('conflicts.school')} 2:</span>
                                 <p className="text-ike-neutral-dark">{conflict.school2}</p>
                                 {conflict.program2 && (
                                   <p className="text-xs text-ike-neutral">{conflict.program2}</p>
@@ -211,11 +214,11 @@ const StudentConflicts = () => {
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center text-ike-neutral">
                         <Clock className="w-4 h-4 mr-1" />
-                        Upptäckt: {conflict.detectedDate}
+                        {t('conflicts.detected')} {conflict.detectedDate}
                       </div>
                       <div className="flex items-center text-ike-neutral">
                         <User className="w-4 h-4 mr-1" />
-                        Ansvarig: {conflict.responsible}
+                        {t('conflicts.responsible')} {conflict.responsible}
                       </div>
                     </div>
                   </div>
@@ -225,22 +228,22 @@ const StudentConflicts = () => {
                       <>
                         <Button size="sm" className="bg-ike-primary hover:bg-ike-primary-dark text-white">
                           <Users className="w-4 h-4 mr-1" />
-                          Välj Placering
+                          {t('conflicts.choose.placement')}
                         </Button>
                         <Button size="sm" variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-                          Redigera
+                          {t('conflicts.edit')}
                         </Button>
                       </>
                     )}
                     {conflict.status === "investigating" && (
                       <Button size="sm" className="bg-ike-success hover:bg-green-600 text-white">
                         <CheckCircle className="w-4 h-4 mr-1" />
-                        Markera Löst
+                        {t('conflicts.mark.resolved')}
                       </Button>
                     )}
                     <Button size="sm" variant="ghost" className="text-ike-neutral hover:text-ike-primary">
                       <MessageSquare className="w-4 h-4 mr-1" />
-                      Kommentarer
+                      {t('conflicts.comments')}
                     </Button>
                   </div>
                 </div>
@@ -253,9 +256,9 @@ const StudentConflicts = () => {
       {/* Conflict Resolution Process */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-ike-neutral-dark">Konfliktlösningsprocess</CardTitle>
+          <CardTitle className="text-ike-neutral-dark">{t('conflicts.resolution.process')}</CardTitle>
           <CardDescription>
-            Standardprocess för att lösa konflikter i studentregistret
+            {t('conflicts.standard.process')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -265,8 +268,8 @@ const StudentConflicts = () => {
                 <span className="text-white text-sm font-bold">1</span>
               </div>
               <div>
-                <h4 className="font-medium text-ike-neutral-dark">Automatisk Upptäckt</h4>
-                <p className="text-sm text-ike-neutral">Systemet identifierar potentiella konflikter vid dataregistrering</p>
+                <h4 className="font-medium text-ike-neutral-dark">{t('conflicts.step.automatic.detection')}</h4>
+                <p className="text-sm text-ike-neutral">{t('conflicts.step.automatic.detection.desc')}</p>
               </div>
             </div>
             
@@ -275,8 +278,8 @@ const StudentConflicts = () => {
                 <span className="text-white text-sm font-bold">2</span>
               </div>
               <div>
-                <h4 className="font-medium text-ike-neutral-dark">Prioritering</h4>
-                <p className="text-sm text-ike-neutral">Konflikter prioriteras baserat på typ och påverkan</p>
+                <h4 className="font-medium text-ike-neutral-dark">{t('conflicts.step.prioritization')}</h4>
+                <p className="text-sm text-ike-neutral">{t('conflicts.step.prioritization.desc')}</p>
               </div>
             </div>
             
@@ -285,8 +288,8 @@ const StudentConflicts = () => {
                 <span className="text-white text-sm font-bold">3</span>
               </div>
               <div>
-                <h4 className="font-medium text-ike-neutral-dark">Utredning</h4>
-                <p className="text-sm text-ike-neutral">Ansvarig administrator kontaktar berörda skolor</p>
+                <h4 className="font-medium text-ike-neutral-dark">{t('conflicts.step.investigation')}</h4>
+                <p className="text-sm text-ike-neutral">{t('conflicts.step.investigation.desc')}</p>
               </div>
             </div>
             
@@ -295,8 +298,8 @@ const StudentConflicts = () => {
                 <span className="text-white text-sm font-bold">4</span>
               </div>
               <div>
-                <h4 className="font-medium text-ike-neutral-dark">Lösning</h4>
-                <p className="text-sm text-ike-neutral">Korrekt placering bestäms och systemet uppdateras</p>
+                <h4 className="font-medium text-ike-neutral-dark">{t('conflicts.step.resolution')}</h4>
+                <p className="text-sm text-ike-neutral">{t('conflicts.step.resolution.desc')}</p>
               </div>
             </div>
           </div>
