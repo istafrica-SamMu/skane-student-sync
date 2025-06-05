@@ -14,8 +14,11 @@ import {
   Download,
   Play
 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Financial = () => {
+  const { t } = useLanguage();
+  
   const calculations = [
     {
       id: 1,
@@ -63,15 +66,15 @@ const Financial = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "completed":
-        return <Badge className="bg-ike-success text-white">Klar</Badge>;
+        return <Badge className="bg-ike-success text-white">{t('financial.completed')}</Badge>;
       case "running":
-        return <Badge className="bg-ike-primary text-white">Pågående</Badge>;
+        return <Badge className="bg-ike-primary text-white">{t('financial.ongoing')}</Badge>;
       case "pending":
-        return <Badge className="bg-ike-warning text-white">Väntande</Badge>;
+        return <Badge className="bg-ike-warning text-white">{t('financial.pending')}</Badge>;
       case "failed":
-        return <Badge className="bg-ike-error text-white">Misslyckad</Badge>;
+        return <Badge className="bg-ike-error text-white">{t('financial.failed')}</Badge>;
       default:
-        return <Badge variant="secondary">Okänd</Badge>;
+        return <Badge variant="secondary">{t('financial.unknown')}</Badge>;
     }
   };
 
@@ -80,19 +83,19 @@ const Financial = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ike-neutral-dark">IKE-beräkningar</h1>
+          <h1 className="text-3xl font-bold text-ike-neutral-dark">{t('financial.title')}</h1>
           <p className="text-ike-neutral mt-2">
-            Hantera månatliga beräkningar för interkommunal ersättning
+            {t('financial.subtitle')}
           </p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
             <Download className="w-4 h-4 mr-2" />
-            Exportera Resultat
+            {t('financial.export.results')}
           </Button>
           <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
             <Play className="w-4 h-4 mr-2" />
-            Ny Beräkning
+            {t('financial.new.calculation')}
           </Button>
         </div>
       </div>
@@ -102,7 +105,7 @@ const Financial = () => {
         <Card className="border-l-4 border-l-ike-primary">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Total Månadskostnad
+              {t('financial.total.monthly.cost')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -110,7 +113,7 @@ const Financial = () => {
               3,755,000 SEK
             </div>
             <div className="text-xs text-ike-success mt-1">
-              +1.5% från förra månaden
+              +1.5% {t('financial.from.last.month')}
             </div>
           </CardContent>
         </Card>
@@ -118,7 +121,7 @@ const Financial = () => {
         <Card className="border-l-4 border-l-ike-success">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Genomsnitt per Student
+              {t('financial.average.per.student')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -126,7 +129,7 @@ const Financial = () => {
               1,319 SEK
             </div>
             <div className="text-xs text-ike-neutral mt-1">
-              Månadsgenomsnitt
+              {t('financial.monthly.average')}
             </div>
           </CardContent>
         </Card>
@@ -134,13 +137,13 @@ const Financial = () => {
         <Card className="border-l-4 border-l-ike-warning">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Aktiva Studenter
+              {t('financial.active.students')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">2,847</div>
             <div className="text-xs text-ike-neutral mt-1">
-              Inkluderade i beräkning
+              {t('financial.included.in.calculation')}
             </div>
           </CardContent>
         </Card>
@@ -148,13 +151,13 @@ const Financial = () => {
         <Card className="border-l-4 border-l-green-500">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Nästa Beräkning
+              {t('financial.next.calculation')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">15 Dec</div>
             <div className="text-xs text-ike-neutral mt-1">
-              Schemalagd körning
+              {t('financial.scheduled.run')}
             </div>
           </CardContent>
         </Card>
@@ -165,10 +168,10 @@ const Financial = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <Calculator className="w-5 h-5 mr-2 text-ike-primary" />
-            Aktuell Beräkningsstatus - November 2024
+            {t('financial.current.calculation.status')} - November 2024
           </CardTitle>
           <CardDescription>
-            Detaljerad status för pågående månatlig beräkning
+            {t('financial.detailed.status')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -176,35 +179,35 @@ const Financial = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Datavalidering</span>
+                  <span className="text-sm font-medium">{t('financial.data.validation')}</span>
                   <Badge className="bg-ike-success text-white">
                     <CheckCircle className="w-3 h-3 mr-1" />
-                    Klar
+                    {t('financial.completed')}
                   </Badge>
                 </div>
                 <Progress value={100} className="h-2" />
-                <p className="text-xs text-ike-neutral">Validerat 2,847 studentposter</p>
+                <p className="text-xs text-ike-neutral">{t('financial.validated.posts').replace('{count}', '2,847')}</p>
               </div>
               
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Prisberäkning</span>
+                  <span className="text-sm font-medium">{t('financial.price.calculation')}</span>
                   <Badge className="bg-ike-primary text-white">
                     <Clock className="w-3 h-3 mr-1" />
-                    Pågående
+                    {t('financial.ongoing')}
                   </Badge>
                 </div>
                 <Progress value={75} className="h-2" />
-                <p className="text-xs text-ike-neutral">Bearbetat 2,135 av 2,847 studenter</p>
+                <p className="text-xs text-ike-neutral">{t('financial.processed.students').replace('{current}', '2,135').replace('{total}', '2,847')}</p>
               </div>
               
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Export & Distribution</span>
-                  <Badge variant="secondary">Väntande</Badge>
+                  <span className="text-sm font-medium">{t('financial.export.distribution')}</span>
+                  <Badge variant="secondary">{t('financial.pending')}</Badge>
                 </div>
                 <Progress value={0} className="h-2" />
-                <p className="text-xs text-ike-neutral">Väntar på beräkningskomplettering</p>
+                <p className="text-xs text-ike-neutral">{t('financial.waiting.completion')}</p>
               </div>
             </div>
 
@@ -212,12 +215,12 @@ const Financial = () => {
               <div className="flex items-center justify-between">
                 <div className="text-sm text-ike-neutral">
                   <div className="flex items-center space-x-4">
-                    <span>Startad: 15 november 2024, 14:00</span>
-                    <span>Beräknad färdig: 15 november 2024, 16:00</span>
+                    <span>{t('financial.started')} 15 november 2024, 14:00</span>
+                    <span>{t('financial.estimated.completion')} 15 november 2024, 16:00</span>
                   </div>
                 </div>
                 <Button size="sm" variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-                  Visa Detaljer
+                  {t('financial.show.details')}
                 </Button>
               </div>
             </div>
@@ -228,9 +231,9 @@ const Financial = () => {
       {/* Calculation History */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-ike-neutral-dark">Beräkningshistorik</CardTitle>
+          <CardTitle className="text-ike-neutral-dark">{t('financial.calculation.history')}</CardTitle>
           <CardDescription>
-            Översikt över tidigare månatliga beräkningar
+            {t('financial.previous.calculations')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -245,9 +248,9 @@ const Financial = () => {
                     <div>
                       <h3 className="font-semibold text-ike-neutral-dark">{calc.month}</h3>
                       <p className="text-sm text-ike-neutral">
-                        {calc.status === "completed" ? `Färdig: ${calc.completionDate}` : 
-                         calc.status === "running" ? `Beräknad färdig: ${calc.estimatedCompletion}` :
-                         `Startdatum: ${calc.startDate}`}
+                        {calc.status === "completed" ? `${t('financial.completed.short')} ${calc.completionDate}` : 
+                         calc.status === "running" ? `${t('financial.estimated.completion')} ${calc.estimatedCompletion}` :
+                         `${t('financial.started')} ${calc.startDate}`}
                       </p>
                     </div>
                   </div>
@@ -257,7 +260,7 @@ const Financial = () => {
                 {calc.status === "running" && (
                   <div className="mb-4">
                     <div className="flex justify-between text-sm mb-2">
-                      <span className="text-ike-neutral">Framsteg</span>
+                      <span className="text-ike-neutral">{t('bulk.progress')}</span>
                       <span className="text-ike-neutral">{calc.progress}%</span>
                     </div>
                     <Progress value={calc.progress} className="h-2" />
@@ -266,27 +269,27 @@ const Financial = () => {
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>
-                    <span className="font-medium text-ike-neutral">Totalt belopp:</span>
+                    <span className="font-medium text-ike-neutral">{t('financial.total.amount')}</span>
                     <p className="text-ike-neutral-dark font-mono">
                       {calc.totalAmount.toLocaleString('sv-SE')} SEK
                     </p>
                   </div>
                   <div>
-                    <span className="font-medium text-ike-neutral">Antal studenter:</span>
+                    <span className="font-medium text-ike-neutral">{t('financial.number.of.students')}</span>
                     <p className="text-ike-neutral-dark">{calc.studentCount.toLocaleString('sv-SE')}</p>
                   </div>
                   <div>
-                    <span className="font-medium text-ike-neutral">Genomsnitt/student:</span>
+                    <span className="font-medium text-ike-neutral">{t('financial.average.per.student.short')}</span>
                     <p className="text-ike-neutral-dark">{calc.avgPerStudent.toLocaleString('sv-SE')} SEK</p>
                   </div>
                   <div className="flex items-center justify-end space-x-2">
                     <Button size="sm" variant="ghost" className="text-ike-neutral hover:text-ike-primary">
-                      Detaljer
+                      {t('financial.details')}
                     </Button>
                     {calc.status === "completed" && (
                       <Button size="sm" variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
                         <Download className="w-4 h-4 mr-1" />
-                        Export
+                        {t('financial.export')}
                       </Button>
                     )}
                   </div>
@@ -302,10 +305,10 @@ const Financial = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <TrendingUp className="w-5 h-5 mr-2 text-ike-primary" />
-            Kommunfördelning - November 2024
+            {t('financial.municipality.breakdown')} - November 2024
           </CardTitle>
           <CardDescription>
-            Kostnadsfördeling per kommun för aktuell månad
+            {t('financial.cost.distribution')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -318,7 +321,7 @@ const Financial = () => {
                   </div>
                   <div>
                     <h4 className="font-medium text-ike-neutral-dark">{municipality.name}</h4>
-                    <p className="text-sm text-ike-neutral">{municipality.students} studenter</p>
+                    <p className="text-sm text-ike-neutral">{municipality.students} {t('financial.students')}</p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -326,7 +329,7 @@ const Financial = () => {
                     {municipality.amount.toLocaleString('sv-SE')} SEK
                   </div>
                   <div className="text-sm text-ike-neutral">
-                    {municipality.avgCost} SEK/student
+                    {municipality.avgCost} {t('financial.sek.per.student')}
                   </div>
                 </div>
               </div>
