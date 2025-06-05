@@ -13,29 +13,32 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const FollowUpReports = () => {
+  const { t } = useLanguage();
+
   const followUpCategories = [
     { 
-      name: "Ej i gymnasieskolan", 
+      name: t('followup.not.in.school'), 
       count: 126, 
       change: +12, 
       status: "increase" 
     },
     { 
-      name: "Påbörjade åtgärder", 
+      name: t('followup.measures.started'), 
       count: 87, 
       change: +8, 
       status: "increase" 
     },
     { 
-      name: "Aktiva åtgärder", 
+      name: t('followup.active.measures'), 
       count: 63, 
       change: -5, 
       status: "decrease" 
     },
     { 
-      name: "Återgått till studier", 
+      name: t('followup.returned.to.studies'), 
       count: 42, 
       change: +15, 
       status: "increase" 
@@ -92,15 +95,15 @@ const FollowUpReports = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "not_in_school":
-        return <Badge className="bg-ike-error text-white">Ej i skolan</Badge>;
+        return <Badge className="bg-ike-error text-white">{t('followup.status.not.in.school')}</Badge>;
       case "measures_started":
-        return <Badge className="bg-ike-warning text-white">Påbörjat åtgärder</Badge>;
+        return <Badge className="bg-ike-warning text-white">{t('followup.status.measures.started')}</Badge>;
       case "active_measures":
-        return <Badge className="bg-ike-primary text-white">Aktiva åtgärder</Badge>;
+        return <Badge className="bg-ike-primary text-white">{t('followup.status.active.measures')}</Badge>;
       case "returned_to_school":
-        return <Badge className="bg-ike-success text-white">Återgått till studier</Badge>;
+        return <Badge className="bg-ike-success text-white">{t('followup.status.returned.to.school')}</Badge>;
       default:
-        return <Badge variant="secondary">Okänd status</Badge>;
+        return <Badge variant="secondary">{t('followup.status.unknown')}</Badge>;
     }
   };
 
@@ -109,19 +112,19 @@ const FollowUpReports = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ike-neutral-dark">Uppföljningsrapporter</h1>
+          <h1 className="text-3xl font-bold text-ike-neutral-dark">{t('followup.title')}</h1>
           <p className="text-ike-neutral mt-2">
-            Uppföljning av ungdomar 16-20 år enligt kommunalt ansvar
+            {t('followup.subtitle')}
           </p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
             <Calendar className="w-4 h-4 mr-2" />
-            Period: Höst 2024
+            {t('followup.period')}
           </Button>
           <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
             <Download className="w-4 h-4 mr-2" />
-            Exportera rapport
+            {t('followup.export.report')}
           </Button>
         </div>
       </div>
@@ -130,9 +133,9 @@ const FollowUpReports = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {followUpCategories.map((category, index) => (
           <Card key={index} className={
-            category.name === "Ej i gymnasieskolan" ? "border-l-4 border-l-ike-error" :
-            category.name === "Påbörjade åtgärder" ? "border-l-4 border-l-ike-warning" :
-            category.name === "Aktiva åtgärder" ? "border-l-4 border-l-ike-primary" :
+            category.name === t('followup.not.in.school') ? "border-l-4 border-l-ike-error" :
+            category.name === t('followup.measures.started') ? "border-l-4 border-l-ike-warning" :
+            category.name === t('followup.active.measures') ? "border-l-4 border-l-ike-primary" :
             "border-l-4 border-l-ike-success"
           }>
             <CardHeader className="pb-2">
@@ -148,12 +151,12 @@ const FollowUpReports = () => {
                 {category.status === "increase" ? (
                   <div className="flex items-center text-ike-error">
                     <ArrowUp className="w-3 h-3 mr-1" />
-                    +{category.change} från förra månaden
+                    +{category.change} {t('followup.from.last.month')}
                   </div>
                 ) : (
                   <div className="flex items-center text-ike-success">
                     <ArrowDown className="w-3 h-3 mr-1" />
-                    {category.change} från förra månaden
+                    {category.change} {t('followup.from.last.month')}
                   </div>
                 )}
               </div>
@@ -167,27 +170,27 @@ const FollowUpReports = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <UserCheck className="w-5 h-5 mr-2 text-ike-primary" />
-            Uppföljningsstatus
+            {t('followup.status')}
           </CardTitle>
           <CardDescription>
-            Översikt över kommunal uppföljning av ungdomar 16-20 år
+            {t('followup.status.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Total uppföljningsgrad</span>
+                <span className="text-sm font-medium">{t('followup.total.rate')}</span>
                 <span className="text-sm text-ike-success">96.8%</span>
               </div>
               <Progress value={96.8} className="h-2" />
-              <p className="text-xs text-ike-neutral">318 av 328 identifierade ungdomar med uppföljning</p>
+              <p className="text-xs text-ike-neutral">318 av 328 {t('followup.identified.youth')}</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Dokumenterade åtgärder</span>
+                  <span className="text-sm font-medium">{t('followup.documented.measures')}</span>
                   <span className="text-sm text-ike-primary">89.2%</span>
                 </div>
                 <Progress value={89.2} className="h-2" />
@@ -195,7 +198,7 @@ const FollowUpReports = () => {
               
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Återgång till studier</span>
+                  <span className="text-sm font-medium">{t('followup.return.to.studies')}</span>
                   <span className="text-sm text-ike-success">33.3%</span>
                 </div>
                 <Progress value={33.3} className="h-2" />
@@ -203,7 +206,7 @@ const FollowUpReports = () => {
               
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Kontakt etablerad</span>
+                  <span className="text-sm font-medium">{t('followup.contact.established')}</span>
                   <span className="text-sm text-ike-warning">92.4%</span>
                 </div>
                 <Progress value={92.4} className="h-2" />
@@ -216,9 +219,9 @@ const FollowUpReports = () => {
       {/* Individual Follow-up */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-ike-neutral-dark">Individuell uppföljning</CardTitle>
+          <CardTitle className="text-ike-neutral-dark">{t('followup.individual.title')}</CardTitle>
           <CardDescription>
-            Lista över individer som omfattas av det kommunala aktivitetsansvaret
+            {t('followup.individual.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -227,27 +230,27 @@ const FollowUpReports = () => {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ike-neutral" />
                 <Input
-                  placeholder="Sök efter namn eller personnummer..."
+                  placeholder={t('followup.search.placeholder')}
                   className="pl-10 border-ike-primary/20 focus:border-ike-primary"
                 />
               </div>
               <Button variant="outline" className="flex md:w-auto">
                 <Filter className="w-4 h-4 mr-2" />
-                Filter
+                {t('followup.filter')}
               </Button>
             </div>
 
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="font-medium">Namn</TableHead>
-                  <TableHead className="font-medium">Personnummer</TableHead>
-                  <TableHead className="font-medium">Ålder</TableHead>
-                  <TableHead className="font-medium">Kommun</TableHead>
-                  <TableHead className="font-medium">Status</TableHead>
-                  <TableHead className="font-medium">Senaste kontakt</TableHead>
-                  <TableHead className="font-medium">Ansvarig</TableHead>
-                  <TableHead className="font-medium text-center">Åtgärder</TableHead>
+                  <TableHead className="font-medium">{t('followup.name')}</TableHead>
+                  <TableHead className="font-medium">{t('followup.personal.number')}</TableHead>
+                  <TableHead className="font-medium">{t('followup.age')}</TableHead>
+                  <TableHead className="font-medium">{t('followup.municipality')}</TableHead>
+                  <TableHead className="font-medium">{t('followup.status.column')}</TableHead>
+                  <TableHead className="font-medium">{t('followup.last.contact')}</TableHead>
+                  <TableHead className="font-medium">{t('followup.responsible')}</TableHead>
+                  <TableHead className="font-medium text-center">{t('followup.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -276,7 +279,7 @@ const FollowUpReports = () => {
             
             <div className="flex justify-center">
               <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-                Visa fler
+                {t('followup.show.more')}
               </Button>
             </div>
           </div>
@@ -286,40 +289,40 @@ const FollowUpReports = () => {
       {/* Action Plans */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-ike-neutral-dark">Åtgärdsplaner</CardTitle>
+          <CardTitle className="text-ike-neutral-dark">{t('followup.action.plans')}</CardTitle>
           <CardDescription>
-            Översikt över planerade och aktiva åtgärder
+            {t('followup.action.plans.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-4 border rounded-lg bg-ike-neutral-light">
-                <h3 className="font-medium text-ike-neutral-dark mb-2">Studievägledning</h3>
+                <h3 className="font-medium text-ike-neutral-dark mb-2">{t('followup.study.guidance')}</h3>
                 <div className="text-2xl font-bold text-ike-primary mb-1">42</div>
-                <p className="text-sm text-ike-neutral">Aktiva åtgärder</p>
+                <p className="text-sm text-ike-neutral">{t('followup.active.measures.count')}</p>
               </div>
               
               <div className="p-4 border rounded-lg bg-ike-neutral-light">
-                <h3 className="font-medium text-ike-neutral-dark mb-2">Praktikplats</h3>
+                <h3 className="font-medium text-ike-neutral-dark mb-2">{t('followup.internship')}</h3>
                 <div className="text-2xl font-bold text-ike-primary mb-1">35</div>
-                <p className="text-sm text-ike-neutral">Aktiva åtgärder</p>
+                <p className="text-sm text-ike-neutral">{t('followup.active.measures.count')}</p>
               </div>
               
               <div className="p-4 border rounded-lg bg-ike-neutral-light">
-                <h3 className="font-medium text-ike-neutral-dark mb-2">Introduktionsprogram</h3>
+                <h3 className="font-medium text-ike-neutral-dark mb-2">{t('followup.introduction.program')}</h3>
                 <div className="text-2xl font-bold text-ike-primary mb-1">28</div>
-                <p className="text-sm text-ike-neutral">Aktiva åtgärder</p>
+                <p className="text-sm text-ike-neutral">{t('followup.active.measures.count')}</p>
               </div>
             </div>
             
             <div className="border-t pt-4">
-              <h3 className="font-medium text-ike-neutral-dark mb-3">Resultat av åtgärder (senaste 12 månaderna)</h3>
+              <h3 className="font-medium text-ike-neutral-dark mb-3">{t('followup.measure.results')}</h3>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Återgång till studier</span>
-                    <span className="text-sm text-ike-success">42 personer (33.3%)</span>
+                    <span className="text-sm">{t('followup.returned.to.studies.result')}</span>
+                    <span className="text-sm text-ike-success">42 {t('followup.people')} (33.3%)</span>
                   </div>
                   <Progress value={33.3} className="h-2 bg-gray-100">
                     <div className="h-full bg-ike-success" style={{ width: '33.3%' }} />
@@ -328,8 +331,8 @@ const FollowUpReports = () => {
                 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Påbörjat arbete</span>
-                    <span className="text-sm text-ike-primary">18 personer (14.3%)</span>
+                    <span className="text-sm">{t('followup.started.work')}</span>
+                    <span className="text-sm text-ike-primary">18 {t('followup.people')} (14.3%)</span>
                   </div>
                   <Progress value={14.3} className="h-2 bg-gray-100">
                     <div className="h-full bg-ike-primary" style={{ width: '14.3%' }} />
@@ -338,8 +341,8 @@ const FollowUpReports = () => {
                 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Fortfarande i åtgärdsprogram</span>
-                    <span className="text-sm text-ike-warning">63 personer (50%)</span>
+                    <span className="text-sm">{t('followup.still.in.program')}</span>
+                    <span className="text-sm text-ike-warning">63 {t('followup.people')} (50%)</span>
                   </div>
                   <Progress value={50} className="h-2 bg-gray-100">
                     <div className="h-full bg-ike-warning" style={{ width: '50%' }} />
@@ -348,8 +351,8 @@ const FollowUpReports = () => {
                 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Avbrutna åtgärder</span>
-                    <span className="text-sm text-ike-error">3 personer (2.4%)</span>
+                    <span className="text-sm">{t('followup.discontinued.measures')}</span>
+                    <span className="text-sm text-ike-error">3 {t('followup.people')} (2.4%)</span>
                   </div>
                   <Progress value={2.4} className="h-2 bg-gray-100">
                     <div className="h-full bg-ike-error" style={{ width: '2.4%' }} />
