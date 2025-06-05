@@ -1,124 +1,166 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { 
   Users, 
   Calculator, 
   AlertTriangle, 
-  DollarSign,
-  TrendingUp,
+  Euro, 
+  TrendingUp, 
+  Download, 
   FileText,
-  Download,
-  Plus
+  CheckCircle,
+  Clock,
+  ArrowUp,
+  ArrowDown
 } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
 
-export default function Dashboard() {
-  const { t } = useLanguage();
-
-  const stats = [
-    {
-      title: t('dashboard.totalStudents'),
-      value: "2,847",
-      icon: Users,
-      trend: "+12.3%",
-      color: "text-ike-primary"
-    },
-    {
-      title: t('dashboard.activeCalculations'),
-      value: "3",
-      icon: Calculator,
-      trend: "Processing",
-      color: "text-ike-warning"
-    },
-    {
-      title: t('dashboard.pendingConflicts'),
-      value: "12",
-      icon: AlertTriangle,
-      trend: "-2 today",
-      color: "text-ike-error"
-    },
-    {
-      title: t('dashboard.monthlyAmount'),
-      value: "3,755,000 SEK",
-      icon: DollarSign,
-      trend: "+5.2%",
-      color: "text-ike-success"
-    }
-  ];
-
-  const recentActivity = [
-    { action: "Student transferred", details: "Erik Andersson moved to Malmö Gymnasium", time: "2 hours ago" },
-    { action: "Calculation completed", details: "November 2024 IKE calculation finalized", time: "4 hours ago" },
-    { action: "Conflict resolved", details: "Double registration for Maria Svensson", time: "6 hours ago" },
-    { action: "Data imported", details: "Weekly student data from Lund Municipality", time: "8 hours ago" },
-    { action: "Report generated", details: "Monthly contribution report for October", time: "1 day ago" }
-  ];
+const Dashboard = () => {
+  const currentDate = new Date().toLocaleDateString('sv-SE', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-ike-neutral-dark">{t('dashboard.welcome')}</h1>
-        <p className="text-ike-neutral">{t('dashboard.overview')}</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-ike-neutral-dark">
+            Välkommen till IKE 2.0
+          </h1>
+          <p className="text-ike-neutral mt-2">
+            {currentDate} • Skåne Regional Platform
+          </p>
+        </div>
+        <div className="flex space-x-3">
+          <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+            <Download className="w-4 h-4 mr-2" />
+            Exportera Data
+          </Button>
+          <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+            <FileText className="w-4 h-4 mr-2" />
+            Generera Rapport
+          </Button>
+        </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <Card key={index} className="hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-ike-neutral">
-                {stat.title}
-              </CardTitle>
-              <stat.icon className={`h-4 w-4 ${stat.color}`} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-ike-neutral-dark">{stat.value}</div>
-              <p className={`text-xs ${stat.color} flex items-center mt-1`}>
-                <TrendingUp className="h-3 w-3 mr-1" />
-                {stat.trend}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Calculation Status */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Calculator className="h-5 w-5 text-ike-primary" />
-              <span>{t('dashboard.calculationStatus')}</span>
+        <Card className="border-l-4 border-l-ike-primary">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-ike-neutral">
+              Totala Studenter
             </CardTitle>
-            <CardDescription>
-              Current monthly calculation progress
-            </CardDescription>
+            <Users className="h-4 w-4 text-ike-primary" />
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="text-2xl font-bold text-ike-neutral-dark">2,847</div>
+            <div className="flex items-center text-xs text-ike-success mt-1">
+              <ArrowUp className="w-3 h-3 mr-1" />
+              +12.3% från förra månaden
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-ike-success">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-ike-neutral">
+              Aktiva Beräkningar
+            </CardTitle>
+            <Calculator className="h-4 w-4 text-ike-success" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-ike-neutral-dark">3</div>
+            <div className="text-xs text-ike-neutral mt-1">
+              Pågående processning
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-ike-warning">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-ike-neutral">
+              Väntande Konflikter
+            </CardTitle>
+            <AlertTriangle className="h-4 w-4 text-ike-warning" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-ike-neutral-dark">12</div>
+            <div className="text-xs text-ike-warning mt-1">
+              Kräver uppmärksamhet
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-green-500">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-ike-neutral">
+              Månadsbelopp
+            </CardTitle>
+            <Euro className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-ike-neutral-dark">3,755,000</div>
+            <div className="text-xs text-ike-neutral mt-1">
+              SEK för november 2024
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Current Calculation Status */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center text-ike-neutral-dark">
+              <Calculator className="w-5 h-5 mr-2 text-ike-primary" />
+              Aktuell Beräkningsstatus
+            </CardTitle>
+            <CardDescription>
+              Månatlig IKE-beräkning för november 2024
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-ike-neutral">November 2024 Calculation</span>
-                <Badge className="bg-ike-success text-white">Completed</Badge>
+                <span className="text-sm font-medium">Datavalidering</span>
+                <Badge className="bg-ike-success text-white">
+                  <CheckCircle className="w-3 h-3 mr-1" />
+                  Klar
+                </Badge>
               </div>
-              <div className="w-full bg-ike-neutral-light rounded-full h-2">
-                <div className="bg-ike-primary h-2 rounded-full" style={{ width: "100%" }}></div>
+              <Progress value={100} className="h-2" />
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Preliminär beräkning</span>
+                <Badge className="bg-ike-warning text-white">
+                  <Clock className="w-3 h-3 mr-1" />
+                  Pågående
+                </Badge>
               </div>
-              <div className="grid grid-cols-3 gap-4 text-sm">
-                <div>
-                  <p className="text-ike-neutral">Students Processed</p>
-                  <p className="font-semibold text-ike-neutral-dark">2,847 / 2,847</p>
-                </div>
-                <div>
-                  <p className="text-ike-neutral">Contributions</p>
-                  <p className="font-semibold text-ike-neutral-dark">3,755,000 SEK</p>
-                </div>
-                <div>
-                  <p className="text-ike-neutral">Processing Time</p>
-                  <p className="font-semibold text-ike-neutral-dark">1.2 hours</p>
-                </div>
+              <Progress value={75} className="h-2" />
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Slutlig beräkning</span>
+                <Badge variant="secondary">Väntande</Badge>
+              </div>
+              <Progress value={0} className="h-2" />
+            </div>
+
+            <div className="pt-4 border-t">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-ike-neutral">Nästa körning:</span>
+                <span className="text-sm font-medium">15 december 2024</span>
               </div>
             </div>
           </CardContent>
@@ -127,23 +169,38 @@ export default function Dashboard() {
         {/* Quick Actions */}
         <Card>
           <CardHeader>
-            <CardTitle>{t('dashboard.quickActions')}</CardTitle>
+            <CardTitle className="text-ike-neutral-dark">Snabbåtgärder</CardTitle>
             <CardDescription>
-              Common tasks and operations
+              Vanliga uppgifter och funktioner
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full justify-start bg-ike-primary hover:bg-ike-primary-light">
-              <Download className="mr-2 h-4 w-4" />
-              {t('common.export')}
+            <Button 
+              className="w-full justify-start bg-ike-primary hover:bg-ike-primary-dark text-white"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Ny Student
             </Button>
-            <Button variant="outline" className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary hover:text-white">
-              <FileText className="mr-2 h-4 w-4" />
-              {t('common.generate')}
+            <Button 
+              variant="outline" 
+              className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
+            >
+              <Calculator className="w-4 h-4 mr-2" />
+              Ny Beräkning
             </Button>
-            <Button variant="outline" className="w-full justify-start">
-              <Plus className="mr-2 h-4 w-4" />
-              New Calculation
+            <Button 
+              variant="outline" 
+              className="w-full justify-start"
+            >
+              <AlertTriangle className="w-4 h-4 mr-2" />
+              Lös Konflikter
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full justify-start"
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              Generera Rapport
             </Button>
           </CardContent>
         </Card>
@@ -152,21 +209,58 @@ export default function Dashboard() {
       {/* Recent Activity */}
       <Card>
         <CardHeader>
-          <CardTitle>{t('dashboard.recentActivity')}</CardTitle>
+          <CardTitle className="text-ike-neutral-dark">Senaste Aktivitet</CardTitle>
           <CardDescription>
-            Latest system activities and updates
+            Översikt över systemhändelser och användaraktivitet
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {recentActivity.map((activity, index) => (
-              <div key={index} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-ike-neutral-light transition-colors">
-                <div className="w-2 h-2 bg-ike-primary rounded-full mt-2"></div>
-                <div className="flex-1 space-y-1">
-                  <p className="text-sm font-medium text-ike-neutral-dark">{activity.action}</p>
-                  <p className="text-sm text-ike-neutral">{activity.details}</p>
+            {[
+              {
+                time: "10:30",
+                action: "Ny student registrerad",
+                details: "Erik Andersson - Malmö Gymnasium",
+                status: "success"
+              },
+              {
+                time: "09:45",
+                action: "Konflikt löst",
+                details: "Dubbelregistrering för Maria Johansson",
+                status: "warning"
+              },
+              {
+                time: "09:15",
+                action: "Beräkning startad",
+                details: "Månatlig IKE-beräkning november 2024",
+                status: "info"
+              },
+              {
+                time: "08:30",
+                action: "Data importerad",
+                details: "SS12000 import från Lunds kommun",
+                status: "success"
+              }
+            ].map((activity, index) => (
+              <div key={index} className="flex items-center space-x-4 p-3 rounded-lg bg-ike-neutral-light">
+                <div className="text-sm text-ike-neutral font-mono">{activity.time}</div>
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-ike-neutral-dark">
+                    {activity.action}
+                  </div>
+                  <div className="text-xs text-ike-neutral">{activity.details}</div>
                 </div>
-                <span className="text-xs text-ike-neutral">{activity.time}</span>
+                <Badge 
+                  variant="secondary" 
+                  className={
+                    activity.status === "success" ? "bg-ike-success/10 text-ike-success" :
+                    activity.status === "warning" ? "bg-ike-warning/10 text-ike-warning" :
+                    "bg-ike-primary/10 text-ike-primary"
+                  }
+                >
+                  {activity.status === "success" ? "Klar" :
+                   activity.status === "warning" ? "Löst" : "Pågående"}
+                </Badge>
               </div>
             ))}
           </div>
@@ -174,4 +268,6 @@ export default function Dashboard() {
       </Card>
     </div>
   );
-}
+};
+
+export default Dashboard;

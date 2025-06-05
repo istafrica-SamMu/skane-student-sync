@@ -12,34 +12,31 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Bell, Search, User, LogOut, Settings } from "lucide-react";
 import { useLocation } from "react-router-dom";
-import { LanguageToggle } from "./LanguageToggle";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 export function Header() {
   const location = useLocation();
-  const { t } = useLanguage();
   
   const getBreadcrumb = () => {
     const path = location.pathname;
-    if (path === "/" || path === "/dashboard") return t('nav.dashboard');
+    if (path === "/" || path === "/dashboard") return "Dashboard";
     if (path.startsWith("/students")) {
-      if (path === "/students") return `${t('nav.students')} > ${t('nav.students.registry')}`;
-      if (path.includes("placements")) return `${t('nav.students')} > ${t('nav.students.placements')}`;
-      if (path.includes("conflicts")) return `${t('nav.students')} > ${t('nav.students.conflicts')}`;
-      if (path.includes("bulk")) return `${t('nav.students')} > ${t('nav.students.bulk')}`;
+      if (path === "/students") return "Studenthantering > Studentregister";
+      if (path.includes("placements")) return "Studenthantering > Placeringar & Överföringar";
+      if (path.includes("conflicts")) return "Studenthantering > Konfliktlösning";
+      if (path.includes("bulk")) return "Studenthantering > Massoperationer";
     }
     if (path.startsWith("/financial")) {
-      if (path.includes("calculations")) return `${t('nav.financial')} > ${t('nav.financial.calculations')}`;
-      if (path.includes("pricelists")) return `${t('nav.financial')} > ${t('nav.financial.pricelists')}`;
+      if (path.includes("calculations")) return "Ekonomihantering > IKE-beräkningar";
+      if (path.includes("pricelists")) return "Ekonomihantering > Prislistor";
     }
     if (path.startsWith("/reports")) {
-      if (path.includes("standard")) return `${t('nav.reports')} > ${t('nav.reports.standard')}`;
-      if (path.includes("contributions")) return `${t('nav.reports')} > ${t('nav.reports.contributions')}`;
-      if (path.includes("statistics")) return `${t('nav.reports')} > ${t('nav.reports.statistics')}`;
-      if (path.includes("follow-up")) return `${t('nav.reports')} > ${t('nav.reports.followup')}`;
+      if (path.includes("standard")) return "Rapporter & Analys > Standardrapporter";
+      if (path.includes("contributions")) return "Rapporter & Analys > Bidragsrapporter";
+      if (path.includes("statistics")) return "Rapporter & Analys > Statistik";
+      if (path.includes("follow-up")) return "Rapporter & Analys > Uppföljningsrapporter";
     }
-    if (path.startsWith("/integration")) return t('nav.integration');
-    if (path.startsWith("/settings")) return t('nav.settings');
+    if (path.startsWith("/integration")) return "Integration & Import";
+    if (path.startsWith("/settings")) return "Inställningar";
     return "IKE 2.0";
   };
 
@@ -59,13 +56,10 @@ export function Header() {
         <div className="relative mr-4 w-96">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ike-neutral" />
           <Input
-            placeholder={t('common.search')}
+            placeholder="Sök studenter, skolor, rapporter..."
             className="pl-10 border-ike-primary/20 focus:border-ike-primary"
           />
         </div>
-
-        {/* Language Toggle */}
-        <LanguageToggle />
 
         {/* Notifications */}
         <Button variant="ghost" size="sm" className="mr-2 relative">
@@ -93,16 +87,16 @@ export function Header() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuItem>
               <User className="mr-2 h-4 w-4" />
-              <span>{t('user.profile')}</span>
+              <span>Profil</span>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Settings className="mr-2 h-4 w-4" />
-              <span>{t('user.settings')}</span>
+              <span>Inställningar</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <LogOut className="mr-2 h-4 w-4" />
-              <span>{t('user.logout')}</span>
+              <span>Logga ut</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
