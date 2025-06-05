@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Header } from "@/components/Header";
 import Dashboard from "./pages/Dashboard";
@@ -27,41 +28,43 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <SidebarProvider>
-          <div className="min-h-screen flex w-full bg-ike-neutral-light">
-            <AppSidebar />
-            <div className="flex-1 flex flex-col">
-              <Header />
-              <main className="flex-1 p-6">
-                <Routes>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/students" element={<Students />} />
-                  <Route path="/students/placements" element={<StudentPlacements />} />
-                  <Route path="/students/conflicts" element={<StudentConflicts />} />
-                  <Route path="/students/bulk" element={<StudentBulk />} />
-                  <Route path="/financial" element={<Financial />} />
-                  <Route path="/financial/calculations" element={<Financial />} />
-                  <Route path="/financial/pricelists" element={<PriceLists />} />
-                  <Route path="/reports" element={<Reports />} />
-                  <Route path="/reports/standard" element={<Reports />} />
-                  <Route path="/reports/contributions" element={<ContributionReports />} />
-                  <Route path="/reports/statistics" element={<Statistics />} />
-                  <Route path="/reports/follow-up" element={<FollowUpReports />} />
-                  <Route path="/integration" element={<Integration />} />
-                  <Route path="/integration/*" element={<Integration />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/settings/*" element={<Settings />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </main>
+      <LanguageProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <SidebarProvider>
+            <div className="min-h-screen flex w-full bg-ike-neutral-light">
+              <AppSidebar />
+              <div className="flex-1 flex flex-col">
+                <Header />
+                <main className="flex-1 p-6">
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/students" element={<Students />} />
+                    <Route path="/students/placements" element={<StudentPlacements />} />
+                    <Route path="/students/conflicts" element={<StudentConflicts />} />
+                    <Route path="/students/bulk" element={<StudentBulk />} />
+                    <Route path="/financial" element={<Financial />} />
+                    <Route path="/financial/calculations" element={<Financial />} />
+                    <Route path="/financial/pricelists" element={<PriceLists />} />
+                    <Route path="/reports" element={<Reports />} />
+                    <Route path="/reports/standard" element={<Reports />} />
+                    <Route path="/reports/contributions" element={<ContributionReports />} />
+                    <Route path="/reports/statistics" element={<Statistics />} />
+                    <Route path="/reports/follow-up" element={<FollowUpReports />} />
+                    <Route path="/integration" element={<Integration />} />
+                    <Route path="/integration/*" element={<Integration />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/settings/*" element={<Settings />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </main>
+              </div>
             </div>
-          </div>
-        </SidebarProvider>
-      </BrowserRouter>
+          </SidebarProvider>
+        </BrowserRouter>
+      </LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
