@@ -36,8 +36,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Students = () => {
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [municipalityFilter, setMunicipalityFilter] = useState("all");
@@ -109,13 +111,13 @@ const Students = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
-        return <Badge className="bg-ike-success text-white">Aktiv</Badge>;
+        return <Badge className="bg-ike-success text-white">{t('students.active')}</Badge>;
       case "conflict":
-        return <Badge className="bg-ike-error text-white">Konflikt</Badge>;
+        return <Badge className="bg-ike-error text-white">{t('students.conflict')}</Badge>;
       case "pending":
-        return <Badge className="bg-ike-warning text-white">Väntande</Badge>;
+        return <Badge className="bg-ike-warning text-white">{t('students.pending')}</Badge>;
       default:
-        return <Badge variant="secondary">Okänd</Badge>;
+        return <Badge variant="secondary">{t('students.unknown')}</Badge>;
     }
   };
 
@@ -133,19 +135,19 @@ const Students = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ike-neutral-dark">Studentregister</h1>
+          <h1 className="text-3xl font-bold text-ike-neutral-dark">{t('students.title')}</h1>
           <p className="text-ike-neutral mt-2">
-            Hantera studentregistrering och placeringar
+            {t('students.subtitle')}
           </p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
             <Download className="w-4 h-4 mr-2" />
-            Exportera
+            {t('students.export')}
           </Button>
           <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
             <Plus className="w-4 h-4 mr-2" />
-            Ny Student
+            {t('students.new.student')}
           </Button>
         </div>
       </div>
@@ -155,7 +157,7 @@ const Students = () => {
         <Card className="border-l-4 border-l-ike-primary">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Totala Studenter
+              {t('students.total.students')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -166,7 +168,7 @@ const Students = () => {
         <Card className="border-l-4 border-l-ike-warning">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Interkommunala
+              {t('students.intercommunal')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -178,7 +180,7 @@ const Students = () => {
         <Card className="border-l-4 border-l-ike-error">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Väntande Överföringar
+              {t('students.pending.transfers')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -189,7 +191,7 @@ const Students = () => {
         <Card className="border-l-4 border-l-ike-success">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Nya denna månad
+              {t('students.new.this.month')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -201,14 +203,14 @@ const Students = () => {
       {/* Search and Filter Section */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-ike-neutral-dark">Sök och Filtrera</CardTitle>
+          <CardTitle className="text-ike-neutral-dark">{t('students.search.filter')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ike-neutral" />
               <Input
-                placeholder="Sök efter namn eller personnummer..."
+                placeholder={t('students.search.placeholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 border-ike-primary/20 focus:border-ike-primary"
@@ -219,10 +221,10 @@ const Students = () => {
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Alla statusar</SelectItem>
-                <SelectItem value="active">Aktiv</SelectItem>
-                <SelectItem value="conflict">Konflikt</SelectItem>
-                <SelectItem value="pending">Väntande</SelectItem>
+                <SelectItem value="all">{t('students.all.statuses')}</SelectItem>
+                <SelectItem value="active">{t('students.active')}</SelectItem>
+                <SelectItem value="conflict">{t('students.conflict')}</SelectItem>
+                <SelectItem value="pending">{t('students.pending')}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={municipalityFilter} onValueChange={setMunicipalityFilter}>
@@ -230,7 +232,7 @@ const Students = () => {
                 <SelectValue placeholder="Kommun" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Alla kommuner</SelectItem>
+                <SelectItem value="all">{t('students.all.municipalities')}</SelectItem>
                 <SelectItem value="Malmö">Malmö</SelectItem>
                 <SelectItem value="Lund">Lund</SelectItem>
                 <SelectItem value="Helsingborg">Helsingborg</SelectItem>
@@ -246,10 +248,10 @@ const Students = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <Users className="w-5 h-5 mr-2 text-ike-primary" />
-            Studenter ({filteredStudents.length})
+            {t('students.student.list')} ({filteredStudents.length})
           </CardTitle>
           <CardDescription>
-            Detaljerad lista över alla registrerade studenter
+            {t('students.detailed.list')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -258,18 +260,18 @@ const Students = () => {
               <TableRow>
                 <TableHead className="font-medium">
                   <Button variant="ghost" className="h-auto p-0 font-medium">
-                    Namn
+                    {t('students.name')}
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                   </Button>
                 </TableHead>
-                <TableHead className="font-medium">Personnummer</TableHead>
-                <TableHead className="font-medium">Kommun</TableHead>
-                <TableHead className="font-medium">Skola</TableHead>
-                <TableHead className="font-medium">Program</TableHead>
-                <TableHead className="font-medium">Klass</TableHead>
-                <TableHead className="font-medium">Status</TableHead>
-                <TableHead className="font-medium text-right">Belopp (SEK)</TableHead>
-                <TableHead className="font-medium text-center">Åtgärder</TableHead>
+                <TableHead className="font-medium">{t('students.personal.number')}</TableHead>
+                <TableHead className="font-medium">{t('students.municipality')}</TableHead>
+                <TableHead className="font-medium">{t('students.school')}</TableHead>
+                <TableHead className="font-medium">{t('students.program')}</TableHead>
+                <TableHead className="font-medium">{t('students.class')}</TableHead>
+                <TableHead className="font-medium">{t('students.status')}</TableHead>
+                <TableHead className="font-medium text-right">{t('students.amount')}</TableHead>
+                <TableHead className="font-medium text-center">{t('students.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -299,15 +301,15 @@ const Students = () => {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>
                           <Eye className="mr-2 h-4 w-4" />
-                          Visa detaljer
+                          {t('students.view.details')}
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Edit className="mr-2 h-4 w-4" />
-                          Redigera
+                          {t('students.edit')}
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <ArrowUpDown className="mr-2 h-4 w-4" />
-                          Överför
+                          {t('students.transfer')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
