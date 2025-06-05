@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,8 +34,10 @@ import {
   AlertTriangle,
   Info
 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Settings = () => {
+  const { t } = useLanguage();
   const [theme, setTheme] = useState("light");
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [dataPrivacyLevel, setDataPrivacyLevel] = useState("anonymous");
@@ -80,9 +83,9 @@ const Settings = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ike-neutral-dark">Inställningar</h1>
+          <h1 className="text-3xl font-bold text-ike-neutral-dark">{t('settings.title')}</h1>
           <p className="text-ike-neutral mt-2">
-            Anpassa systeminställningar och preferenser
+            {t('settings.subtitle')}
           </p>
         </div>
       </div>
@@ -92,53 +95,53 @@ const Settings = () => {
         <TabsList>
           <TabsTrigger value="general">
             <SettingsIcon className="mr-2 h-4 w-4" />
-            Allmänt
+            {t('settings.general')}
           </TabsTrigger>
           <TabsTrigger value="users">
             <Users className="mr-2 h-4 w-4" />
-            Användare
+            {t('settings.users')}
           </TabsTrigger>
           <TabsTrigger value="security">
             <Shield className="mr-2 h-4 w-4" />
-            Säkerhet
+            {t('settings.security')}
           </TabsTrigger>
           <TabsTrigger value="data">
             <Database className="mr-2 h-4 w-4" />
-            Datahantering
+            {t('settings.data.management')}
           </TabsTrigger>
           <TabsTrigger value="notifications">
             <Bell className="mr-2 h-4 w-4" />
-            Aviseringar
+            {t('settings.notifications')}
           </TabsTrigger>
           <TabsTrigger value="appearance">
             <Palette className="mr-2 h-4 w-4" />
-            Utseende
+            {t('settings.appearance')}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="general">
           <Card>
             <CardHeader>
-              <CardTitle>Allmänna Inställningar</CardTitle>
+              <CardTitle>{t('settings.general.settings')}</CardTitle>
               <CardDescription>
-                Konfigurera grundläggande systeminställningar.
+                {t('settings.general.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6">
               <div className="flex items-center justify-between space-x-2">
-                <Label htmlFor="theme">Tema</Label>
+                <Label htmlFor="theme">{t('settings.theme')}</Label>
                 <Select value={theme} onValueChange={handleThemeChange}>
                   <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Välj tema" />
+                    <SelectValue placeholder={t('settings.theme.select')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="light">Ljust</SelectItem>
-                    <SelectItem value="dark">Mörkt</SelectItem>
-                    <SelectItem value="system">Systemstandard</SelectItem>
+                    <SelectItem value="light">{t('settings.theme.light')}</SelectItem>
+                    <SelectItem value="dark">{t('settings.theme.dark')}</SelectItem>
+                    <SelectItem value="system">{t('settings.theme.system')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex items-center justify-between space-x-2">
-                <Label htmlFor="auto-update">Automatisk Uppdatering</Label>
+                <Label htmlFor="auto-update">{t('settings.auto.update')}</Label>
                 <Switch
                   id="auto-update"
                   checked={autoUpdate}
@@ -151,15 +154,15 @@ const Settings = () => {
         <TabsContent value="users">
           <Card>
             <CardHeader>
-              <CardTitle>Användarhantering</CardTitle>
+              <CardTitle>{t('settings.user.management')}</CardTitle>
               <CardDescription>
-                Hantera användarkonton och behörigheter.
+                {t('settings.user.management.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6">
               <div>
                 <p className="text-sm text-ike-neutral">
-                  Här kan du lägga till, redigera eller ta bort användare.
+                  {t('settings.user.management.content')}
                 </p>
                 {/* Implement user management UI here */}
               </div>
@@ -169,25 +172,25 @@ const Settings = () => {
         <TabsContent value="security">
           <Card>
             <CardHeader>
-              <CardTitle>Säkerhetsinställningar</CardTitle>
+              <CardTitle>{t('settings.security.settings')}</CardTitle>
               <CardDescription>
-                Konfigurera säkerhetsalternativ för systemet.
+                {t('settings.security.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6">
               <div className="flex items-center justify-between space-x-2">
-                <Label htmlFor="data-privacy">Datasekretessnivå</Label>
+                <Label htmlFor="data-privacy">{t('settings.data.privacy.level')}</Label>
                 <Select
                   value={dataPrivacyLevel}
                   onValueChange={handleDataPrivacyChange}
                 >
                   <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Välj nivå" />
+                    <SelectValue placeholder={t('settings.data.privacy.select')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="anonymous">Anonymiserad</SelectItem>
-                    <SelectItem value="pseudonymized">Pseudonymiserad</SelectItem>
-                    <SelectItem value="full">Fullständig</SelectItem>
+                    <SelectItem value="anonymous">{t('settings.data.privacy.anonymous')}</SelectItem>
+                    <SelectItem value="pseudonymized">{t('settings.data.privacy.pseudonymized')}</SelectItem>
+                    <SelectItem value="full">{t('settings.data.privacy.full')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -197,31 +200,30 @@ const Settings = () => {
         <TabsContent value="data">
           <Card>
             <CardHeader>
-              <CardTitle>Datahantering</CardTitle>
+              <CardTitle>{t('settings.data.management')}</CardTitle>
               <CardDescription>
-                Importera, exportera eller återställ systemdata.
+                {t('settings.data.management.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6">
               <div className="flex items-center space-x-4">
                 <Button onClick={handleImport}>
                   <Upload className="mr-2 h-4 w-4" />
-                  Importera Data
+                  {t('settings.data.import')}
                 </Button>
                 <Button variant="outline" onClick={handleExport}>
                   <Download className="mr-2 h-4 w-4" />
-                  Exportera Data
+                  {t('settings.data.export')}
                 </Button>
                 <Button variant="destructive" onClick={handleReset}>
                   <RefreshCw className="mr-2 h-4 w-4" />
-                  Återställ Data
+                  {t('settings.data.reset')}
                 </Button>
               </div>
               <div>
                 <p className="text-sm text-ike-neutral">
                   <Info className="mr-1 inline-block h-4 w-4" />
-                  Var försiktig med datahantering. Återställning kan leda till
-                  dataförlust.
+                  {t('settings.data.warning')}
                 </p>
               </div>
             </CardContent>
@@ -230,14 +232,14 @@ const Settings = () => {
         <TabsContent value="notifications">
           <Card>
             <CardHeader>
-              <CardTitle>Aviseringar</CardTitle>
+              <CardTitle>{t('settings.notifications')}</CardTitle>
               <CardDescription>
-                Hantera systemaviseringar och påminnelser.
+                {t('settings.notifications.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6">
               <div className="flex items-center justify-between space-x-2">
-                <Label htmlFor="notifications">Aktivera Aviseringar</Label>
+                <Label htmlFor="notifications">{t('settings.notifications.enable')}</Label>
                 <Switch
                   id="notifications"
                   checked={notificationsEnabled}
@@ -248,8 +250,7 @@ const Settings = () => {
                 <Badge variant="secondary" className="space-x-2">
                   <AlertTriangle className="h-4 w-4" />
                   <span>
-                    Viktigt: Inaktivering av aviseringar kan påverka din
-                    förmåga att reagera på viktiga händelser.
+                    {t('settings.notifications.warning')}
                   </span>
                 </Badge>
               </div>
@@ -259,27 +260,27 @@ const Settings = () => {
         <TabsContent value="appearance">
           <Card>
             <CardHeader>
-              <CardTitle>Utseende</CardTitle>
+              <CardTitle>{t('settings.appearance')}</CardTitle>
               <CardDescription>
-                Anpassa systemets utseende och känsla.
+                {t('settings.appearance.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6">
               <div className="flex items-center justify-between space-x-2">
-                <Label htmlFor="custom-css">Anpassad CSS</Label>
+                <Label htmlFor="custom-css">{t('settings.custom.css')}</Label>
                 <Input
                   id="custom-css"
-                  placeholder="Lägg till anpassad CSS här"
+                  placeholder={t('settings.custom.css.placeholder')}
                 />
               </div>
               <div>
                 <Button variant="secondary">
                   <Check className="mr-2 h-4 w-4" />
-                  Spara CSS
+                  {t('settings.save.css')}
                 </Button>
                 <Button variant="destructive" className="ml-2">
                   <X className="mr-2 h-4 w-4" />
-                  Återställ Standard
+                  {t('settings.reset.default')}
                 </Button>
               </div>
             </CardContent>
