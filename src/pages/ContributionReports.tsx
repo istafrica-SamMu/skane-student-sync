@@ -18,8 +18,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const ContributionReports = () => {
+  const { t } = useLanguage();
+
   const contributions = [
     {
       municipality: "Malmö", 
@@ -68,19 +71,19 @@ const ContributionReports = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ike-neutral-dark">Bidragsrapporter</h1>
+          <h1 className="text-3xl font-bold text-ike-neutral-dark">{t('contributions.title')}</h1>
           <p className="text-ike-neutral mt-2">
-            Analys av interkommunala ersättningar mellan kommuner
+            {t('contributions.subtitle')}
           </p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
             <Calendar className="w-4 h-4 mr-2" />
-            Historiska rapporter
+            {t('contributions.historical.reports')}
           </Button>
           <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
             <Download className="w-4 h-4 mr-2" />
-            Exportera data
+            {t('contributions.export.data')}
           </Button>
         </div>
       </div>
@@ -90,16 +93,16 @@ const ContributionReports = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <Filter className="w-5 h-5 mr-2 text-ike-primary" />
-            Filtrera bidragsdata
+            {t('contributions.filter.data')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-ike-neutral mb-1">Period</label>
+              <label className="block text-sm font-medium text-ike-neutral mb-1">{t('contributions.period')}</label>
               <Select defaultValue="current">
                 <SelectTrigger>
-                  <SelectValue placeholder="Välj period" />
+                  <SelectValue placeholder={t('contributions.select.period')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="current">November 2024</SelectItem>
@@ -111,13 +114,13 @@ const ContributionReports = () => {
               </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-ike-neutral mb-1">Kommun</label>
+              <label className="block text-sm font-medium text-ike-neutral mb-1">{t('contributions.municipality')}</label>
               <Select defaultValue="all">
                 <SelectTrigger>
-                  <SelectValue placeholder="Välj kommun" />
+                  <SelectValue placeholder={t('contributions.select.municipality')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Alla kommuner</SelectItem>
+                  <SelectItem value="all">{t('contributions.all.municipalities')}</SelectItem>
                   <SelectItem value="malmo">Malmö</SelectItem>
                   <SelectItem value="lund">Lund</SelectItem>
                   <SelectItem value="helsingborg">Helsingborg</SelectItem>
@@ -126,13 +129,13 @@ const ContributionReports = () => {
               </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-ike-neutral mb-1">Program</label>
+              <label className="block text-sm font-medium text-ike-neutral mb-1">{t('contributions.program')}</label>
               <Select defaultValue="all">
                 <SelectTrigger>
-                  <SelectValue placeholder="Välj program" />
+                  <SelectValue placeholder={t('contributions.select.program')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Alla program</SelectItem>
+                  <SelectItem value="all">{t('contributions.all.programs')}</SelectItem>
                   <SelectItem value="na">Naturvetenskapsprogrammet</SelectItem>
                   <SelectItem value="sa">Samhällsvetenskapsprogrammet</SelectItem>
                   <SelectItem value="te">Teknikprogrammet</SelectItem>
@@ -141,24 +144,24 @@ const ContributionReports = () => {
               </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-ike-neutral mb-1">Flödestyp</label>
+              <label className="block text-sm font-medium text-ike-neutral mb-1">{t('contributions.flow.type')}</label>
               <Select defaultValue="all">
                 <SelectTrigger>
-                  <SelectValue placeholder="Välj flödestyp" />
+                  <SelectValue placeholder={t('contributions.select.flow.type')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Alla flöden</SelectItem>
-                  <SelectItem value="sent">Skickade betalningar</SelectItem>
-                  <SelectItem value="received">Mottagna betalningar</SelectItem>
-                  <SelectItem value="netpositive">Positiv nettostatus</SelectItem>
-                  <SelectItem value="netnegative">Negativ nettostatus</SelectItem>
+                  <SelectItem value="all">{t('contributions.all.flows')}</SelectItem>
+                  <SelectItem value="sent">{t('contributions.sent.payments')}</SelectItem>
+                  <SelectItem value="received">{t('contributions.received.payments')}</SelectItem>
+                  <SelectItem value="netpositive">{t('contributions.positive.net')}</SelectItem>
+                  <SelectItem value="netnegative">{t('contributions.negative.net')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="flex justify-end mt-4">
             <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
-              Tillämpa filter
+              {t('contributions.apply.filter')}
             </Button>
           </div>
         </CardContent>
@@ -169,7 +172,7 @@ const ContributionReports = () => {
         <Card className="border-l-4 border-l-ike-primary">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Total bidrag
+              {t('contributions.total.contributions')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -177,7 +180,7 @@ const ContributionReports = () => {
               3,755,000 SEK
             </div>
             <div className="text-xs text-ike-success mt-1">
-              +5.7% från förra månaden
+              +5.7% {t('contributions.from.last.month')}
             </div>
           </CardContent>
         </Card>
@@ -185,7 +188,7 @@ const ContributionReports = () => {
         <Card className="border-l-4 border-l-ike-success">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Genomsnitt per student
+              {t('contributions.average.per.student')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -193,7 +196,7 @@ const ContributionReports = () => {
               5,033 SEK
             </div>
             <div className="text-xs text-ike-neutral mt-1">
-              Månadsgenomsnitt
+              {t('contributions.monthly.average')}
             </div>
           </CardContent>
         </Card>
@@ -201,13 +204,13 @@ const ContributionReports = () => {
         <Card className="border-l-4 border-l-ike-warning">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Största bidragsmottagare
+              {t('contributions.largest.recipient')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">Malmö</div>
             <div className="text-xs text-ike-neutral mt-1">
-              500,000 SEK mottaget
+              500,000 SEK {t('contributions.received')}
             </div>
           </CardContent>
         </Card>
@@ -215,13 +218,13 @@ const ContributionReports = () => {
         <Card className="border-l-4 border-l-green-500">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Största bidragsgivare
+              {t('contributions.largest.contributor')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">Lund</div>
             <div className="text-xs text-ike-neutral mt-1">
-              620,000 SEK skickat
+              620,000 SEK {t('contributions.sent')}
             </div>
           </CardContent>
         </Card>
@@ -232,10 +235,10 @@ const ContributionReports = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <Euro className="w-5 h-5 mr-2 text-ike-primary" />
-            Bidragsöversikt per Kommun
+            {t('contributions.overview.per.municipality')}
           </CardTitle>
           <CardDescription>
-            Detaljerad översikt över kommunala bidragsflöden
+            {t('contributions.detailed.overview')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -249,7 +252,7 @@ const ContributionReports = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold text-ike-neutral-dark">{contribution.municipality}</h3>
-                      <p className="text-sm text-ike-neutral">{contribution.studentCount} studenter</p>
+                      <p className="text-sm text-ike-neutral">{contribution.studentCount} {t('contributions.students')}</p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -257,7 +260,7 @@ const ContributionReports = () => {
                       {contribution.totalAmount.toLocaleString('sv-SE')} SEK
                     </div>
                     <div className="text-sm text-ike-neutral">
-                      Total transaktionsvolym
+                      {t('contributions.total.transaction.volume')}
                     </div>
                   </div>
                 </div>
@@ -265,7 +268,7 @@ const ContributionReports = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                   <div>
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm text-ike-neutral">Skickat bidrag</span>
+                      <span className="text-sm text-ike-neutral">{t('contributions.sent.contribution')}</span>
                       <span className="text-sm font-medium text-ike-neutral-dark">
                         {contribution.sentAmount.toLocaleString('sv-SE')} SEK
                       </span>
@@ -280,7 +283,7 @@ const ContributionReports = () => {
                   
                   <div>
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm text-ike-neutral">Mottaget bidrag</span>
+                      <span className="text-sm text-ike-neutral">{t('contributions.received.contribution')}</span>
                       <span className="text-sm font-medium text-ike-neutral-dark">
                         {contribution.receivedAmount.toLocaleString('sv-SE')} SEK
                       </span>
@@ -296,7 +299,7 @@ const ContributionReports = () => {
 
                 <div className="flex items-center justify-between border-t pt-4">
                   <div className="text-sm">
-                    <span className="font-medium text-ike-neutral">Nettoresultat:</span>
+                    <span className="font-medium text-ike-neutral">{t('contributions.net.result')}</span>
                     <span 
                       className={contribution.netPosition >= 0 ? "ml-2 text-ike-success" : "ml-2 text-ike-error"}
                     >
@@ -307,11 +310,11 @@ const ContributionReports = () => {
                   <div className="flex space-x-2">
                     <Button size="sm" variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
                       <TrendingUp className="w-4 h-4 mr-1" />
-                      Trender
+                      {t('contributions.trends')}
                     </Button>
                     <Button size="sm" variant="ghost" className="text-ike-neutral hover:text-ike-primary">
                       <FileText className="w-4 h-4 mr-1" />
-                      Detaljer
+                      {t('contributions.details')}
                     </Button>
                   </div>
                 </div>
@@ -324,9 +327,9 @@ const ContributionReports = () => {
       {/* Available Report Types */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-ike-neutral-dark">Tillgängliga Rapporter</CardTitle>
+          <CardTitle className="text-ike-neutral-dark">{t('contributions.available.reports')}</CardTitle>
           <CardDescription>
-            Specialiserade bidragsrapporter för olika användningsfall
+            {t('contributions.specialized.reports')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -336,13 +339,13 @@ const ContributionReports = () => {
                 <div className="h-10 w-10 bg-ike-primary/10 text-ike-primary rounded-lg flex items-center justify-center">
                   <FileText className="h-5 w-5" />
                 </div>
-                <h3 className="font-medium text-ike-neutral-dark">Kommunal Sammanställning</h3>
+                <h3 className="font-medium text-ike-neutral-dark">{t('contributions.municipal.summary')}</h3>
               </div>
               <p className="text-sm text-ike-neutral mb-4">
-                Detaljerad sammanställning av bidragsflöden mellan kommuner
+                {t('contributions.municipal.summary.desc')}
               </p>
               <Button size="sm" className="w-full bg-ike-primary hover:bg-ike-primary-dark text-white">
-                Generera rapport
+                {t('contributions.generate.report')}
               </Button>
             </div>
             
@@ -351,13 +354,13 @@ const ContributionReports = () => {
                 <div className="h-10 w-10 bg-ike-primary/10 text-ike-primary rounded-lg flex items-center justify-center">
                   <TrendingUp className="h-5 w-5" />
                 </div>
-                <h3 className="font-medium text-ike-neutral-dark">Trendanalys</h3>
+                <h3 className="font-medium text-ike-neutral-dark">{t('contributions.trend.analysis')}</h3>
               </div>
               <p className="text-sm text-ike-neutral mb-4">
-                Analys av bidragsförändringar över tid med trendprognoser
+                {t('contributions.trend.analysis.desc')}
               </p>
               <Button size="sm" className="w-full bg-ike-primary hover:bg-ike-primary-dark text-white">
-                Generera rapport
+                {t('contributions.generate.report')}
               </Button>
             </div>
             
@@ -366,13 +369,13 @@ const ContributionReports = () => {
                 <div className="h-10 w-10 bg-ike-primary/10 text-ike-primary rounded-lg flex items-center justify-center">
                   <Euro className="h-5 w-5" />
                 </div>
-                <h3 className="font-medium text-ike-neutral-dark">Ekonomisk Analys</h3>
+                <h3 className="font-medium text-ike-neutral-dark">{t('contributions.economic.analysis')}</h3>
               </div>
               <p className="text-sm text-ike-neutral mb-4">
-                Ekonomiska konsekvenser av studentrörelser mellan kommuner
+                {t('contributions.economic.analysis.desc')}
               </p>
               <Button size="sm" className="w-full bg-ike-primary hover:bg-ike-primary-dark text-white">
-                Generera rapport
+                {t('contributions.generate.report')}
               </Button>
             </div>
           </div>
