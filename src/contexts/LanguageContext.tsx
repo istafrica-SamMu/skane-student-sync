@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 type Language = 'en' | 'sv';
@@ -436,7 +437,6 @@ const translations = {
     'followup.total.rate': 'Total follow-up rate',
     'followup.identified.youth': 'identified youth with follow-up',
     'followup.documented.measures': 'Documented measures',
-    'followup.returned.to.studies': 'Return to studies',
     'followup.contact.established': 'Contact established',
     'followup.individual.title': 'Individual Follow-up',
     'followup.individual.description': 'List of individuals covered by municipal activity responsibility',
@@ -897,7 +897,6 @@ const translations = {
     'followup.total.rate': 'Total uppföljningsgrad',
     'followup.identified.youth': 'identifierade ungdomar med uppföljning',
     'followup.documented.measures': 'Dokumenterade åtgärder',
-    'followup.returned.to.studies': 'Återgång till studier',
     'followup.contact.established': 'Kontakt etablerad',
     'followup.individual.title': 'Individuell uppföljning',
     'followup.individual.description': 'Lista över individer som omfattas av det kommunala aktivitetsansvaret',
