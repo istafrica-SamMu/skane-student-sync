@@ -3,8 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpDown, Calendar, CheckCircle, Clock, User } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const StudentPlacements = () => {
+  const { t } = useLanguage();
+  
   const placements = [
     {
       id: 1,
@@ -50,13 +53,13 @@ const StudentPlacements = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
-        return <Badge className="bg-ike-warning text-white">Väntande</Badge>;
+        return <Badge className="bg-ike-warning text-white">{t('placements.pending')}</Badge>;
       case "approved":
-        return <Badge className="bg-ike-primary text-white">Godkänd</Badge>;
+        return <Badge className="bg-ike-primary text-white">{t('placements.approved')}</Badge>;
       case "completed":
-        return <Badge className="bg-ike-success text-white">Genomförd</Badge>;
+        return <Badge className="bg-ike-success text-white">{t('placements.completed')}</Badge>;
       default:
-        return <Badge variant="secondary">Okänd</Badge>;
+        return <Badge variant="secondary">{t('placements.unknown')}</Badge>;
     }
   };
 
@@ -65,14 +68,14 @@ const StudentPlacements = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ike-neutral-dark">Placeringar & Överföringar</h1>
+          <h1 className="text-3xl font-bold text-ike-neutral-dark">{t('placements.title')}</h1>
           <p className="text-ike-neutral mt-2">
-            Hantera studentöverföringar mellan kommuner och skolor
+            {t('placements.subtitle')}
           </p>
         </div>
         <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
           <ArrowUpDown className="w-4 h-4 mr-2" />
-          Ny Överföring
+          {t('placements.new.transfer')}
         </Button>
       </div>
 
@@ -81,36 +84,36 @@ const StudentPlacements = () => {
         <Card className="border-l-4 border-l-ike-warning">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Väntande Överföringar
+              {t('placements.pending.transfers')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">23</div>
-            <div className="text-xs text-ike-neutral">Kräver godkännande</div>
+            <div className="text-xs text-ike-neutral">{t('placements.requires.approval')}</div>
           </CardContent>
         </Card>
         
         <Card className="border-l-4 border-l-ike-primary">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Godkända denna månad
+              {t('placements.approved.this.month')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">47</div>
-            <div className="text-xs text-ike-neutral">+15% från förra månaden</div>
+            <div className="text-xs text-ike-neutral">+15% {t('placements.from.last.month')}</div>
           </CardContent>
         </Card>
         
         <Card className="border-l-4 border-l-ike-success">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Genomförda överföringar
+              {t('placements.completed.transfers')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">156</div>
-            <div className="text-xs text-ike-neutral">Sedan terminsstart</div>
+            <div className="text-xs text-ike-neutral">{t('placements.since.term.start')}</div>
           </CardContent>
         </Card>
       </div>
@@ -120,10 +123,10 @@ const StudentPlacements = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <ArrowUpDown className="w-5 h-5 mr-2 text-ike-primary" />
-            Aktuella Överföringsförfrågningar
+            {t('placements.current.requests')}
           </CardTitle>
           <CardDescription>
-            Pågående och nyligen genomförda studentöverföringar
+            {t('placements.recent.transfers')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -147,7 +150,7 @@ const StudentPlacements = () => {
                       <div>
                         <div className="space-y-2">
                           <div>
-                            <span className="font-medium text-ike-neutral">Från:</span>
+                            <span className="font-medium text-ike-neutral">{t('placements.from')}</span>
                             <p className="text-ike-neutral-dark">{placement.fromSchool}</p>
                             <p className="text-xs text-ike-neutral">{placement.fromMunicipality} kommun</p>
                           </div>
@@ -157,7 +160,7 @@ const StudentPlacements = () => {
                       <div>
                         <div className="space-y-2">
                           <div>
-                            <span className="font-medium text-ike-neutral">Till:</span>
+                            <span className="font-medium text-ike-neutral">{t('placements.to')}</span>
                             <p className="text-ike-neutral-dark">{placement.toSchool}</p>
                             <p className="text-xs text-ike-neutral">{placement.toMunicipality} kommun</p>
                           </div>
@@ -168,7 +171,7 @@ const StudentPlacements = () => {
                     <div className="mt-3 pt-3 border-t border-gray-200">
                       <div className="flex items-center justify-between text-sm">
                         <div>
-                          <span className="font-medium text-ike-neutral">Program:</span>
+                          <span className="font-medium text-ike-neutral">{t('placements.program')}</span>
                           <span className="ml-2 text-ike-neutral-dark">{placement.program}</span>
                         </div>
                         <div className="flex items-center text-ike-neutral">
@@ -177,7 +180,7 @@ const StudentPlacements = () => {
                         </div>
                       </div>
                       <div className="mt-2">
-                        <span className="font-medium text-ike-neutral">Anledning:</span>
+                        <span className="font-medium text-ike-neutral">{t('placements.reason')}</span>
                         <span className="ml-2 text-ike-neutral-dark">{placement.reason}</span>
                       </div>
                     </div>
@@ -188,21 +191,21 @@ const StudentPlacements = () => {
                       <>
                         <Button size="sm" className="bg-ike-success hover:bg-green-600 text-white">
                           <CheckCircle className="w-4 h-4 mr-1" />
-                          Godkänn
+                          {t('placements.approve')}
                         </Button>
                         <Button size="sm" variant="outline" className="border-ike-error text-ike-error hover:bg-ike-error/10">
-                          Avslå
+                          {t('placements.reject')}
                         </Button>
                       </>
                     )}
                     {placement.status === "approved" && (
                       <Button size="sm" className="bg-ike-primary hover:bg-ike-primary-dark text-white">
                         <Clock className="w-4 h-4 mr-1" />
-                        Genomför
+                        {t('placements.execute')}
                       </Button>
                     )}
                     <Button size="sm" variant="ghost" className="text-ike-neutral hover:text-ike-primary">
-                      Visa detaljer
+                      {t('placements.view.details')}
                     </Button>
                   </div>
                 </div>
@@ -215,9 +218,9 @@ const StudentPlacements = () => {
       {/* Transfer Timeline */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-ike-neutral-dark">Överföringsprocess</CardTitle>
+          <CardTitle className="text-ike-neutral-dark">{t('placements.transfer.process')}</CardTitle>
           <CardDescription>
-            Standardprocess för studentöverföringar mellan kommuner
+            {t('placements.process.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -227,8 +230,8 @@ const StudentPlacements = () => {
                 <span className="text-white text-sm font-bold">1</span>
               </div>
               <div>
-                <h4 className="font-medium text-ike-neutral-dark">Ansökan inkommen</h4>
-                <p className="text-sm text-ike-neutral">Student eller vårdnadshavare lämnar in ansökan</p>
+                <h4 className="font-medium text-ike-neutral-dark">{t('placements.step.application')}</h4>
+                <p className="text-sm text-ike-neutral">{t('placements.step.application.desc')}</p>
               </div>
             </div>
             
@@ -237,8 +240,8 @@ const StudentPlacements = () => {
                 <span className="text-white text-sm font-bold">2</span>
               </div>
               <div>
-                <h4 className="font-medium text-ike-neutral-dark">Granskning</h4>
-                <p className="text-sm text-ike-neutral">Både avgående och mottagande skola granskar ansökan</p>
+                <h4 className="font-medium text-ike-neutral-dark">{t('placements.step.review')}</h4>
+                <p className="text-sm text-ike-neutral">{t('placements.step.review.desc')}</p>
               </div>
             </div>
             
@@ -247,8 +250,8 @@ const StudentPlacements = () => {
                 <span className="text-white text-sm font-bold">3</span>
               </div>
               <div>
-                <h4 className="font-medium text-ike-neutral-dark">Godkännande</h4>
-                <p className="text-sm text-ike-neutral">Beslut fattas av ansvarig administrator</p>
+                <h4 className="font-medium text-ike-neutral-dark">{t('placements.step.approval')}</h4>
+                <p className="text-sm text-ike-neutral">{t('placements.step.approval.desc')}</p>
               </div>
             </div>
             
@@ -257,8 +260,8 @@ const StudentPlacements = () => {
                 <span className="text-white text-sm font-bold">4</span>
               </div>
               <div>
-                <h4 className="font-medium text-ike-neutral-dark">Genomförande</h4>
-                <p className="text-sm text-ike-neutral">Systemet uppdaterar studentregistret och beräknar nya bidrag</p>
+                <h4 className="font-medium text-ike-neutral-dark">{t('placements.step.execution')}</h4>
+                <p className="text-sm text-ike-neutral">{t('placements.step.execution.desc')}</p>
               </div>
             </div>
           </div>
