@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,33 +13,36 @@ import {
   Star,
   User
 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Reports = () => {
+  const { t } = useLanguage();
+
   const reportCategories = [
     {
       id: 1,
-      name: "Studentrapporter",
+      name: t('reports.student.reports'),
       icon: User,
       count: 14,
       popular: "Studentregistrering (månadsvis)"
     },
     {
       id: 2,
-      name: "Ekonomirapporter",
+      name: t('reports.financial.reports'),
       icon: FileText,
       count: 9,
       popular: "Ekonomisk sammanställning (månadsvis)"
     },
     {
       id: 3,
-      name: "Kommunrapporter",
+      name: t('reports.municipality.reports'),
       icon: FileText,
       count: 8,
       popular: "Kommunal fördelning (kvartalsvis)"
     },
     {
       id: 4,
-      name: "Statistikrapporter",
+      name: t('reports.statistics.reports'),
       icon: FileText,
       count: 12,
       popular: "Programanalys (terminsvis)"
@@ -120,14 +122,14 @@ const Reports = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ike-neutral-dark">Standardrapporter</h1>
+          <h1 className="text-3xl font-bold text-ike-neutral-dark">{t('reports.title')}</h1>
           <p className="text-ike-neutral mt-2">
-            Generera och hantera vanliga systemrapporter
+            {t('reports.subtitle')}
           </p>
         </div>
         <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
           <FileText className="w-4 h-4 mr-2" />
-          Ny Rapport
+          {t('reports.new.report')}
         </Button>
       </div>
 
@@ -135,7 +137,7 @@ const Reports = () => {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-ike-neutral" />
         <Input
-          placeholder="Sök i alla rapporter..."
+          placeholder={t('reports.search.placeholder')}
           className="pl-10 py-6 text-lg border-ike-primary/20 focus:border-ike-primary"
         />
       </div>
@@ -160,13 +162,13 @@ const Reports = () => {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-ike-neutral mb-4">
-                Mest populär: <span className="text-ike-neutral-dark">{category.popular}</span>
+                {t('reports.most.popular')} <span className="text-ike-neutral-dark">{category.popular}</span>
               </p>
               <Button 
                 variant="ghost" 
                 className="w-full justify-between text-ike-primary hover:bg-ike-primary/10"
               >
-                Visa alla
+                {t('reports.show.all')}
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </CardContent>
@@ -179,10 +181,10 @@ const Reports = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <Clock className="w-5 h-5 mr-2 text-ike-primary" />
-            Senaste Rapporter
+            {t('reports.recent.reports')}
           </CardTitle>
           <CardDescription>
-            Nyligen genererade och schemalagda rapporter
+            {t('reports.recent.scheduled')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -230,10 +232,10 @@ const Reports = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <Star className="w-5 h-5 mr-2 text-ike-warning" />
-            Sparade Rapporter
+            {t('reports.saved.reports')}
           </CardTitle>
           <CardDescription>
-            Anpassade och sparade rapportmallar
+            {t('reports.custom.templates')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -288,7 +290,7 @@ const Reports = () => {
           <CardHeader>
             <CardTitle className="flex items-center text-ike-neutral-dark">
               <User className="w-5 h-5 mr-2 text-ike-primary" />
-              Studentrapporter
+              {t('reports.student.reports')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -317,7 +319,7 @@ const Reports = () => {
           <CardHeader>
             <CardTitle className="flex items-center text-ike-neutral-dark">
               <FileText className="w-5 h-5 mr-2 text-ike-primary" />
-              Ekonomirapporter
+              {t('reports.financial.reports')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -346,7 +348,7 @@ const Reports = () => {
           <CardHeader>
             <CardTitle className="flex items-center text-ike-neutral-dark">
               <FileText className="w-5 h-5 mr-2 text-ike-primary" />
-              Statistikrapporter
+              {t('reports.statistics.reports')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
