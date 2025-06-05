@@ -15,8 +15,11 @@ import {
   ArrowUp,
   ArrowDown
 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Integration = () => {
+  const { t } = useLanguage();
+  
   const integrations = [
     {
       id: 1,
@@ -36,7 +39,7 @@ const Integration = () => {
       lastSync: "2024-11-15 15:45",
       processed: 458,
       errors: 0,
-      nextScheduled: "Pågående..."
+      nextScheduled: t('integration.ongoing')
     },
     {
       id: 3,
@@ -56,22 +59,22 @@ const Integration = () => {
       lastSync: "2024-11-15 10:15",
       processed: 342,
       errors: 12,
-      nextScheduled: "Fel - Manuell åtgärd krävs"
+      nextScheduled: t('integration.manual.action.required')
     }
   ];
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "success":
-        return <Badge className="bg-ike-success text-white">Framgångsrik</Badge>;
+        return <Badge className="bg-ike-success text-white">{t('integration.status.successful')}</Badge>;
       case "running":
-        return <Badge className="bg-ike-primary text-white">Pågående</Badge>;
+        return <Badge className="bg-ike-primary text-white">{t('integration.status.running')}</Badge>;
       case "scheduled":
-        return <Badge className="bg-ike-warning text-white">Schemalagd</Badge>;
+        return <Badge className="bg-ike-warning text-white">{t('integration.status.scheduled')}</Badge>;
       case "error":
-        return <Badge className="bg-ike-error text-white">Fel</Badge>;
+        return <Badge className="bg-ike-error text-white">{t('integration.status.error')}</Badge>;
       default:
-        return <Badge variant="secondary">Okänd</Badge>;
+        return <Badge variant="secondary">{t('integration.status.unknown')}</Badge>;
     }
   };
 
@@ -110,14 +113,14 @@ const Integration = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ike-neutral-dark">Integration & Import</h1>
+          <h1 className="text-3xl font-bold text-ike-neutral-dark">{t('integration.title')}</h1>
           <p className="text-ike-neutral mt-2">
-            Hantera dataintegration med externa system
+            {t('integration.subtitle')}
           </p>
         </div>
         <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
           <RefreshCcw className="w-4 h-4 mr-2" />
-          Synkronisera nu
+          {t('integration.sync.now')}
         </Button>
       </div>
 
@@ -126,14 +129,14 @@ const Integration = () => {
         <Card className="border-l-4 border-l-ike-success">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Framgångsrika synkroniseringar
+              {t('integration.successful.syncs')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">24</div>
             <div className="flex items-center text-xs text-ike-success mt-1">
               <ArrowUp className="w-3 h-3 mr-1" />
-              Senaste 24 timmarna
+              {t('integration.last.24.hours')}
             </div>
           </CardContent>
         </Card>
@@ -141,13 +144,13 @@ const Integration = () => {
         <Card className="border-l-4 border-l-ike-warning">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Behandlade poster
+              {t('integration.processed.records')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">48,234</div>
             <div className="flex items-center text-xs text-ike-neutral mt-1">
-              Senaste 24 timmarna
+              {t('integration.last.24.hours')}
             </div>
           </CardContent>
         </Card>
@@ -155,14 +158,14 @@ const Integration = () => {
         <Card className="border-l-4 border-l-ike-error">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Integrationsproblem
+              {t('integration.integration.issues')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">3</div>
             <div className="flex items-center text-xs text-ike-error mt-1">
               <ArrowUp className="w-3 h-3 mr-1" />
-              Kräver åtgärd
+              {t('integration.requires.action')}
             </div>
           </CardContent>
         </Card>
@@ -170,14 +173,14 @@ const Integration = () => {
         <Card className="border-l-4 border-l-ike-primary">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Genomsnittlig synktid
+              {t('integration.average.sync.time')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">1.8h</div>
             <div className="flex items-center text-xs text-ike-success mt-1">
               <ArrowDown className="w-3 h-3 mr-1" />
-              -0.5h från föregående månad
+              -0.5h {t('integration.from.previous.month')}
             </div>
           </CardContent>
         </Card>
@@ -188,10 +191,10 @@ const Integration = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <Database className="w-5 h-5 mr-2 text-ike-primary" />
-            Integrationsstatus
+            {t('integration.integration.status')}
           </CardTitle>
           <CardDescription>
-            Status för aktiva systemintegrationer
+            {t('integration.status.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -211,7 +214,7 @@ const Integration = () => {
                     <div>
                       <h3 className="font-semibold text-ike-neutral-dark">{integration.name}</h3>
                       <p className="text-sm text-ike-neutral">
-                        Senaste synk: {integration.lastSync}
+                        {t('integration.last.sync')} {integration.lastSync}
                       </p>
                     </div>
                   </div>
@@ -221,7 +224,7 @@ const Integration = () => {
                 {integration.status === "running" && (
                   <div className="mb-4">
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-ike-neutral">Förlopp</span>
+                      <span className="text-ike-neutral">{t('integration.progress')}</span>
                       <span className="text-ike-neutral">65%</span>
                     </div>
                     <Progress value={65} className="h-2" />
@@ -230,11 +233,11 @@ const Integration = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm">
                   <div className="flex items-center justify-between bg-ike-neutral-light p-2 rounded-lg">
-                    <span className="text-ike-neutral">Bearbetade poster:</span>
+                    <span className="text-ike-neutral">{t('integration.processed.records.count')}</span>
                     <span className="font-medium">{integration.processed.toLocaleString()}</span>
                   </div>
                   <div className="flex items-center justify-between bg-ike-neutral-light p-2 rounded-lg">
-                    <span className="text-ike-neutral">Fel:</span>
+                    <span className="text-ike-neutral">{t('integration.errors')}</span>
                     <span className={`font-medium ${integration.errors > 0 ? 'text-ike-error' : ''}`}>
                       {integration.errors}
                     </span>
@@ -244,32 +247,32 @@ const Integration = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center text-sm text-ike-neutral">
                     <Clock className="w-4 h-4 mr-1" />
-                    Nästa: {integration.nextScheduled}
+                    {t('integration.next')} {integration.nextScheduled}
                   </div>
 
                   <div className="flex space-x-2">
                     {integration.status === "error" && (
                       <Button size="sm" className="bg-ike-error hover:bg-ike-error/80 text-white">
                         <XCircle className="w-4 h-4 mr-1" />
-                        Visa fel
+                        {t('integration.show.errors')}
                       </Button>
                     )}
 
                     {integration.status === "running" && (
                       <Button size="sm" variant="outline" className="border-ike-error text-ike-error hover:bg-ike-error/10">
-                        Avbryt
+                        {t('integration.cancel')}
                       </Button>
                     )}
 
                     {(integration.status === "success" || integration.status === "error") && (
                       <Button size="sm" className="bg-ike-primary hover:bg-ike-primary-dark text-white">
                         <RefreshCcw className="w-4 h-4 mr-1" />
-                        Synkronisera
+                        {t('integration.synchronize')}
                       </Button>
                     )}
 
                     <Button size="sm" variant="ghost" className="text-ike-neutral hover:text-ike-primary">
-                      Konfiguration
+                      {t('integration.configuration')}
                     </Button>
                   </div>
                 </div>
@@ -285,10 +288,10 @@ const Integration = () => {
           <CardHeader>
             <CardTitle className="flex items-center text-ike-neutral-dark">
               <Database className="w-5 h-5 mr-2 text-blue-500" />
-              Kommunal SIS Synk
+              {t('integration.municipal.sis.sync')}
             </CardTitle>
             <CardDescription>
-              Integration med kommunala skoladministrationssystem
+              {t('integration.municipal.sis.description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -307,7 +310,7 @@ const Integration = () => {
               </div>
               
               <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white mt-2">
-                Konfigurera anslutningar
+                {t('integration.configure.connections')}
               </Button>
             </div>
           </CardContent>
@@ -317,29 +320,29 @@ const Integration = () => {
           <CardHeader>
             <CardTitle className="flex items-center text-ike-neutral-dark">
               <Upload className="w-5 h-5 mr-2 text-ike-primary" />
-              SS12000 Import
+              {t('integration.ss12000.import')}
             </CardTitle>
             <CardDescription>
-              Import via SS12000-standarden
+              {t('integration.ss12000.description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-ike-success" />
-                <span className="text-sm">Fullt stöd för SS12000 v1.1</span>
+                <span className="text-sm">{t('integration.full.support')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-ike-success" />
-                <span className="text-sm">Batch och realtidsimport</span>
+                <span className="text-sm">{t('integration.batch.realtime')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-ike-success" />
-                <span className="text-sm">Validering och konflikthantering</span>
+                <span className="text-sm">{t('integration.validation.conflict')}</span>
               </div>
               
               <Button className="w-full bg-ike-primary hover:bg-ike-primary-dark text-white mt-2">
-                Importera SS12000-data
+                {t('integration.import.ss12000')}
               </Button>
             </div>
           </CardContent>
@@ -349,29 +352,29 @@ const Integration = () => {
           <CardHeader>
             <CardTitle className="flex items-center text-ike-neutral-dark">
               <User className="w-5 h-5 mr-2 text-green-500" />
-              Navet Integration
+              {t('integration.navet.integration')}
             </CardTitle>
             <CardDescription>
-              Integration med Skatteverkets folkbokföring
+              {t('integration.navet.description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-ike-success" />
-                <span className="text-sm">Befolkningsdata</span>
+                <span className="text-sm">{t('integration.population.data')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-ike-success" />
-                <span className="text-sm">Adressuppdateringar</span>
+                <span className="text-sm">{t('integration.address.updates')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-ike-success" />
-                <span className="text-sm">Skyddat persondata</span>
+                <span className="text-sm">{t('integration.protected.personal.data')}</span>
               </div>
               
               <Button className="w-full bg-green-500 hover:bg-green-600 text-white mt-2">
-                Navet-inställningar
+                {t('integration.navet.settings')}
               </Button>
             </div>
           </CardContent>
@@ -383,10 +386,10 @@ const Integration = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <FileText className="w-5 h-5 mr-2 text-amber-500" />
-            Filbehandling
+            {t('integration.file.processing')}
           </CardTitle>
           <CardDescription>
-            Manuell import och export av filer
+            {t('integration.file.processing.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -394,26 +397,26 @@ const Integration = () => {
             <div className="border rounded-lg p-6 bg-ike-neutral-light/40">
               <h3 className="font-medium text-ike-neutral-dark mb-4 flex items-center">
                 <Upload className="w-5 h-5 mr-2 text-ike-primary" />
-                Importera data
+                {t('integration.import.data')}
               </h3>
               <p className="text-sm text-ike-neutral mb-4">
-                Ladda upp Excel-filer eller CSV-data för import till systemet
+                {t('integration.import.data.description')}
               </p>
               <Button className="w-full bg-ike-primary hover:bg-ike-primary-dark text-white">
-                Välj fil för import
+                {t('integration.choose.file.import')}
               </Button>
             </div>
             
             <div className="border rounded-lg p-6 bg-ike-neutral-light/40">
               <h3 className="font-medium text-ike-neutral-dark mb-4 flex items-center">
                 <FileText className="w-5 h-5 mr-2 text-amber-500" />
-                Exportera data
+                {t('integration.export.data')}
               </h3>
               <p className="text-sm text-ike-neutral mb-4">
-                Exportera data till Excel eller CSV för användning i externa system
+                {t('integration.export.data.description')}
               </p>
               <Button className="w-full border-amber-500 text-amber-500 hover:bg-amber-500/10" variant="outline">
-                Välj data för export
+                {t('integration.choose.data.export')}
               </Button>
             </div>
           </div>
