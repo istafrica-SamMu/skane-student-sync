@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, BarChart3 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { regionalAdminMenu, municipalityAdminMenu, schoolAdminMenu } from "@/config/roleMenus";
 
@@ -97,10 +98,10 @@ export function RoleBasedSidebar() {
                                 asChild 
                                 className="hover:bg-ike-primary/10 hover:text-ike-primary"
                               >
-                                <a href={subItem.url}>
+                                <Link to={subItem.url || '#'}>
                                   <subItem.icon className="w-4 h-4" />
                                   <span>{subItem.title}</span>
-                                </a>
+                                </Link>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                           ))}
@@ -112,10 +113,10 @@ export function RoleBasedSidebar() {
                       asChild 
                       className="hover:bg-ike-primary/10 hover:text-ike-primary"
                     >
-                      <a href={item.url}>
+                      <Link to={item.url || '#'}>
                         <item.icon className="w-4 h-4" />
                         <span>{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   )}
                 </SidebarMenuItem>
