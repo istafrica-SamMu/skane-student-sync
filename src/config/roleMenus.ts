@@ -1,4 +1,3 @@
-
 import {
   Home,
   Users,
@@ -200,19 +199,19 @@ export const municipalityAdminMenu: MenuItem[] = [
         icon: Users,
       },
       {
-        title: "Students by Class",
-        url: "/students",
-        icon: GraduationCap,
-      },
-      {
-        title: "External Students",
+        title: "Student Transfers",
         url: "/students/placements",
         icon: ArrowUpDown,
       },
       {
-        title: "Location Control",
-        url: "/students",
-        icon: MapPin,
+        title: "IKE Calculations",
+        url: "/financial",
+        icon: Calculator,
+      },
+      {
+        title: "Student Statistics",
+        url: "/reports/statistics",
+        icon: BarChart3,
       },
     ],
   },
