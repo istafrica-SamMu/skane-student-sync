@@ -27,6 +27,9 @@ import UserManagement from "./pages/system/UserManagement";
 import MunicipalityManagement from "./pages/system/MunicipalityManagement";
 import SchoolUnits from "./pages/system/SchoolUnits";
 import SchoolYears from "./pages/system/SchoolYears";
+import StudyPaths from "./pages/study-paths/StudyPaths";
+import PriceCodes from "./pages/study-paths/PriceCodes";
+import NationalPrograms from "./pages/study-paths/NationalPrograms";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +88,21 @@ const AppContent = () => {
               <Route path="/system/school-years" element={
                 <ProtectedRoute>
                   <SchoolYears />
+                </ProtectedRoute>
+              } />
+              <Route path="/study-paths" element={
+                <ProtectedRoute>
+                  <StudyPaths />
+                </ProtectedRoute>
+              } />
+              <Route path="/study-paths/price-codes" element={
+                <ProtectedRoute>
+                  <PriceCodes />
+                </ProtectedRoute>
+              } />
+              <Route path="/study-paths/programs" element={
+                <ProtectedRoute>
+                  <NationalPrograms />
                 </ProtectedRoute>
               } />
               <Route path="/students" element={
