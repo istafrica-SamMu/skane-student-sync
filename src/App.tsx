@@ -37,6 +37,9 @@ import RegionalStatistics from "./pages/reports/RegionalStatistics";
 import MonthlyCompilation from "./pages/reports/MonthlyCompilation";
 import FinancialAnalysis from "./pages/reports/FinancialAnalysis";
 import ChangeTracking from "./pages/reports/ChangeTracking";
+import Messages from "./pages/my-page/Messages";
+import EnrollmentSettings from "./pages/my-page/EnrollmentSettings";
+import ActivityLogs from "./pages/my-page/ActivityLogs";
 
 const queryClient = new QueryClient();
 
