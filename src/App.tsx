@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -208,6 +209,21 @@ const AppContent = () => {
               <Route path="/reports/changes" element={
                 <ProtectedRoute>
                   <ChangeTracking />
+                </ProtectedRoute>
+              } />
+              <Route path="/my-page/messages" element={
+                <ProtectedRoute>
+                  <Messages />
+                </ProtectedRoute>
+              } />
+              <Route path="/my-page/enrollment" element={
+                <ProtectedRoute>
+                  <EnrollmentSettings />
+                </ProtectedRoute>
+              } />
+              <Route path="/my-page/logs" element={
+                <ProtectedRoute>
+                  <ActivityLogs />
                 </ProtectedRoute>
               } />
               <Route path="/integration" element={
