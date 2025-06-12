@@ -248,13 +248,18 @@ export const municipalityAdminMenu: MenuItem[] = [
       },
       {
         title: "Additional Amounts",
-        url: "/financial",
+        url: "/financial/additional-amounts",
         icon: DollarSign,
       },
       {
-        title: "Compensation Reports",
-        url: "/reports/contributions",
+        title: "Municipal Financial Reports",
+        url: "/financial/reports",
         icon: FileText,
+      },
+      {
+        title: "Inter-Municipal Compensation",
+        url: "/financial/compensation",
+        icon: TrendingUp,
       },
     ],
   },

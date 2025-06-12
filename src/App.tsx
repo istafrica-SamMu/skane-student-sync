@@ -49,6 +49,9 @@ import ExternalStudents from "./pages/students/ExternalStudents";
 import ScheduleIntegration from "./pages/integration/ScheduleIntegration";
 import ImportStudentData from "./pages/integration/ImportStudentData";
 import IntegrationStatus from "./pages/integration/IntegrationStatus";
+import AdditionalAmounts from "./pages/financial/AdditionalAmounts";
+import MunicipalFinancialReports from "./pages/financial/MunicipalFinancialReports";
+import InterMunicipalCompensation from "./pages/financial/InterMunicipalCompensation";
 
 const queryClient = new QueryClient();
 
