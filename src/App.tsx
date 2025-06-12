@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -41,6 +40,9 @@ import ChangeTracking from "./pages/reports/ChangeTracking";
 import Messages from "./pages/my-page/Messages";
 import EnrollmentSettings from "./pages/my-page/EnrollmentSettings";
 import ActivityLogs from "./pages/my-page/ActivityLogs";
+import ExtensExport from "./pages/integration/ExtensExport";
+import PopulationRegistry from "./pages/integration/PopulationRegistry";
+import IntegrationTesting from "./pages/integration/IntegrationTesting";
 
 const queryClient = new QueryClient();
 
@@ -229,6 +231,21 @@ const AppContent = () => {
               <Route path="/integration" element={
                 <ProtectedRoute>
                   <Integration />
+                </ProtectedRoute>
+              } />
+              <Route path="/integration/extens" element={
+                <ProtectedRoute>
+                  <ExtensExport />
+                </ProtectedRoute>
+              } />
+              <Route path="/integration/population" element={
+                <ProtectedRoute>
+                  <PopulationRegistry />
+                </ProtectedRoute>
+              } />
+              <Route path="/integration/testing" element={
+                <ProtectedRoute>
+                  <IntegrationTesting />
                 </ProtectedRoute>
               } />
               <Route path="/integration/*" element={
