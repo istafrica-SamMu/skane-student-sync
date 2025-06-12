@@ -1,4 +1,3 @@
-
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,14 +10,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Bell, Search, User, LogOut, Settings } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { t } = useLanguage();
+  const { user, logout } = useAuth();
   
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   const getBreadcrumb = () => {
     const path = location.pathname;
     if (path === "/" || path === "/dashboard") return t('header.breadcrumb.dashboard');
@@ -85,8 +92,12 @@ export function Header() {
                 <User className="w-4 h-4 text-white" />
               </div>
               <div className="text-left">
-                <div className="text-sm font-medium">Anna Lindström</div>
-                <div className="text-xs text-ike-neutral">Municipal Admin</div>
+                <div className="text-sm font-medium">{user?.name || 'User'}</div>
+                <div className="text-xs text-ike-neutral">
+                  {user?.role === 'regional-admin' && 'Regional Admin'}
+                  {user?.role === 'municipality-admin' && 'Municipality Admin'}
+                  {user?.role === 'school-admin' && 'School Admin'}
+                </div>
               </div>
             </Button>
           </DropdownMenuTrigger>
@@ -100,7 +111,7 @@ export function Header() {
               <span>Inställningar</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Logga ut</span>
             </DropdownMenuItem>

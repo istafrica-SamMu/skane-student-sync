@@ -1,13 +1,14 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
+import { RoleBasedSidebar } from "@/components/RoleBasedSidebar";
 import { Header } from "@/components/Header";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Students from "./pages/Students";
 import StudentPlacements from "./pages/StudentPlacements";
@@ -25,45 +26,147 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+const AppContent = () => {
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return (
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
+  }
+
+  return (
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-ike-neutral-light">
+        <RoleBasedSidebar />
+        <div className="flex-1 flex flex-col">
+          <Header />
+          <main className="flex-1 p-6">
+            <Routes>
+              <Route path="/login" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/students" element={
+                <ProtectedRoute>
+                  <Students />
+                </ProtectedRoute>
+              } />
+              <Route path="/students/placements" element={
+                <ProtectedRoute>
+                  <StudentPlacements />
+                </ProtectedRoute>
+              } />
+              <Route path="/students/conflicts" element={
+                <ProtectedRoute>
+                  <StudentConflicts />
+                </ProtectedRoute>
+              } />
+              <Route path="/students/bulk" element={
+                <ProtectedRoute>
+                  <StudentBulk />
+                </ProtectedRoute>
+              } />
+              <Route path="/financial" element={
+                <ProtectedRoute>
+                  <Financial />
+                </ProtectedRoute>
+              } />
+              <Route path="/financial/calculations" element={
+                <ProtectedRoute>
+                  <Financial />
+                </ProtectedRoute>
+              } />
+              <Route path="/financial/pricelists" element={
+                <ProtectedRoute>
+                  <PriceLists />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports" element={
+                <ProtectedRoute>
+                  <Reports />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/standard" element={
+                <ProtectedRoute>
+                  <Reports />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/contributions" element={
+                <ProtectedRoute>
+                  <ContributionReports />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/statistics" element={
+                <ProtectedRoute>
+                  <Statistics />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/follow-up" element={
+                <ProtectedRoute>
+                  <FollowUpReports />
+                </ProtectedRoute>
+              } />
+              <Route path="/integration" element={
+                <ProtectedRoute>
+                  <Integration />
+                </ProtectedRoute>
+              } />
+              <Route path="/integration/*" element={
+                <ProtectedRoute>
+                  <Integration />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings" element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings/*" element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              } />
+              <Route path="*" element={
+                <ProtectedRoute>
+                  <NotFound />
+                </ProtectedRoute>
+              } />
+            </Routes>
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <LanguageProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <SidebarProvider>
-            <div className="min-h-screen flex w-full bg-ike-neutral-light">
-              <AppSidebar />
-              <div className="flex-1 flex flex-col">
-                <Header />
-                <main className="flex-1 p-6">
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/students" element={<Students />} />
-                    <Route path="/students/placements" element={<StudentPlacements />} />
-                    <Route path="/students/conflicts" element={<StudentConflicts />} />
-                    <Route path="/students/bulk" element={<StudentBulk />} />
-                    <Route path="/financial" element={<Financial />} />
-                    <Route path="/financial/calculations" element={<Financial />} />
-                    <Route path="/financial/pricelists" element={<PriceLists />} />
-                    <Route path="/reports" element={<Reports />} />
-                    <Route path="/reports/standard" element={<Reports />} />
-                    <Route path="/reports/contributions" element={<ContributionReports />} />
-                    <Route path="/reports/statistics" element={<Statistics />} />
-                    <Route path="/reports/follow-up" element={<FollowUpReports />} />
-                    <Route path="/integration" element={<Integration />} />
-                    <Route path="/integration/*" element={<Integration />} />
-                    <Route path="/settings" element={<Settings />} />
-                    <Route path="/settings/*" element={<Settings />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </main>
-              </div>
-            </div>
-          </SidebarProvider>
-        </BrowserRouter>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </AuthProvider>
       </LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>
