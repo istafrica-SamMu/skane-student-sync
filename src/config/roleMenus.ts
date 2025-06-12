@@ -1,4 +1,3 @@
-
 import {
   Home,
   Users,
@@ -295,18 +294,23 @@ export const municipalityAdminMenu: MenuItem[] = [
     items: [
       {
         title: "Money to Receive",
-        url: "/reports",
+        url: "/reports/money-to-receive",
         icon: TrendingUp,
       },
       {
         title: "Money to Pay",
-        url: "/reports",
+        url: "/reports/money-to-pay",
         icon: DollarSign,
       },
       {
         title: "Municipal Statistics",
-        url: "/reports/statistics",
+        url: "/reports/municipal-statistics",
         icon: BarChart3,
+      },
+      {
+        title: "Financial System Export",
+        url: "/reports/financial-export",
+        icon: FileSpreadsheet,
       },
     ],
   },

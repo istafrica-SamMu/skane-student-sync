@@ -56,6 +56,10 @@ import IntegrationStatus from "./pages/integration/IntegrationStatus";
 import AdditionalAmounts from "./pages/financial/AdditionalAmounts";
 import MunicipalFinancialReports from "./pages/financial/MunicipalFinancialReports";
 import InterMunicipalCompensation from "./pages/financial/InterMunicipalCompensation";
+import MoneyToReceive from "./pages/reports/MoneyToReceive";
+import MoneyToPay from "./pages/reports/MoneyToPay";
+import MunicipalStatistics from "./pages/reports/MunicipalStatistics";
+import FinancialExport from "./pages/reports/FinancialExport";
 
 const queryClient = new QueryClient();
 
@@ -274,6 +278,26 @@ const AppContent = () => {
               <Route path="/reports/changes" element={
                 <ProtectedRoute>
                   <ChangeTracking />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/money-to-receive" element={
+                <ProtectedRoute>
+                  <MoneyToReceive />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/money-to-pay" element={
+                <ProtectedRoute>
+                  <MoneyToPay />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/municipal-statistics" element={
+                <ProtectedRoute>
+                  <MunicipalStatistics />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/financial-export" element={
+                <ProtectedRoute>
+                  <FinancialExport />
                 </ProtectedRoute>
               } />
               <Route path="/my-page/messages" element={
