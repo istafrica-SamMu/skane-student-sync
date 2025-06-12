@@ -22,32 +22,32 @@ const MoneyToPay = () => {
   const payableData = [
     {
       id: 1,
-      studentName: "Lisa Johansson",
-      studentId: "20050201-3456",
-      homeMunicipality: "Stockholm",
-      program: "Samhällsvetenskap",
+      studentName: "Anna Karlsson",
+      studentId: "20050312-1234",
+      studyingAt: "Malmö Gymnasium",
+      program: "Naturvetenskap",
       period: "2024-09",
-      amount: 11900,
-      status: "Invoiced"
-    },
-    {
-      id: 2,
-      studentName: "Johan Svensson",
-      studentId: "20040830-7890",
-      homeMunicipality: "Göteborg",
-      program: "Ekonomi",
-      period: "2024-09",
-      amount: 12650,
+      amount: 12450,
       status: "Pending"
     },
     {
-      id: 3,
-      studentName: "Sara Nilsson",
-      studentId: "20051115-2345",
-      homeMunicipality: "Malmö",
-      program: "Naturvetenskap",
+      id: 2,
+      studentName: "Erik Lindström",
+      studentId: "20040715-5678",
+      studyingAt: "Lund Technical College",
+      program: "Teknik",
       period: "2024-09",
-      amount: 13100,
+      amount: 13200,
+      status: "Invoiced"
+    },
+    {
+      id: 3,
+      studentName: "Maria Andersson",
+      studentId: "20051022-9012",
+      studyingAt: "Helsingborg Arts School",
+      program: "Estetiska",
+      period: "2024-09",
+      amount: 11800,
       status: "Paid"
     }
   ];
@@ -61,7 +61,7 @@ const MoneyToPay = () => {
         <div>
           <h1 className="text-3xl font-bold text-ike-neutral-dark">Money to Pay</h1>
           <p className="text-ike-neutral mt-2">
-            Reports for external students studying in your municipality
+            Reports for municipal students studying at external schools
           </p>
         </div>
         <div className="flex space-x-2">
@@ -80,11 +80,11 @@ const MoneyToPay = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-ike-neutral">External Students</CardTitle>
+            <CardTitle className="text-sm font-medium text-ike-neutral">Municipal Students</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">{payableData.length}</div>
-            <p className="text-xs text-ike-neutral">+1 from last month</p>
+            <p className="text-xs text-ike-neutral">+2 from last month</p>
           </CardContent>
         </Card>
         <Card>
@@ -136,10 +136,10 @@ const MoneyToPay = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <DollarSign className="w-5 h-5 mr-2 text-ike-primary" />
-            External Students in Municipal Schools
+            Municipal Students at External Schools
           </CardTitle>
           <CardDescription>
-            Students from other municipalities studying in your schools
+            Students from your municipality studying at schools in other municipalities
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -148,7 +148,7 @@ const MoneyToPay = () => {
               <TableRow>
                 <TableHead>Student</TableHead>
                 <TableHead>Student ID</TableHead>
-                <TableHead>Home Municipality</TableHead>
+                <TableHead>School</TableHead>
                 <TableHead>Program</TableHead>
                 <TableHead>Period</TableHead>
                 <TableHead>Amount</TableHead>
@@ -171,7 +171,7 @@ const MoneyToPay = () => {
                   <TableCell>
                     <div className="flex items-center">
                       <Building className="w-4 h-4 mr-2 text-ike-neutral" />
-                      <span>{item.homeMunicipality}</span>
+                      <span>{item.studyingAt}</span>
                     </div>
                   </TableCell>
                   <TableCell>{item.program}</TableCell>

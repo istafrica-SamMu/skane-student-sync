@@ -22,32 +22,32 @@ const MoneyToReceive = () => {
   const receivableData = [
     {
       id: 1,
-      studentName: "Anna Karlsson",
-      studentId: "20050312-1234",
-      studyingAt: "Malmö Gymnasium",
-      program: "Naturvetenskap",
+      studentName: "Lisa Johansson",
+      studentId: "20050201-3456",
+      homeMunicipality: "Stockholm",
+      program: "Samhällsvetenskap",
       period: "2024-09",
-      amount: 12450,
-      status: "Pending"
+      amount: 11900,
+      status: "Invoiced"
     },
     {
       id: 2,
-      studentName: "Erik Lindström",
-      studentId: "20040715-5678",
-      studyingAt: "Lund Technical College",
-      program: "Teknik",
+      studentName: "Johan Svensson",
+      studentId: "20040830-7890",
+      homeMunicipality: "Göteborg",
+      program: "Ekonomi",
       period: "2024-09",
-      amount: 13200,
+      amount: 12650,
       status: "Confirmed"
     },
     {
       id: 3,
-      studentName: "Maria Andersson",
-      studentId: "20051022-9012",
-      studyingAt: "Helsingborg Arts School",
-      program: "Estetiska",
+      studentName: "Sara Nilsson",
+      studentId: "20051115-2345",
+      homeMunicipality: "Malmö",
+      program: "Naturvetenskap",
       period: "2024-09",
-      amount: 11800,
+      amount: 13100,
       status: "Pending"
     }
   ];
@@ -61,7 +61,7 @@ const MoneyToReceive = () => {
         <div>
           <h1 className="text-3xl font-bold text-ike-neutral-dark">Money to Receive</h1>
           <p className="text-ike-neutral mt-2">
-            Reports for municipal students studying at external schools
+            Reports for external students studying in your municipality
           </p>
         </div>
         <div className="flex space-x-2">
@@ -80,16 +80,16 @@ const MoneyToReceive = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-ike-neutral">Total Students</CardTitle>
+            <CardTitle className="text-sm font-medium text-ike-neutral">External Students</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">{receivableData.length}</div>
-            <p className="text-xs text-ike-neutral">+2 from last month</p>
+            <p className="text-xs text-ike-neutral">+1 from last month</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-ike-neutral">Total Amount</CardTitle>
+            <CardTitle className="text-sm font-medium text-ike-neutral">Total Receivable</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-primary">{totalReceivable.toLocaleString()} SEK</div>
@@ -102,7 +102,7 @@ const MoneyToReceive = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-ike-success">1</div>
-            <p className="text-xs text-ike-neutral">Ready for payment</p>
+            <p className="text-xs text-ike-neutral">Ready to receive</p>
           </CardContent>
         </Card>
         <Card>
@@ -136,10 +136,10 @@ const MoneyToReceive = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <TrendingUp className="w-5 h-5 mr-2 text-ike-primary" />
-            Municipal Students at External Schools
+            External Students in Municipal Schools
           </CardTitle>
           <CardDescription>
-            Students from your municipality studying at schools in other municipalities
+            Students from other municipalities studying in your schools
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -148,7 +148,7 @@ const MoneyToReceive = () => {
               <TableRow>
                 <TableHead>Student</TableHead>
                 <TableHead>Student ID</TableHead>
-                <TableHead>School</TableHead>
+                <TableHead>Home Municipality</TableHead>
                 <TableHead>Program</TableHead>
                 <TableHead>Period</TableHead>
                 <TableHead>Amount</TableHead>
@@ -171,7 +171,7 @@ const MoneyToReceive = () => {
                   <TableCell>
                     <div className="flex items-center">
                       <Building className="w-4 h-4 mr-2 text-ike-neutral" />
-                      <span>{item.studyingAt}</span>
+                      <span>{item.homeMunicipality}</span>
                     </div>
                   </TableCell>
                   <TableCell>{item.program}</TableCell>
@@ -184,8 +184,12 @@ const MoneyToReceive = () => {
                   </TableCell>
                   <TableCell>
                     <Badge 
-                      variant={item.status === "Confirmed" ? "default" : "secondary"}
-                      className={item.status === "Confirmed" ? "bg-ike-success text-white" : "bg-ike-warning text-white"}
+                      variant={item.status === "Confirmed" ? "default" : item.status === "Invoiced" ? "secondary" : "outline"}
+                      className={
+                        item.status === "Confirmed" ? "bg-ike-success text-white" :
+                        item.status === "Invoiced" ? "bg-ike-warning text-white" :
+                        "border-ike-error text-ike-error"
+                      }
                     >
                       {item.status}
                     </Badge>
