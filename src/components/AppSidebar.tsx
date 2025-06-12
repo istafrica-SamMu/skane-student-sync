@@ -14,9 +14,10 @@ import {
   Euro,
   TrendingUp,
   UserCheck,
-  Link,
+  Link as LinkIcon,
   User
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import {
   Sidebar,
@@ -117,7 +118,7 @@ const menuItems = [
       {
         title: "Kommunal SIS-synk",
         url: "/integration/municipal",
-        icon: Link,
+        icon: LinkIcon,
       },
       {
         title: "SS12000 Import",
@@ -133,6 +134,21 @@ const menuItems = [
         title: "Filbehandling",
         url: "/integration/files",
         icon: FileText,
+      },
+      {
+        title: "Extens Export",
+        url: "/integration/extens",
+        icon: FileText,
+      },
+      {
+        title: "Population Registry",
+        url: "/integration/population",
+        icon: User,
+      },
+      {
+        title: "Integration Testing",
+        url: "/integration/testing",
+        icon: Settings,
       },
     ],
   },
@@ -183,10 +199,10 @@ export function AppSidebar() {
                                 asChild 
                                 className="hover:bg-ike-primary/10 hover:text-ike-primary"
                               >
-                                <a href={subItem.url}>
+                                <Link to={subItem.url}>
                                   <subItem.icon className="w-4 h-4" />
                                   <span>{subItem.title}</span>
-                                </a>
+                                </Link>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                           ))}
@@ -198,10 +214,10 @@ export function AppSidebar() {
                       asChild 
                       className="hover:bg-ike-primary/10 hover:text-ike-primary"
                     >
-                      <a href={item.url}>
+                      <Link to={item.url}>
                         <item.icon className="w-4 h-4" />
                         <span>{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   )}
                 </SidebarMenuItem>
