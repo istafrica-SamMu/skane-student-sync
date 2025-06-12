@@ -23,6 +23,10 @@ import FollowUpReports from "./pages/FollowUpReports";
 import Integration from "./pages/Integration";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import UserManagement from "./pages/system/UserManagement";
+import MunicipalityManagement from "./pages/system/MunicipalityManagement";
+import SchoolUnits from "./pages/system/SchoolUnits";
+import SchoolYears from "./pages/system/SchoolYears";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +65,26 @@ const AppContent = () => {
               <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/system/users" element={
+                <ProtectedRoute>
+                  <UserManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/system/municipalities" element={
+                <ProtectedRoute>
+                  <MunicipalityManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/system/schools" element={
+                <ProtectedRoute>
+                  <SchoolUnits />
+                </ProtectedRoute>
+              } />
+              <Route path="/system/school-years" element={
+                <ProtectedRoute>
+                  <SchoolYears />
                 </ProtectedRoute>
               } />
               <Route path="/students" element={
