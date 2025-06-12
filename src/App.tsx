@@ -33,6 +33,10 @@ import NationalPrograms from "./pages/study-paths/NationalPrograms";
 import GradePromotions from "./pages/operations/GradePromotions";
 import PopulationData from "./pages/operations/PopulationData";
 import AddressUpdates from "./pages/operations/AddressUpdates";
+import RegionalStatistics from "./pages/reports/RegionalStatistics";
+import MonthlyCompilation from "./pages/reports/MonthlyCompilation";
+import FinancialAnalysis from "./pages/reports/FinancialAnalysis";
+import ChangeTracking from "./pages/reports/ChangeTracking";
 
 const queryClient = new QueryClient();
 
@@ -181,6 +185,26 @@ const AppContent = () => {
               <Route path="/reports/follow-up" element={
                 <ProtectedRoute>
                   <FollowUpReports />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/regional" element={
+                <ProtectedRoute>
+                  <RegionalStatistics />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/monthly" element={
+                <ProtectedRoute>
+                  <MonthlyCompilation />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/financial" element={
+                <ProtectedRoute>
+                  <FinancialAnalysis />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/changes" element={
+                <ProtectedRoute>
+                  <ChangeTracking />
                 </ProtectedRoute>
               } />
               <Route path="/integration" element={
