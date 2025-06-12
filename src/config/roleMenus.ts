@@ -194,24 +194,24 @@ export const municipalityAdminMenu: MenuItem[] = [
     icon: Users,
     items: [
       {
-        title: "Municipal Students",
+        title: "Students Overview",
         url: "/students",
         icon: Users,
       },
       {
-        title: "Student Transfers",
-        url: "/students/placements",
+        title: "Students by Class & Study Path",
+        url: "/students/classes",
+        icon: GraduationCap,
+      },
+      {
+        title: "Municipal School Students",
+        url: "/students/municipal",
+        icon: School,
+      },
+      {
+        title: "External School Students",
+        url: "/students/external",
         icon: ArrowUpDown,
-      },
-      {
-        title: "IKE Calculations",
-        url: "/financial",
-        icon: Calculator,
-      },
-      {
-        title: "Student Statistics",
-        url: "/reports/statistics",
-        icon: BarChart3,
       },
     ],
   },
