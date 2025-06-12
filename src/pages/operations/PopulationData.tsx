@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Users, Download, Upload, BarChart3, Refresh } from "lucide-react";
+import { Users, Download, Upload, BarChart3, RefreshCw } from "lucide-react";
 
 export default function PopulationData() {
   return (
@@ -22,7 +22,7 @@ export default function PopulationData() {
             Import Data
           </Button>
           <Button variant="outline">
-            <Refresh className="w-4 h-4 mr-2" />
+            <RefreshCw className="w-4 h-4 mr-2" />
             Sync Registry
           </Button>
           <Button>
