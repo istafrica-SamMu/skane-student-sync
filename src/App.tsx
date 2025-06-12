@@ -43,6 +43,9 @@ import ActivityLogs from "./pages/my-page/ActivityLogs";
 import ExtensExport from "./pages/integration/ExtensExport";
 import PopulationRegistry from "./pages/integration/PopulationRegistry";
 import IntegrationTesting from "./pages/integration/IntegrationTesting";
+import StudentsByClass from "./pages/students/StudentsByClass";
+import MunicipalStudents from "./pages/students/MunicipalStudents";
+import ExternalStudents from "./pages/students/ExternalStudents";
 
 const queryClient = new QueryClient();
 
@@ -136,6 +139,21 @@ const AppContent = () => {
               <Route path="/students" element={
                 <ProtectedRoute>
                   <Students />
+                </ProtectedRoute>
+              } />
+              <Route path="/students/classes" element={
+                <ProtectedRoute>
+                  <StudentsByClass />
+                </ProtectedRoute>
+              } />
+              <Route path="/students/municipal" element={
+                <ProtectedRoute>
+                  <MunicipalStudents />
+                </ProtectedRoute>
+              } />
+              <Route path="/students/external" element={
+                <ProtectedRoute>
+                  <ExternalStudents />
                 </ProtectedRoute>
               } />
               <Route path="/students/placements" element={
