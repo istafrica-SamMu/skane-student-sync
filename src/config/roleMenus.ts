@@ -269,12 +269,12 @@ export const municipalityAdminMenu: MenuItem[] = [
     items: [
       {
         title: "Municipal School Units",
-        url: "/operations/school-units",
+        url: "/operations/municipal-schools",
         icon: School,
       },
       {
         title: "Municipal User Administration",
-        url: "/operations/user-admin",
+        url: "/operations/municipal-users",
         icon: Users,
       },
       {
