@@ -46,6 +46,9 @@ import IntegrationTesting from "./pages/integration/IntegrationTesting";
 import StudentsByClass from "./pages/students/StudentsByClass";
 import MunicipalStudents from "./pages/students/MunicipalStudents";
 import ExternalStudents from "./pages/students/ExternalStudents";
+import ScheduleIntegration from "./pages/integration/ScheduleIntegration";
+import ImportStudentData from "./pages/integration/ImportStudentData";
+import IntegrationStatus from "./pages/integration/IntegrationStatus";
 
 const queryClient = new QueryClient();
 
@@ -244,6 +247,21 @@ const AppContent = () => {
               <Route path="/my-page/logs" element={
                 <ProtectedRoute>
                   <ActivityLogs />
+                </ProtectedRoute>
+              } />
+              <Route path="/integration/schedule" element={
+                <ProtectedRoute>
+                  <ScheduleIntegration />
+                </ProtectedRoute>
+              } />
+              <Route path="/integration/import" element={
+                <ProtectedRoute>
+                  <ImportStudentData />
+                </ProtectedRoute>
+              } />
+              <Route path="/integration/status" element={
+                <ProtectedRoute>
+                  <IntegrationStatus />
                 </ProtectedRoute>
               } />
               <Route path="/integration" element={

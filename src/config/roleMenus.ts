@@ -1,3 +1,4 @@
+
 import {
   Home,
   Users,
@@ -220,18 +221,18 @@ export const municipalityAdminMenu: MenuItem[] = [
     icon: Database,
     items: [
       {
-        title: "SIS Integration",
-        url: "/integration",
+        title: "Schedule Integration",
+        url: "/integration/schedule",
+        icon: Calendar,
+      },
+      {
+        title: "Import Student Data",
+        url: "/integration/import",
         icon: Database,
       },
       {
-        title: "Integration Schedule",
-        url: "/integration",
-        icon: Clock,
-      },
-      {
-        title: "Integration Logs",
-        url: "/integration",
+        title: "Integration Status & Logs",
+        url: "/integration/status",
         icon: Activity,
       },
     ],
