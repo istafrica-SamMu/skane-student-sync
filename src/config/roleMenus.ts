@@ -1,3 +1,4 @@
+
 import {
   Home,
   Users,
@@ -195,22 +196,22 @@ export const municipalityAdminMenu: MenuItem[] = [
     items: [
       {
         title: "Municipal Students",
-        url: "/students/municipal",
+        url: "/students",
         icon: Users,
       },
       {
         title: "Students by Class",
-        url: "/students/by-class",
+        url: "/students",
         icon: GraduationCap,
       },
       {
         title: "External Students",
-        url: "/students/external",
+        url: "/students/placements",
         icon: ArrowUpDown,
       },
       {
         title: "Location Control",
-        url: "/students/location-control",
+        url: "/students",
         icon: MapPin,
       },
     ],
@@ -221,17 +222,17 @@ export const municipalityAdminMenu: MenuItem[] = [
     items: [
       {
         title: "SIS Integration",
-        url: "/integration/sis",
+        url: "/integration",
         icon: Database,
       },
       {
         title: "Integration Schedule",
-        url: "/integration/schedule",
+        url: "/integration",
         icon: Clock,
       },
       {
         title: "Integration Logs",
-        url: "/integration/logs",
+        url: "/integration",
         icon: Activity,
       },
     ],
@@ -242,17 +243,17 @@ export const municipalityAdminMenu: MenuItem[] = [
     items: [
       {
         title: "Municipal Price Lists",
-        url: "/financial/price-lists",
+        url: "/financial/pricelists",
         icon: Euro,
       },
       {
         title: "Additional Amounts",
-        url: "/financial/additional",
+        url: "/financial",
         icon: DollarSign,
       },
       {
         title: "Compensation Reports",
-        url: "/financial/compensation",
+        url: "/reports/contributions",
         icon: FileText,
       },
     ],
@@ -263,17 +264,17 @@ export const municipalityAdminMenu: MenuItem[] = [
     items: [
       {
         title: "School Units",
-        url: "/operations/schools",
+        url: "/system/schools",
         icon: School,
       },
       {
         title: "User Management",
-        url: "/operations/users",
+        url: "/system/users",
         icon: Users,
       },
       {
         title: "Enrollment Control",
-        url: "/operations/enrollment",
+        url: "/students",
         icon: UserPlus,
       },
     ],
@@ -284,12 +285,12 @@ export const municipalityAdminMenu: MenuItem[] = [
     items: [
       {
         title: "Money to Receive",
-        url: "/reports/receivables",
+        url: "/reports",
         icon: TrendingUp,
       },
       {
         title: "Money to Pay",
-        url: "/reports/payables",
+        url: "/reports",
         icon: DollarSign,
       },
       {
