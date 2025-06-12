@@ -268,19 +268,24 @@ export const municipalityAdminMenu: MenuItem[] = [
     icon: Building,
     items: [
       {
-        title: "School Units",
-        url: "/system/schools",
+        title: "Municipal School Units",
+        url: "/operations/school-units",
         icon: School,
       },
       {
-        title: "User Management",
-        url: "/system/users",
+        title: "Municipal User Administration",
+        url: "/operations/user-admin",
         icon: Users,
       },
       {
-        title: "Enrollment Control",
-        url: "/students",
-        icon: UserPlus,
+        title: "Enrollment Control & Scheduling",
+        url: "/operations/enrollment-control",
+        icon: Calendar,
+      },
+      {
+        title: "Location Control & Double Placement",
+        url: "/operations/location-control",
+        icon: MapPin,
       },
     ],
   },

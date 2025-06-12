@@ -1,4 +1,5 @@
 
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -34,6 +35,10 @@ import NationalPrograms from "./pages/study-paths/NationalPrograms";
 import GradePromotions from "./pages/operations/GradePromotions";
 import PopulationData from "./pages/operations/PopulationData";
 import AddressUpdates from "./pages/operations/AddressUpdates";
+import MunicipalSchoolUnits from "./pages/operations/MunicipalSchoolUnits";
+import MunicipalUserAdmin from "./pages/operations/MunicipalUserAdmin";
+import EnrollmentControl from "./pages/operations/EnrollmentControl";
+import LocationControl from "./pages/operations/LocationControl";
 import RegionalStatistics from "./pages/reports/RegionalStatistics";
 import MonthlyCompilation from "./pages/reports/MonthlyCompilation";
 import FinancialAnalysis from "./pages/reports/FinancialAnalysis";
