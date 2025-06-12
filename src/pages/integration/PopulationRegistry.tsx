@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Users, Sync, Shield, AlertTriangle, CheckCircle, RefreshCcw } from "lucide-react";
+import { Users, RotateCcw, Shield, AlertTriangle, CheckCircle, RefreshCcw } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const PopulationRegistry = () => {
@@ -75,7 +75,7 @@ const PopulationRegistry = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
-            <Sync className="w-5 h-5 mr-2 text-ike-primary" />
+            <RotateCcw className="w-5 h-5 mr-2 text-ike-primary" />
             Current Synchronization
           </CardTitle>
           <CardDescription>
