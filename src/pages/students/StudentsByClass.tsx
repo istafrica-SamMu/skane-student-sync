@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { 
   Table,
   TableBody,
@@ -18,12 +19,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { 
   GraduationCap, 
   Users, 
   School,
   BookOpen,
-  Filter
+  Filter,
+  Plus,
+  Edit,
+  Settings
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -31,6 +43,7 @@ const StudentsByClass = () => {
   const { t } = useLanguage();
   const [selectedProgram, setSelectedProgram] = useState("all");
   const [selectedYear, setSelectedYear] = useState("all");
+  const [showCreateClass, setShowCreateClass] = useState(false);
 
   // Mock data for classes and study paths
   const classData = [
@@ -42,7 +55,8 @@ const StudentsByClass = () => {
       school: "Malmö Gymnasium",
       students: 28,
       capacity: 30,
-      teacher: "Anna Andersson"
+      teacher: "Anna Andersson",
+      room: "A101"
     },
     {
       id: 2,
@@ -52,7 +66,8 @@ const StudentsByClass = () => {
       school: "Katedralskolan",
       students: 32,
       capacity: 32,
-      teacher: "Erik Johansson"
+      teacher: "Erik Johansson",
+      room: "B205"
     },
     {
       id: 3,
@@ -62,7 +77,8 @@ const StudentsByClass = () => {
       school: "Nicolai Gymnasium",
       students: 25,
       capacity: 28,
-      teacher: "Maria Lindström"
+      teacher: "Maria Lindström",
+      room: "C302"
     },
     {
       id: 4,
@@ -72,7 +88,8 @@ const StudentsByClass = () => {
       school: "Jensen Gymnasium",
       students: 30,
       capacity: 30,
-      teacher: "Carl Petersson"
+      teacher: "Carl Petersson",
+      room: "D150"
     }
   ];
 
@@ -92,10 +109,77 @@ const StudentsByClass = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ike-neutral-dark">Students by Class & Study Path</h1>
+          <h1 className="text-3xl font-bold text-ike-neutral-dark">Class Management & Organization</h1>
           <p className="text-ike-neutral mt-2">
-            Overview of students organized by class and study program
+            Organize and manage classes, assign teachers, and monitor capacity
           </p>
+        </div>
+        <div className="flex gap-2">
+          <Dialog open={showCreateClass} onOpenChange={setShowCreateClass}>
+            <DialogTrigger asChild>
+              <Button className="bg-ike-primary hover:bg-ike-primary/90">
+                <Plus className="w-4 h-4 mr-2" />
+                Create New Class
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Class</DialogTitle>
+                <DialogDescription>
+                  Set up a new class with program, year, and capacity details.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div>
+                  <label className="text-sm font-medium">Class Name</label>
+                  <Input placeholder="e.g., NA24A" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Program</label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select program" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="na">Naturvetenskapsprogrammet</SelectItem>
+                      <SelectItem value="sa">Samhällsvetenskapsprogrammet</SelectItem>
+                      <SelectItem value="te">Teknikprogrammet</SelectItem>
+                      <SelectItem value="ek">Ekonomiprogrammet</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Year</label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">År 1</SelectItem>
+                      <SelectItem value="2">År 2</SelectItem>
+                      <SelectItem value="3">År 3</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Capacity</label>
+                  <Input type="number" placeholder="30" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Classroom</label>
+                  <Input placeholder="e.g., A101" />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setShowCreateClass(false)}>
+                  Cancel
+                </Button>
+                <Button className="bg-ike-primary hover:bg-ike-primary/90">
+                  Create Class
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -126,18 +210,18 @@ const StudentsByClass = () => {
         <Card className="border-l-4 border-l-ike-warning">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Nearly Full Classes
+              Average Class Size
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-ike-neutral-dark">8</div>
+            <div className="text-2xl font-bold text-ike-neutral-dark">26.5</div>
           </CardContent>
         </Card>
         
         <Card className="border-l-4 border-l-ike-error">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Full Classes
+              Classes at Capacity
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -149,10 +233,13 @@ const StudentsByClass = () => {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-ike-neutral-dark">Filter Classes</CardTitle>
+          <CardTitle className="text-ike-neutral-dark">Filter & Search Classes</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <Input placeholder="Search by class name or teacher..." />
+            </div>
             <Select value={selectedProgram} onValueChange={setSelectedProgram}>
               <SelectTrigger className="w-64">
                 <SelectValue placeholder="Select Program" />
@@ -185,10 +272,10 @@ const StudentsByClass = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <GraduationCap className="w-5 h-5 mr-2 text-ike-primary" />
-            Classes Overview
+            Class Organization Overview
           </CardTitle>
           <CardDescription>
-            Detailed view of all classes in the municipality
+            Manage class details, assignments, and capacity
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -198,10 +285,11 @@ const StudentsByClass = () => {
                 <TableHead className="font-medium">Class</TableHead>
                 <TableHead className="font-medium">Program</TableHead>
                 <TableHead className="font-medium">Year</TableHead>
-                <TableHead className="font-medium">School</TableHead>
                 <TableHead className="font-medium">Teacher</TableHead>
+                <TableHead className="font-medium">Room</TableHead>
                 <TableHead className="font-medium">Students</TableHead>
                 <TableHead className="font-medium">Status</TableHead>
+                <TableHead className="font-medium">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -212,13 +300,25 @@ const StudentsByClass = () => {
                   </TableCell>
                   <TableCell>{classItem.program}</TableCell>
                   <TableCell>{classItem.year}</TableCell>
-                  <TableCell>{classItem.school}</TableCell>
                   <TableCell>{classItem.teacher}</TableCell>
+                  <TableCell>{classItem.room}</TableCell>
                   <TableCell>
                     <span className="font-medium">{classItem.students}</span>
                     <span className="text-ike-neutral">/{classItem.capacity}</span>
                   </TableCell>
                   <TableCell>{getCapacityBadge(classItem.students, classItem.capacity)}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">
+                        <Edit className="w-4 h-4 mr-1" />
+                        Edit
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <Users className="w-4 h-4 mr-1" />
+                        Students
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
