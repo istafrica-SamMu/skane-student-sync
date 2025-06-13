@@ -365,17 +365,17 @@ export const schoolAdminMenu: MenuItem[] = [
     items: [
       {
         title: "School Unit Information",
-        url: "/school/information",
+        url: "/system/schools",
         icon: Building,
       },
       {
         title: "Programs & Specializations",
-        url: "/school/programs",
+        url: "/study-paths/programs",
         icon: Book,
       },
       {
         title: "Class Management",
-        url: "/school/classes",
+        url: "/students/classes",
         icon: GraduationCap,
       },
     ],
