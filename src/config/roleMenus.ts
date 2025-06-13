@@ -364,19 +364,19 @@ export const schoolAdminMenu: MenuItem[] = [
     icon: School,
     items: [
       {
-        title: "School Information",
+        title: "School Unit Information",
         url: "/school/information",
         icon: Building,
       },
       {
-        title: "Programs & Classes",
+        title: "Programs & Specializations",
         url: "/school/programs",
         icon: Book,
       },
       {
-        title: "Unit Management",
-        url: "/school/units",
-        icon: Briefcase,
+        title: "Class Management",
+        url: "/school/classes",
+        icon: GraduationCap,
       },
     ],
   },
