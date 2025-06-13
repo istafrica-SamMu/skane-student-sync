@@ -354,7 +354,7 @@ export const schoolAdminMenu: MenuItem[] = [
       },
       {
         title: "Add New Student",
-        url: "/students",
+        url: "/data-entry/registration",
         icon: UserPlus,
       },
       {
