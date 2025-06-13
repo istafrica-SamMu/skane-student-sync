@@ -348,7 +348,7 @@ export const schoolAdminMenu: MenuItem[] = [
     icon: Users,
     items: [
       {
-        title: "View & Edit Student Roster",
+        title: "Student Roster & Classes",
         url: "/students",
         icon: Users,
       },
@@ -356,11 +356,6 @@ export const schoolAdminMenu: MenuItem[] = [
         title: "Manage Student Placements",
         url: "/students/placements",
         icon: ArrowUpDown,
-      },
-      {
-        title: "Students by Class & Program",
-        url: "/students/classes",
-        icon: GraduationCap,
       },
       {
         title: "Track Student Dates",
