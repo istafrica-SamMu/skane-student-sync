@@ -1,4 +1,5 @@
 
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +21,11 @@ import {
   Globe,
   Database,
   Shield,
-  Settings
+  Settings,
+  GraduationCap,
+  Calendar,
+  MapPin,
+  DollarSign
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -35,6 +40,324 @@ const Dashboard = () => {
     month: 'long',
     day: 'numeric'
   });
+
+  // Municipal Admin specific dashboard
+  if (user?.role === 'municipality-admin') {
+    return (
+      <div className="space-y-6">
+        {/* Welcome Header - Municipal Admin */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-ike-neutral-dark">
+              Municipal Administration Dashboard
+            </h1>
+            <p className="text-ike-neutral mt-2">
+              {currentDate} • {user.organization || 'Municipality'} Overview
+            </p>
+          </div>
+          <div className="flex space-x-3">
+            <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+              <Download className="w-4 h-4 mr-2" />
+              Export Municipal Report
+            </Button>
+            <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+              <FileText className="w-4 h-4 mr-2" />
+              Financial Export
+            </Button>
+          </div>
+        </div>
+
+        {/* Municipal Key Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="border-l-4 border-l-ike-primary">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-ike-neutral">
+                Municipal Students
+              </CardTitle>
+              <Users className="h-4 w-4 text-ike-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-ike-neutral-dark">4,250</div>
+              <div className="flex items-center text-xs text-ike-success mt-1">
+                <ArrowUp className="w-3 h-3 mr-1" />
+                +2.1% from last month
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-l-4 border-l-ike-success">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-ike-neutral">
+                External Students
+              </CardTitle>
+              <ArrowUp className="h-4 w-4 text-ike-success" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-ike-neutral-dark">847</div>
+              <div className="text-xs text-ike-neutral mt-1">
+                In independent schools
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-l-4 border-l-ike-warning">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-ike-neutral">
+                Money to Pay
+              </CardTitle>
+              <Euro className="h-4 w-4 text-ike-warning" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-ike-neutral-dark">2.8M SEK</div>
+              <div className="text-xs text-ike-warning mt-1">
+                November calculation
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-l-4 border-l-green-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-ike-neutral">
+                Money to Receive
+              </CardTitle>
+              <TrendingUp className="h-4 w-4 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-ike-neutral-dark">1.4M SEK</div>
+              <div className="text-xs text-ike-neutral mt-1">
+                From other municipalities
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Municipal Integration Status */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center text-ike-neutral-dark">
+                <Database className="w-5 h-5 mr-2 text-ike-primary" />
+                Municipal Integration Status
+              </CardTitle>
+              <CardDescription>
+                System integration and data synchronization
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Schedule Integration</span>
+                  <Badge className="bg-ike-success text-white">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Connected
+                  </Badge>
+                </div>
+                <Progress value={100} className="h-2" />
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Student Data Import</span>
+                  <Badge className="bg-ike-warning text-white">
+                    <Clock className="w-3 h-3 mr-1" />
+                    Processing
+                  </Badge>
+                </div>
+                <Progress value={65} className="h-2" />
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Regional Sync</span>
+                  <Badge className="bg-ike-success text-white">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Up to date
+                  </Badge>
+                </div>
+                <Progress value={100} className="h-2" />
+              </div>
+
+              <div className="pt-4 border-t">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-ike-neutral">Last sync:</span>
+                  <span className="text-sm font-medium">5 minutes ago</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Municipal Operations */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-ike-neutral-dark">Municipal Operations</CardTitle>
+              <CardDescription>
+                Quick access to key functions
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button 
+                className="w-full justify-start bg-ike-primary hover:bg-ike-primary-dark text-white"
+              >
+                <Users className="w-4 h-4 mr-2" />
+                Student Management
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
+              >
+                <Euro className="w-4 h-4 mr-2" />
+                Financial Reports
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+              >
+                <School className="w-4 h-4 mr-2" />
+                Municipal Schools
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+              >
+                <Calendar className="w-4 h-4 mr-2" />
+                Enrollment Control
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Municipal Schools Overview */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-ike-neutral-dark">Municipal Schools Overview</CardTitle>
+            <CardDescription>
+              Status and metrics for municipal school units
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[
+                {
+                  name: "Centralskolan",
+                  students: 420,
+                  grade: "F-9",
+                  status: "Active",
+                  integration: "Connected",
+                  statusColor: "success"
+                },
+                {
+                  name: "Gymnasieskolan Väst",
+                  students: 850,
+                  grade: "Gy",
+                  status: "Active",
+                  integration: "Connected",
+                  statusColor: "success"
+                },
+                {
+                  name: "Österskolan",
+                  students: 320,
+                  grade: "F-6",
+                  status: "Active",
+                  integration: "Warning",
+                  statusColor: "warning"
+                },
+                {
+                  name: "Södraskolan",
+                  students: 280,
+                  grade: "7-9",
+                  status: "Active",
+                  integration: "Connected",
+                  statusColor: "success"
+                }
+              ].map((school, index) => (
+                <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-ike-primary/10 rounded-lg flex items-center justify-center">
+                      <School className="w-6 h-6 text-ike-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-ike-neutral-dark">{school.name}</h3>
+                      <p className="text-sm text-ike-neutral">{school.students} students • Grade {school.grade}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <Badge 
+                      className={
+                        school.statusColor === "success" ? "bg-ike-success text-white" :
+                        school.statusColor === "warning" ? "bg-ike-warning text-white" :
+                        "bg-ike-error text-white"
+                      }
+                    >
+                      {school.integration}
+                    </Badge>
+                    <div className={`w-3 h-3 rounded-full ${
+                      school.statusColor === "success" ? "bg-ike-success" : "bg-ike-warning"
+                    }`}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Financial Summary */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-ike-neutral-dark">Inter-Municipal Compensation</CardTitle>
+              <CardDescription>
+                Current month financial overview
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-ike-neutral">Students in external schools:</span>
+                <span className="font-medium">847 students</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-ike-neutral">External students in our schools:</span>
+                <span className="font-medium">312 students</span>
+              </div>
+              <div className="border-t pt-4">
+                <div className="flex justify-between items-center text-lg">
+                  <span className="font-medium">Net compensation:</span>
+                  <span className="font-bold text-ike-warning">-1.4M SEK</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-ike-neutral-dark">Enrollment Periods</CardTitle>
+              <CardDescription>
+                Municipal enrollment management
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-ike-neutral">Current period:</span>
+                <Badge className="bg-ike-success text-white">Open</Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-ike-neutral">Applications received:</span>
+                <span className="font-medium">156</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-ike-neutral">Deadline:</span>
+                <span className="font-medium">15 mars 2025</span>
+              </div>
+              <Button className="w-full mt-4" variant="outline">
+                <Settings className="w-4 h-4 mr-2" />
+                Manage Enrollment Settings
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   // Regional Admin specific dashboard
   if (user?.role === 'regional-admin') {
