@@ -397,27 +397,6 @@ export const schoolAdminMenu: MenuItem[] = [
     ],
   },
   {
-    title: "Warnings & Notifications",
-    icon: Bell,
-    items: [
-      {
-        title: "Double Registration",
-        url: "/warnings/double-registration",
-        icon: AlertTriangle,
-      },
-      {
-        title: "System Warnings",
-        url: "/warnings/system",
-        icon: Bell,
-      },
-      {
-        title: "Conflict Resolution",
-        url: "/students/conflicts",
-        icon: AlertTriangle,
-      },
-    ],
-  },
-  {
     title: "Reports",
     icon: FileText,
     items: [
