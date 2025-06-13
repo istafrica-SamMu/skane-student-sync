@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -253,7 +254,7 @@ const Dashboard = () => {
                   name: "Helsingborg",
                   students: 9800,
                   status: "Active",
-4 lastSync: "1 min ago",
+                  lastSync: "1 min ago",
                   integration: "Warning",
                   statusColor: "warning"
                 },
