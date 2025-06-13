@@ -348,13 +348,13 @@ export const schoolAdminMenu: MenuItem[] = [
     icon: Users,
     items: [
       {
-        title: "School Roster",
-        url: "/students/roster",
+        title: "Students Overview",
+        url: "/students",
         icon: Users,
       },
       {
         title: "Add New Student",
-        url: "/students/add",
+        url: "/students",
         icon: UserPlus,
       },
       {
@@ -363,7 +363,7 @@ export const schoolAdminMenu: MenuItem[] = [
         icon: ArrowUpDown,
       },
       {
-        title: "Class Management",
+        title: "Students by Class & Study Path",
         url: "/students/classes",
         icon: GraduationCap,
       },
@@ -401,7 +401,7 @@ export const schoolAdminMenu: MenuItem[] = [
       },
       {
         title: "Bulk Operations",
-        url: "/data-entry/bulk",
+        url: "/students/bulk",
         icon: Package,
       },
       {
@@ -427,7 +427,7 @@ export const schoolAdminMenu: MenuItem[] = [
       },
       {
         title: "Conflict Resolution",
-        url: "/warnings/conflicts",
+        url: "/students/conflicts",
         icon: AlertTriangle,
       },
     ],
