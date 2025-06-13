@@ -348,11 +348,6 @@ export const schoolAdminMenu: MenuItem[] = [
     icon: Users,
     items: [
       {
-        title: "Add New Students",
-        url: "/data-entry/registration",
-        icon: UserPlus,
-      },
-      {
         title: "View & Edit Student Roster",
         url: "/students",
         icon: Users,
