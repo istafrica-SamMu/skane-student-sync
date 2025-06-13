@@ -41,6 +41,9 @@ import RegionalStatistics from "./pages/reports/RegionalStatistics";
 import MonthlyCompilation from "./pages/reports/MonthlyCompilation";
 import FinancialAnalysis from "./pages/reports/FinancialAnalysis";
 import ChangeTracking from "./pages/reports/ChangeTracking";
+import StudentLists from "./pages/reports/StudentLists";
+import SchoolFinancialReports from "./pages/reports/SchoolFinancialReports";
+import SchoolStatistics from "./pages/reports/SchoolStatistics";
 import Messages from "./pages/my-page/Messages";
 import EnrollmentSettings from "./pages/my-page/EnrollmentSettings";
 import ActivityLogs from "./pages/my-page/ActivityLogs";
@@ -245,14 +248,24 @@ const AppContent = () => {
                   <Reports />
                 </ProtectedRoute>
               } />
-              <Route path="/reports/contributions" element={
+              <Route path="/reports/students" element={
                 <ProtectedRoute>
-                  <ContributionReports />
+                  <StudentLists />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/financial" element={
+                <ProtectedRoute>
+                  <SchoolFinancialReports />
                 </ProtectedRoute>
               } />
               <Route path="/reports/statistics" element={
                 <ProtectedRoute>
-                  <Statistics />
+                  <SchoolStatistics />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/contributions" element={
+                <ProtectedRoute>
+                  <ContributionReports />
                 </ProtectedRoute>
               } />
               <Route path="/reports/follow-up" element={
@@ -268,11 +281,6 @@ const AppContent = () => {
               <Route path="/reports/monthly" element={
                 <ProtectedRoute>
                   <MonthlyCompilation />
-                </ProtectedRoute>
-              } />
-              <Route path="/reports/financial" element={
-                <ProtectedRoute>
-                  <FinancialAnalysis />
                 </ProtectedRoute>
               } />
               <Route path="/reports/changes" element={
