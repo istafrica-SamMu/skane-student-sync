@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,16 +37,16 @@ const Reports = () => {
       name: "Financial Contribution Reports",
       icon: DollarSign,
       count: 5,
-      popular: "Monthly Financial Summary",
-      url: "/financial/reports"
+      popular: "School Financial Summary",
+      url: "/financial"
     },
     {
       id: 3,
-      name: "School Statistics",
+      name: "Data Export & Statistics",
       icon: BarChart3,
       count: 6,
-      popular: "Program Distribution Analysis",
-      url: "/reports/statistics"
+      popular: "Student Data Export",
+      url: "/students/classes"
     }
   ];
 
@@ -110,9 +109,9 @@ const Reports = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ike-neutral-dark">School Reports</h1>
+          <h1 className="text-3xl font-bold text-ike-neutral-dark">Basic Reporting</h1>
           <p className="text-ike-neutral mt-2">
-            Generate and manage school-specific reports and statistics
+            School-specific student lists, financial reports, and data export capabilities
           </p>
         </div>
         <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
@@ -294,8 +293,8 @@ const Reports = () => {
                 <FileText className="w-4 h-4" />
               </Button>
             </div>
-            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/students/placements'}>
-              <span className="text-sm">Student Placements</span>
+            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/students'}>
+              <span className="text-sm">Student Statistics</span>
               <Button size="sm" variant="ghost">
                 <FileText className="w-4 h-4" />
               </Button>
@@ -311,8 +310,8 @@ const Reports = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/financial/reports'}>
-              <span className="text-sm">Monthly Financial Summary</span>
+            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/financial'}>
+              <span className="text-sm">School Financial Summary</span>
               <Button size="sm" variant="ghost">
                 <FileText className="w-4 h-4" />
               </Button>
@@ -323,7 +322,7 @@ const Reports = () => {
                 <FileText className="w-4 h-4" />
               </Button>
             </div>
-            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/financial/reports'}>
+            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/financial'}>
               <span className="text-sm">Annual Financial Report</span>
               <Button size="sm" variant="ghost">
                 <FileText className="w-4 h-4" />
@@ -336,24 +335,24 @@ const Reports = () => {
           <CardHeader>
             <CardTitle className="flex items-center text-ike-neutral-dark">
               <BarChart3 className="w-5 h-5 mr-2 text-ike-primary" />
-              School Statistics
+              Data Export & Statistics
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/reports/statistics'}>
-              <span className="text-sm">Program Distribution</span>
+            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/students'}>
+              <span className="text-sm">Student Data Export</span>
               <Button size="sm" variant="ghost">
                 <FileText className="w-4 h-4" />
               </Button>
             </div>
             <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/students/classes'}>
-              <span className="text-sm">Class Size Analysis</span>
+              <span className="text-sm">Class Information Export</span>
               <Button size="sm" variant="ghost">
                 <FileText className="w-4 h-4" />
               </Button>
             </div>
-            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/reports/statistics'}>
-              <span className="text-sm">Academic Performance</span>
+            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/financial'}>
+              <span className="text-sm">Financial Data Export</span>
               <Button size="sm" variant="ghost">
                 <FileText className="w-4 h-4" />
               </Button>
