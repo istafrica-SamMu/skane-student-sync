@@ -348,24 +348,24 @@ export const schoolAdminMenu: MenuItem[] = [
     icon: Users,
     items: [
       {
+        title: "Student Registration",
+        url: "/data-entry/registration",
+        icon: UserPlus,
+      },
+      {
         title: "Students Overview",
         url: "/students",
         icon: Users,
       },
       {
-        title: "Add New Student",
-        url: "/data-entry/registration",
-        icon: UserPlus,
+        title: "Student Conflicts",
+        url: "/students/conflicts",
+        icon: AlertTriangle,
       },
       {
-        title: "Student Placements",
-        url: "/students/placements",
-        icon: ArrowUpDown,
-      },
-      {
-        title: "Students by Class & Study Path",
-        url: "/students/classes",
-        icon: GraduationCap,
+        title: "Bulk Operations",
+        url: "/students/bulk",
+        icon: Package,
       },
     ],
   },
