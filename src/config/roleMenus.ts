@@ -1,4 +1,3 @@
-
 import {
   Home,
   Users,
@@ -370,7 +369,7 @@ export const schoolAdminMenu: MenuItem[] = [
       },
       {
         title: "Track Student Dates",
-        url: "/students",
+        url: "/students/dates",
         icon: Calendar,
       },
     ],
@@ -400,11 +399,6 @@ export const schoolAdminMenu: MenuItem[] = [
     title: "Data Entry",
     icon: FileText,
     items: [
-      {
-        title: "Student Registration",
-        url: "/data-entry/registration",
-        icon: UserPlus,
-      },
       {
         title: "Bulk Operations",
         url: "/students/bulk",
