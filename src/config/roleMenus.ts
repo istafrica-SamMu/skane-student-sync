@@ -381,22 +381,6 @@ export const schoolAdminMenu: MenuItem[] = [
     ],
   },
   {
-    title: "Data Entry",
-    icon: FileText,
-    items: [
-      {
-        title: "Bulk Operations",
-        url: "/students/bulk",
-        icon: Package,
-      },
-      {
-        title: "Student Completion",
-        url: "/data-entry/completion",
-        icon: UserCheck,
-      },
-    ],
-  },
-  {
     title: "Reports",
     icon: FileText,
     items: [
