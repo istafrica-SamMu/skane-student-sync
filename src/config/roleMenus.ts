@@ -1,3 +1,4 @@
+
 import {
   Home,
   Users,
@@ -348,24 +349,29 @@ export const schoolAdminMenu: MenuItem[] = [
     icon: Users,
     items: [
       {
-        title: "Student Registration",
+        title: "Add New Students",
         url: "/data-entry/registration",
         icon: UserPlus,
       },
       {
-        title: "Students Overview",
+        title: "View & Edit Student Roster",
         url: "/students",
         icon: Users,
       },
       {
-        title: "Student Conflicts",
-        url: "/students/conflicts",
-        icon: AlertTriangle,
+        title: "Manage Student Placements",
+        url: "/students/placements",
+        icon: ArrowUpDown,
       },
       {
-        title: "Bulk Operations",
-        url: "/students/bulk",
-        icon: Package,
+        title: "Students by Class & Program",
+        url: "/students/classes",
+        icon: GraduationCap,
+      },
+      {
+        title: "Track Student Dates",
+        url: "/students",
+        icon: Calendar,
       },
     ],
   },
