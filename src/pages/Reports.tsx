@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,109 +12,96 @@ import {
   ChevronRight,
   Clock,
   Star,
-  User
+  User,
+  DollarSign,
+  BarChart3
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Reports = () => {
   const { t } = useLanguage();
+  const { user } = useAuth();
 
+  // School admin specific report categories
   const reportCategories = [
     {
       id: 1,
-      name: t('reports.student.reports'),
+      name: "Student Lists & Statistics",
       icon: User,
-      count: 14,
-      popular: "Studentregistrering (månadsvis)"
+      count: 8,
+      popular: "Current Student Roster",
+      url: "/students"
     },
     {
       id: 2,
-      name: t('reports.financial.reports'),
-      icon: FileText,
-      count: 9,
-      popular: "Ekonomisk sammanställning (månadsvis)"
+      name: "Financial Contribution Reports",
+      icon: DollarSign,
+      count: 5,
+      popular: "Monthly Financial Summary",
+      url: "/financial/reports"
     },
     {
       id: 3,
-      name: t('reports.municipality.reports'),
-      icon: FileText,
-      count: 8,
-      popular: "Kommunal fördelning (kvartalsvis)"
-    },
-    {
-      id: 4,
-      name: t('reports.statistics.reports'),
-      icon: FileText,
-      count: 12,
-      popular: "Programanalys (terminsvis)"
+      name: "School Statistics",
+      icon: BarChart3,
+      count: 6,
+      popular: "Program Distribution Analysis",
+      url: "/reports/statistics"
     }
   ];
 
   const recentReports = [
     {
       id: 1,
-      name: "Student Enrollment Report",
-      category: "Studentrapporter",
+      name: "Current Student Roster",
+      category: "Student Lists",
       generatedDate: "2024-11-15 10:30",
-      scheduleType: "Daily",
-      nextSchedule: "2024-11-16 06:00",
       format: "Excel",
-      user: "Anna Lindström"
+      user: user?.name || "School Admin"
     },
     {
       id: 2,
-      name: "Financial Summary October 2024",
-      category: "Ekonomirapporter",
+      name: "Monthly Financial Contribution",
+      category: "Financial Reports",
       generatedDate: "2024-11-10 14:15",
-      scheduleType: "Monthly",
-      nextSchedule: "2024-12-10 06:00",
       format: "PDF",
-      user: "Lars Persson"
+      user: user?.name || "School Admin"
     },
     {
       id: 3,
-      name: "Conflict Resolution Report",
-      category: "Studentrapporter",
+      name: "Program Enrollment Statistics",
+      category: "School Statistics",
       generatedDate: "2024-11-12 09:45",
-      scheduleType: "Weekly",
-      nextSchedule: "2024-11-19 06:00",
       format: "Excel",
-      user: "Maria Andersson"
+      user: user?.name || "School Admin"
     }
   ];
 
   const savedReports = [
     {
       id: 1,
-      name: "Student Distribution by Program",
-      category: "Studentrapporter",
+      name: "Weekly Student Attendance",
+      category: "Student Lists",
       lastRun: "2024-11-10",
       favorite: true,
-      description: "Shows the distribution of students across all programs"
+      description: "Weekly attendance report for all classes"
     },
     {
       id: 2,
-      name: "Municipality Cost Analysis",
-      category: "Ekonomirapporter",
+      name: "Financial Contribution Summary",
+      category: "Financial Reports",
       lastRun: "2024-11-08",
       favorite: true,
-      description: "Detailed cost breakdown per municipality"
+      description: "Monthly financial contribution breakdown"
     },
     {
       id: 3,
-      name: "Grade Performance Analysis",
-      category: "Statistikrapporter",
+      name: "Class Performance Analysis",
+      category: "School Statistics",
       lastRun: "2024-10-30",
       favorite: false,
-      description: "Analysis of grade performance across schools"
-    },
-    {
-      id: 4,
-      name: "Demographic Analysis",
-      category: "Statistikrapporter",
-      lastRun: "2024-10-25",
-      favorite: false,
-      description: "Student demographics across regions"
+      description: "Academic performance across all programs"
     }
   ];
 
@@ -122,14 +110,14 @@ const Reports = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ike-neutral-dark">{t('reports.title')}</h1>
+          <h1 className="text-3xl font-bold text-ike-neutral-dark">School Reports</h1>
           <p className="text-ike-neutral mt-2">
-            {t('reports.subtitle')}
+            Generate and manage school-specific reports and statistics
           </p>
         </div>
         <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
           <FileText className="w-4 h-4 mr-2" />
-          {t('reports.new.report')}
+          New Report
         </Button>
       </div>
 
@@ -137,17 +125,18 @@ const Reports = () => {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-ike-neutral" />
         <Input
-          placeholder={t('reports.search.placeholder')}
+          placeholder="Search school reports..."
           className="pl-10 py-6 text-lg border-ike-primary/20 focus:border-ike-primary"
         />
       </div>
 
       {/* Report Categories */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {reportCategories.map((category) => (
           <Card 
             key={category.id}
             className="hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-ike-primary"
+            onClick={() => window.location.href = category.url}
           >
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
@@ -162,13 +151,13 @@ const Reports = () => {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-ike-neutral mb-4">
-                {t('reports.most.popular')} <span className="text-ike-neutral-dark">{category.popular}</span>
+                Most popular: <span className="text-ike-neutral-dark">{category.popular}</span>
               </p>
               <Button 
                 variant="ghost" 
                 className="w-full justify-between text-ike-primary hover:bg-ike-primary/10"
               >
-                {t('reports.show.all')}
+                View Reports
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </CardContent>
@@ -181,10 +170,10 @@ const Reports = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <Clock className="w-5 h-5 mr-2 text-ike-primary" />
-            {t('reports.recent.reports')}
+            Recent Reports
           </CardTitle>
           <CardDescription>
-            {t('reports.recent.scheduled')}
+            Recently generated school reports
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -199,7 +188,6 @@ const Reports = () => {
                     <h3 className="font-medium text-ike-neutral-dark">{report.name}</h3>
                     <div className="text-sm text-ike-neutral mt-1">
                       <span className="mr-4">{report.category}</span>
-                      <span className="mr-4">{report.scheduleType}</span>
                       <Badge variant="outline">{report.format}</Badge>
                     </div>
                     <div className="flex items-center text-xs text-ike-neutral mt-2">
@@ -213,12 +201,12 @@ const Reports = () => {
                 </div>
                 <div className="flex space-x-2">
                   <Button size="sm" variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-                    <Calendar className="w-4 h-4 mr-1" />
-                    Schema
+                    <Edit className="w-4 h-4 mr-1" />
+                    Edit
                   </Button>
                   <Button size="sm" className="bg-ike-primary hover:bg-ike-primary-dark text-white">
                     <Download className="w-4 h-4 mr-1" />
-                    Ladda ner
+                    Download
                   </Button>
                 </div>
               </div>
@@ -232,10 +220,10 @@ const Reports = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <Star className="w-5 h-5 mr-2 text-ike-warning" />
-            {t('reports.saved.reports')}
+            Saved Report Templates
           </CardTitle>
           <CardDescription>
-            {t('reports.custom.templates')}
+            Your custom report templates and favorites
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -260,7 +248,7 @@ const Reports = () => {
                       <div className="text-sm text-ike-neutral">
                         <span>{report.category}</span>
                         <span className="mx-2">•</span>
-                        <span>Senast körd: {report.lastRun}</span>
+                        <span>Last run: {report.lastRun}</span>
                       </div>
                     </div>
                   </div>
@@ -271,11 +259,11 @@ const Reports = () => {
                 <div className="flex space-x-2 mt-4">
                   <Button size="sm" variant="outline" className="border-ike-neutral text-ike-neutral hover:bg-ike-neutral-light">
                     <Edit className="w-4 h-4 mr-1" />
-                    Redigera
+                    Edit
                   </Button>
                   <Button size="sm" className="bg-ike-primary hover:bg-ike-primary-dark text-white">
                     <FileText className="w-4 h-4 mr-1" />
-                    Generera
+                    Generate
                   </Button>
                 </div>
               </div>
@@ -284,30 +272,30 @@ const Reports = () => {
         </CardContent>
       </Card>
 
-      {/* Available Report Types */}
+      {/* Available Report Types for School Admin */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center text-ike-neutral-dark">
               <User className="w-5 h-5 mr-2 text-ike-primary" />
-              {t('reports.student.reports')}
+              Student Lists & Statistics
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md">
-              <span className="text-sm">Studentregistrering (Monthly)</span>
+            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/students'}>
+              <span className="text-sm">Current Student Roster</span>
               <Button size="sm" variant="ghost">
                 <FileText className="w-4 h-4" />
               </Button>
             </div>
-            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md">
-              <span className="text-sm">Elevplatser (Weekly)</span>
+            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/students/classes'}>
+              <span className="text-sm">Students by Class</span>
               <Button size="sm" variant="ghost">
                 <FileText className="w-4 h-4" />
               </Button>
             </div>
-            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md">
-              <span className="text-sm">Konfliktanalys (Daily)</span>
+            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/students/placements'}>
+              <span className="text-sm">Student Placements</span>
               <Button size="sm" variant="ghost">
                 <FileText className="w-4 h-4" />
               </Button>
@@ -318,25 +306,25 @@ const Reports = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center text-ike-neutral-dark">
-              <FileText className="w-5 h-5 mr-2 text-ike-primary" />
-              {t('reports.financial.reports')}
+              <DollarSign className="w-5 h-5 mr-2 text-ike-primary" />
+              Financial Contribution Reports
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md">
-              <span className="text-sm">Ekonomisk sammanställning (Monthly)</span>
+            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/financial/reports'}>
+              <span className="text-sm">Monthly Financial Summary</span>
               <Button size="sm" variant="ghost">
                 <FileText className="w-4 h-4" />
               </Button>
             </div>
-            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md">
-              <span className="text-sm">Kostnad per student (Quarterly)</span>
+            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/financial'}>
+              <span className="text-sm">Cost per Student</span>
               <Button size="sm" variant="ghost">
                 <FileText className="w-4 h-4" />
               </Button>
             </div>
-            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md">
-              <span className="text-sm">Budgetavstämning (Monthly)</span>
+            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/financial/reports'}>
+              <span className="text-sm">Annual Financial Report</span>
               <Button size="sm" variant="ghost">
                 <FileText className="w-4 h-4" />
               </Button>
@@ -347,25 +335,25 @@ const Reports = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center text-ike-neutral-dark">
-              <FileText className="w-5 h-5 mr-2 text-ike-primary" />
-              {t('reports.statistics.reports')}
+              <BarChart3 className="w-5 h-5 mr-2 text-ike-primary" />
+              School Statistics
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md">
-              <span className="text-sm">Programanalys (Termly)</span>
+            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/reports/statistics'}>
+              <span className="text-sm">Program Distribution</span>
               <Button size="sm" variant="ghost">
                 <FileText className="w-4 h-4" />
               </Button>
             </div>
-            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md">
-              <span className="text-sm">Kommunfördelning (Quarterly)</span>
+            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/students/classes'}>
+              <span className="text-sm">Class Size Analysis</span>
               <Button size="sm" variant="ghost">
                 <FileText className="w-4 h-4" />
               </Button>
             </div>
-            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md">
-              <span className="text-sm">Årsstatistik (Yearly)</span>
+            <div className="flex items-center justify-between p-2 hover:bg-ike-neutral-light rounded-md cursor-pointer" onClick={() => window.location.href = '/reports/statistics'}>
+              <span className="text-sm">Academic Performance</span>
               <Button size="sm" variant="ghost">
                 <FileText className="w-4 h-4" />
               </Button>
