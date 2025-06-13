@@ -219,6 +219,10 @@ const Students = () => {
           </p>
         </div>
         <div className="flex space-x-3">
+          <Button className="bg-ike-primary hover:bg-ike-primary/90 text-white">
+            <Plus className="w-4 h-4 mr-2" />
+            New Student
+          </Button>
           <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
             <Download className="w-4 h-4 mr-2" />
             {t('students.export')}

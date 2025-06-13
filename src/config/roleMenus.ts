@@ -357,11 +357,6 @@ export const schoolAdminMenu: MenuItem[] = [
         url: "/students/placements",
         icon: ArrowUpDown,
       },
-      {
-        title: "Track Student Dates",
-        url: "/students/dates",
-        icon: Calendar,
-      },
     ],
   },
   {
