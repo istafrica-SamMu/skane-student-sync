@@ -92,11 +92,6 @@ export const regionalAdminMenu: MenuItem[] = [
     icon: Database,
     items: [
       {
-        title: "Grade Promotions",
-        url: "/operations/promotions",
-        icon: TrendingUp,
-      },
-      {
         title: "Population Data",
         url: "/operations/population",
         icon: Users,

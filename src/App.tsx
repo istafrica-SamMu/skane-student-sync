@@ -30,7 +30,6 @@ import SchoolYears from "./pages/system/SchoolYears";
 import StudyPaths from "./pages/study-paths/StudyPaths";
 import PriceCodes from "./pages/study-paths/PriceCodes";
 import NationalPrograms from "./pages/study-paths/NationalPrograms";
-import GradePromotions from "./pages/operations/GradePromotions";
 import PopulationData from "./pages/operations/PopulationData";
 import AddressUpdates from "./pages/operations/AddressUpdates";
 import MunicipalSchoolUnits from "./pages/operations/MunicipalSchoolUnits";
@@ -136,11 +135,6 @@ const AppContent = () => {
               <Route path="/study-paths/programs" element={
                 <ProtectedRoute>
                   <NationalPrograms />
-                </ProtectedRoute>
-              } />
-              <Route path="/operations/promotions" element={
-                <ProtectedRoute>
-                  <GradePromotions />
                 </ProtectedRoute>
               } />
               <Route path="/operations/population" element={
