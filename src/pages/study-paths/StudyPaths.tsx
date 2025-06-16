@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Book, Plus, Search, Filter, Edit, Trash2, Eye } from "lucide-react";
+import { Book, Plus, Search, Filter, Edit, Trash2, Eye, Download } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -36,6 +36,7 @@ export default function StudyPaths() {
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [editingPath, setEditingPath] = useState<StudyPath | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({
@@ -140,6 +141,14 @@ export default function StudyPaths() {
     });
   };
 
+  const handleImport = () => {
+    toast({
+      title: "Import Started",
+      description: "Importing study paths from Swedish national database...",
+    });
+    setIsImportDialogOpen(false);
+  };
+
   const filteredPaths = studyPaths.filter(path =>
     path.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     path.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -155,80 +164,121 @@ export default function StudyPaths() {
             Manage study paths connected to price codes and national programs
           </p>
         </div>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-ike-primary hover:bg-ike-primary/90">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Study Path
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Add New Study Path</DialogTitle>
-              <DialogDescription>
-                Create a new study path for the regional education system.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="name">Study Path Name *</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g., Natural Science"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="code">Study Path Code *</Label>
-                <Input
-                  id="code"
-                  value={formData.code}
-                  onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                  placeholder="e.g., NA001"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="municipality">Municipality *</Label>
-                <Select value={formData.municipality} onValueChange={(value) => setFormData({ ...formData, municipality: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select municipality" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {municipalities.map((municipality) => (
-                      <SelectItem key={municipality} value={municipality}>
-                        {municipality}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="priceCode">Price Code</Label>
-                <Select value={formData.priceCode} onValueChange={(value) => setFormData({ ...formData, priceCode: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select price code" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {priceCodes.map((priceCode) => (
-                      <SelectItem key={priceCode} value={priceCode}>
-                        {priceCode}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                Cancel
+        <div className="flex gap-2">
+          <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Download className="w-4 h-4 mr-2" />
+                Import from Database
               </Button>
-              <Button onClick={handleAdd} className="bg-ike-primary hover:bg-ike-primary/90">
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Import from Swedish National Database</DialogTitle>
+                <DialogDescription>
+                  This will import the latest study paths and their connections to national programs from the Swedish national school database.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="p-4 bg-ike-neutral-light rounded-lg">
+                  <h4 className="font-medium mb-2">Import Options:</h4>
+                  <ul className="text-sm text-ike-neutral space-y-1">
+                    <li>• Study paths from national programs</li>
+                    <li>• Municipal study path configurations</li>
+                    <li>• Price code connections</li>
+                    <li>• Student enrollment data</li>
+                  </ul>
+                </div>
+                <p className="text-sm text-ike-neutral">
+                  Last import: December 15, 2024. This operation may take a few minutes and will update existing study paths with new data.
+                </p>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsImportDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleImport} className="bg-ike-primary hover:bg-ike-primary/90">
+                  Start Import
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-ike-primary hover:bg-ike-primary/90">
+                <Plus className="w-4 h-4 mr-2" />
                 Add Study Path
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New Study Path</DialogTitle>
+                <DialogDescription>
+                  Create a new study path for the regional education system.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Study Path Name *</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="e.g., Natural Science"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="code">Study Path Code *</Label>
+                  <Input
+                    id="code"
+                    value={formData.code}
+                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                    placeholder="e.g., NA001"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="municipality">Municipality *</Label>
+                  <Select value={formData.municipality} onValueChange={(value) => setFormData({ ...formData, municipality: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select municipality" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {municipalities.map((municipality) => (
+                        <SelectItem key={municipality} value={municipality}>
+                          {municipality}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="priceCode">Price Code</Label>
+                  <Select value={formData.priceCode} onValueChange={(value) => setFormData({ ...formData, priceCode: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select price code" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {priceCodes.map((priceCode) => (
+                        <SelectItem key={priceCode} value={priceCode}>
+                          {priceCode}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleAdd} className="bg-ike-primary hover:bg-ike-primary/90">
+                  Add Study Path
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
