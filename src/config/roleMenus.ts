@@ -85,11 +85,6 @@ export const regionalAdminMenu: MenuItem[] = [
         url: "/study-paths/price-codes",
         icon: Euro,
       },
-      {
-        title: "National Programs",
-        url: "/study-paths/programs",
-        icon: GraduationCap,
-      },
     ],
   },
   {
