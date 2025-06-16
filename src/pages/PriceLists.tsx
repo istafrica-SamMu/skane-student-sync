@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -368,50 +367,6 @@ const PriceLists = () => {
                 ))}
               </TableBody>
             </Table>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Price Trends */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center text-ike-neutral-dark">
-            <TrendingUp className="w-5 h-5 mr-2 text-ike-primary" />
-            Price Trends & Analysis
-          </CardTitle>
-          <CardDescription>
-            Historical pricing data and trends for {municipalityName}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-ike-neutral-light rounded-lg">
-                <h4 className="font-medium text-ike-neutral-dark mb-2">2024-2025</h4>
-                <div className="text-2xl font-bold text-ike-primary">{averageNormalPrice.toLocaleString('sv-SE')} SEK</div>
-                <div className="text-sm text-ike-success">+3.2% from previous year</div>
-              </div>
-              
-              <div className="p-4 bg-ike-neutral-light rounded-lg">
-                <h4 className="font-medium text-ike-neutral-dark mb-2">2023-2024</h4>
-                <div className="text-2xl font-bold text-ike-neutral-dark">121,500 SEK</div>
-                <div className="text-sm text-ike-success">+2.8% from previous year</div>
-              </div>
-              
-              <div className="p-4 bg-ike-neutral-light rounded-lg">
-                <h4 className="font-medium text-ike-neutral-dark mb-2">2022-2023</h4>
-                <div className="text-2xl font-bold text-ike-neutral-dark">118,200 SEK</div>
-                <div className="text-sm text-ike-success">+2.2% from previous year</div>
-              </div>
-            </div>
-            
-            <div className="h-64 flex items-center justify-center border rounded-lg p-4">
-              <div className="text-center text-ike-neutral">
-                <TrendingUp className="w-12 h-12 mx-auto mb-2 text-ike-primary" />
-                <p>Interactive Price Trend Chart</p>
-                <p className="text-sm">Visualization of price changes over time</p>
-              </div>
-            </div>
           </div>
         </CardContent>
       </Card>
