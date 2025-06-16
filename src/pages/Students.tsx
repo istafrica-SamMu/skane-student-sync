@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -56,15 +55,12 @@ import {
 import { 
   Users, 
   Search, 
-  Filter, 
-  Download, 
   Plus,
   MoreHorizontal,
   Edit,
   ArrowUpDown,
   Eye,
   GraduationCap,
-  School,
   Trash2,
   FileText
 } from "lucide-react";
@@ -97,7 +93,6 @@ const Students = () => {
       personalNumber: "",
       municipality: "",
       school: "",
-      schoolUnit: "",
       program: "",
       class: "",
       year: "",
@@ -380,54 +375,28 @@ const Students = () => {
                       )}
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="school"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>School</FormLabel>
-                          <FormControl>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select school" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Malmö Gymnasium">Malmö Gymnasium</SelectItem>
-                                <SelectItem value="Katedralskolan">Katedralskolan</SelectItem>
-                                <SelectItem value="Nicolai Gymnasium">Nicolai Gymnasium</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="schoolUnit"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>School Unit</FormLabel>
-                          <FormControl>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select school unit" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Huvudenhet">Huvudenhet</SelectItem>
-                                <SelectItem value="Estetisk enhet">Estetisk enhet</SelectItem>
-                                <SelectItem value="Teknikcentrum">Teknikcentrum</SelectItem>
-                                <SelectItem value="Ekonomicentrum">Ekonomicentrum</SelectItem>
-                                <SelectItem value="Kreativ enhet">Kreativ enhet</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <FormField
+                    control={form.control}
+                    name="school"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>School</FormLabel>
+                        <FormControl>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select school" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Malmö Gymnasium">Malmö Gymnasium</SelectItem>
+                              <SelectItem value="Katedralskolan">Katedralskolan</SelectItem>
+                              <SelectItem value="Nicolai Gymnasium">Nicolai Gymnasium</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -516,14 +485,6 @@ const Students = () => {
               </Form>
             </DialogContent>
           </Dialog>
-          <Button 
-            variant="outline" 
-            className="border-ike-primary text-ike-primary hover:bg-ike-primary/10"
-            onClick={handleExportData}
-          >
-            <Download className="w-4 h-4 mr-2" />
-            {t('students.export')}
-          </Button>
         </div>
       </div>
 
@@ -732,10 +693,6 @@ const Students = () => {
                             <DropdownMenuItem onClick={() => handleEditStudent(student)}>
                               <Edit className="mr-2 h-4 w-4" />
                               {t('students.edit')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <ArrowUpDown className="mr-2 h-4 w-4" />
-                              {t('students.transfer')}
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                               onClick={() => handleDeleteStudent(student)}
