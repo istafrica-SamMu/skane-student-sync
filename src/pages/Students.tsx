@@ -296,7 +296,6 @@ const Students = () => {
       personalNumber: "",
       municipality: "",
       school: "",
-      schoolUnit: "",
       program: "",
       class: "",
       year: "",
