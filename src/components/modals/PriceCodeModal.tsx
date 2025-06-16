@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -50,18 +50,33 @@ const PriceCodeModal = ({
 
   const form = useForm<PriceCodeFormData>({
     defaultValues: {
-      code: initialData?.code || "",
-      name: initialData?.name || "",
-      specialization: initialData?.specialization || "",
-      normalPrice: initialData?.normalPrice || 0,
-      internalPrice: initialData?.internalPrice || 0,
+      code: "",
+      name: "",
+      specialization: "",
+      normalPrice: 0,
+      internalPrice: 0,
     },
   });
+
+  // Reset form with initial data when modal opens or initialData changes
+  useEffect(() => {
+    if (isOpen) {
+      form.reset({
+        code: initialData?.code || "",
+        name: initialData?.name || "",
+        specialization: initialData?.specialization || "",
+        normalPrice: initialData?.normalPrice || 0,
+        internalPrice: initialData?.internalPrice || 0,
+      });
+    }
+  }, [isOpen, initialData, form]);
 
   const handleSubmit = (data: PriceCodeFormData) => {
     try {
       onSubmit(data);
-      form.reset();
+      if (!initialData) {
+        form.reset();
+      }
     } catch (error) {
       toast({
         title: "Error",
