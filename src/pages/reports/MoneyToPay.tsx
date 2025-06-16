@@ -2,8 +2,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { 
   DollarSign, 
   Search, 
@@ -12,12 +13,19 @@ import {
   Filter,
   User,
   Building,
-  Euro
+  Euro,
+  MoreHorizontal,
+  Eye
 } from "lucide-react";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const MoneyToPay = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   const payableData = [
     {
@@ -27,8 +35,7 @@ const MoneyToPay = () => {
       studyingAt: "Malmö Gymnasium",
       program: "Naturvetenskap",
       period: "2024-09",
-      amount: 12450,
-      status: "Pending"
+      amount: 12450
     },
     {
       id: 2,
@@ -37,8 +44,7 @@ const MoneyToPay = () => {
       studyingAt: "Lund Technical College",
       program: "Teknik",
       period: "2024-09",
-      amount: 13200,
-      status: "Invoiced"
+      amount: 13200
     },
     {
       id: 3,
@@ -47,12 +53,23 @@ const MoneyToPay = () => {
       studyingAt: "Helsingborg Arts School",
       program: "Estetiska",
       period: "2024-09",
-      amount: 11800,
-      status: "Paid"
+      amount: 11800
     }
   ];
 
   const totalPayable = payableData.reduce((sum, item) => sum + item.amount, 0);
+
+  const handleViewDetails = (student) => {
+    setSelectedStudent(student);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleExportReport = () => {
+    toast({
+      title: "Report Exported",
+      description: "Money to Pay report has been exported successfully",
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -69,7 +86,10 @@ const MoneyToPay = () => {
             <Filter className="w-4 h-4 mr-2" />
             Filter
           </Button>
-          <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+          <Button 
+            onClick={handleExportReport}
+            className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+          >
             <Download className="w-4 h-4 mr-2" />
             Export Report
           </Button>
@@ -77,7 +97,7 @@ const MoneyToPay = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">Municipal Students</CardTitle>
@@ -94,24 +114,6 @@ const MoneyToPay = () => {
           <CardContent>
             <div className="text-2xl font-bold text-ike-error">{totalPayable.toLocaleString()} SEK</div>
             <p className="text-xs text-ike-neutral">September 2024</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-ike-neutral">Paid</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-ike-success">1</div>
-            <p className="text-xs text-ike-neutral">Completed payments</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-ike-neutral">Outstanding</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-ike-warning">2</div>
-            <p className="text-xs text-ike-neutral">Requires payment</p>
           </CardContent>
         </Card>
       </div>
@@ -152,7 +154,6 @@ const MoneyToPay = () => {
                 <TableHead>Program</TableHead>
                 <TableHead>Period</TableHead>
                 <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -183,21 +184,22 @@ const MoneyToPay = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge 
-                      variant={item.status === "Paid" ? "default" : item.status === "Invoiced" ? "secondary" : "outline"}
-                      className={
-                        item.status === "Paid" ? "bg-ike-success text-white" :
-                        item.status === "Invoiced" ? "bg-ike-warning text-white" :
-                        "border-ike-error text-ike-error"
-                      }
-                    >
-                      {item.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Button size="sm" variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-                      View Details
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="sm" variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="bg-white border border-gray-200 shadow-md">
+                        <DropdownMenuItem 
+                          onClick={() => handleViewDetails(item)}
+                          className="cursor-pointer hover:bg-ike-primary/10"
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          View Details
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
@@ -205,6 +207,53 @@ const MoneyToPay = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Student Details Modal */}
+      <Dialog open={isDetailModalOpen} onOpenChange={setIsDetailModalOpen}>
+        <DialogContent className="bg-white max-w-2xl border border-gray-200 shadow-lg">
+          <DialogHeader>
+            <DialogTitle>Student Details</DialogTitle>
+            <DialogDescription>
+              Detailed information for {selectedStudent?.studentName}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedStudent && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Student Name</label>
+                  <p className="text-ike-neutral-dark">{selectedStudent.studentName}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Student ID</label>
+                  <p className="text-ike-neutral-dark">{selectedStudent.studentId}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">School</label>
+                  <p className="text-ike-neutral-dark">{selectedStudent.studyingAt}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Program</label>
+                  <p className="text-ike-neutral-dark">{selectedStudent.program}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Period</label>
+                  <p className="text-ike-neutral-dark">{selectedStudent.period}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Amount</label>
+                  <p className="text-ike-error font-medium">{selectedStudent.amount.toLocaleString()} SEK</p>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button onClick={() => setIsDetailModalOpen(false)} variant="outline">
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
