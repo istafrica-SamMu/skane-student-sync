@@ -100,24 +100,8 @@ export const regionalAdminMenu: MenuItem[] = [
   },
   {
     title: "Integrations",
-    icon: Link,
-    items: [
-      {
-        title: "Extens IKE Export",
-        url: "/integration/extens",
-        icon: FileSpreadsheet,
-      },
-      {
-        title: "Population Registry",
-        url: "/integration/population",
-        icon: Users,
-      },
-      {
-        title: "Integration Testing",
-        url: "/integration/testing",
-        icon: Settings,
-      },
-    ],
+    url: "/integration",
+    icon: Calculator,
   },
   {
     title: "Reports & Analytics",
