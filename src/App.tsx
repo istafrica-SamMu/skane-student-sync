@@ -317,6 +317,11 @@ const AppContent = () => {
                   <ActivityLogs />
                 </ProtectedRoute>
               } />
+              <Route path="/my-page/settings" element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              } />
               <Route path="/integration/schedule" element={
                 <ProtectedRoute>
                   <ScheduleIntegration />

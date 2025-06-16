@@ -148,6 +148,11 @@ export const regionalAdminMenu: MenuItem[] = [
         url: "/my-page/logs",
         icon: Activity,
       },
+      {
+        title: "Settings",
+        url: "/my-page/settings",
+        icon: Settings,
+      },
     ],
   },
 ];
@@ -302,6 +307,11 @@ export const municipalityAdminMenu: MenuItem[] = [
         url: "/my-page/logs",
         icon: Activity,
       },
+      {
+        title: "Settings",
+        url: "/my-page/settings",
+        icon: Settings,
+      },
     ],
   },
 ];
@@ -388,6 +398,11 @@ export const schoolAdminMenu: MenuItem[] = [
         title: "Activity Logs",
         url: "/my-page/logs",
         icon: Activity,
+      },
+      {
+        title: "Settings",
+        url: "/my-page/settings",
+        icon: Settings,
       },
     ],
   },
