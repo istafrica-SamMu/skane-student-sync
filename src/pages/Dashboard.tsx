@@ -26,13 +26,7 @@ import {
   MapPin,
   DollarSign,
   Book,
-  BarChart3,
-  Building2,
-  AlertCircle,
-  XCircle,
-  ArrowUpRight,
-  ArrowDownRight,
-  TrendingDown
+  BarChart3
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -737,6 +731,16 @@ const Dashboard = () => {
               {currentDate} • System Overview for Region Skåne
             </p>
           </div>
+          <div className="flex space-x-3">
+            <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+              <Download className="w-4 h-4 mr-2" />
+              Export Regional Report
+            </Button>
+            <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+              <FileText className="w-4 h-4 mr-2" />
+              Generate System Report
+            </Button>
+          </div>
         </div>
 
         {/* Regional Key Metrics */}
@@ -807,7 +811,7 @@ const Dashboard = () => {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Regional System Status */}
-          <Card className="lg:col-span-1">
+          <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle className="flex items-center text-ike-neutral-dark">
                 <Database className="w-5 h-5 mr-2 text-ike-primary" />
@@ -860,15 +864,12 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Regional Operations */}
-          <Card className="lg:col-span-1">
+          {/* Regional Actions */}
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-ike-primary" />
-                Regional Operations
-              </CardTitle>
+              <CardTitle className="text-ike-neutral-dark">Regional Operations</CardTitle>
               <CardDescription>
-                Manage regional system components
+                System administration and oversight
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -876,7 +877,7 @@ const Dashboard = () => {
                 asChild
                 className="w-full justify-start bg-ike-primary hover:bg-ike-primary-dark text-white"
               >
-                <Link to="/system/municipalities">
+                <Link to="/system/municipality-management">
                   <Building className="w-4 h-4 mr-2" />
                   Manage Municipalities
                 </Link>
@@ -886,7 +887,7 @@ const Dashboard = () => {
                 variant="outline" 
                 className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
               >
-                <Link to="/system/schools">
+                <Link to="/system/school-units">
                   <School className="w-4 h-4 mr-2" />
                   School Unit Overview
                 </Link>
@@ -896,7 +897,7 @@ const Dashboard = () => {
                 variant="outline" 
                 className="w-full justify-start"
               >
-                <Link to="/system/users">
+                <Link to="/system/user-management">
                   <Users className="w-4 h-4 mr-2" />
                   User Management
                 </Link>
@@ -913,86 +914,79 @@ const Dashboard = () => {
               </Button>
             </CardContent>
           </Card>
+        </div>
 
-          {/* Municipality Overview - Enhanced Design */}
-          <Card className="w-full">
-            <CardHeader className="pb-6">
-              <CardTitle className="text-xl font-bold text-ike-neutral-dark flex items-center gap-3">
-                <Building className="w-6 h-6 text-ike-primary" />
-                Municipality Status Overview
-              </CardTitle>
-              <CardDescription className="text-base">
-                Real-time status of municipalities in the region
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {[
-                  {
-                    name: "Malmö",
-                    students: 12450,
-                    status: "Active",
-                    lastSync: "2 min ago",
-                    integration: "Healthy",
-                    statusColor: "success"
-                  },
-                  {
-                    name: "Lund",
-                    students: 8200,
-                    status: "Active",
-                    lastSync: "5 min ago",
-                    integration: "Healthy",
-                    statusColor: "success"
-                  },
-                  {
-                    name: "Helsingborg",
-                    students: 9800,
-                    status: "Active",
-                    lastSync: "1 min ago",
-                    integration: "Warning",
-                    statusColor: "warning"
-                  },
-                  {
-                    name: "Kristianstad",
-                    students: 5600,
-                    status: "Active",
-                    lastSync: "15 min ago",
-                    integration: "Error",
-                    statusColor: "error"
-                  }
-                ].map((municipality, index) => (
-                  <div key={index} className="flex items-center justify-between p-6 border rounded-xl bg-gradient-to-r from-white to-gray-50 hover:shadow-md transition-shadow">
-                    <div className="flex items-center space-x-6">
-                      <div className="w-16 h-16 bg-ike-primary/10 rounded-xl flex items-center justify-center">
-                        <Building className="w-8 h-8 text-ike-primary" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-ike-neutral-dark">{municipality.name}</h3>
-                        <p className="text-sm text-ike-neutral font-medium">{municipality.students.toLocaleString()} students</p>
-                        <p className="text-xs text-ike-neutral">Last sync: {municipality.lastSync}</p>
-                      </div>
+        {/* Municipality Overview */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-ike-neutral-dark">Municipality Status Overview</CardTitle>
+            <CardDescription>
+              Real-time status of municipalities in the region
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[
+                {
+                  name: "Malmö",
+                  students: 12450,
+                  status: "Active",
+                  lastSync: "2 min ago",
+                  integration: "Healthy",
+                  statusColor: "success"
+                },
+                {
+                  name: "Lund",
+                  students: 8200,
+                  status: "Active",
+                  lastSync: "5 min ago",
+                  integration: "Healthy",
+                  statusColor: "success"
+                },
+                {
+                  name: "Helsingborg",
+                  students: 9800,
+                  status: "Active",
+                  lastSync: "1 min ago",
+                  integration: "Warning",
+                  statusColor: "warning"
+                },
+                {
+                  name: "Kristianstad",
+                  students: 5600,
+                  status: "Active",
+                  lastSync: "15 min ago",
+                  integration: "Error",
+                  statusColor: "error"
+                }
+              ].map((municipality, index) => (
+                <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-ike-primary/10 rounded-lg flex items-center justify-center">
+                      <Building className="w-6 h-6 text-ike-primary" />
                     </div>
-                    <div className="flex flex-col items-end space-y-3">
-                      <Badge 
-                        className={`px-3 py-1 text-sm font-medium ${
-                          municipality.statusColor === "success" ? "bg-ike-success text-white" :
-                          municipality.statusColor === "warning" ? "bg-ike-warning text-white" :
-                          "bg-ike-error text-white"
-                        }`}
-                      >
-                        {municipality.integration}
-                      </Badge>
-                      <div className={`w-4 h-4 rounded-full ${
-                        municipality.statusColor === "success" ? "bg-ike-success" : 
-                        municipality.statusColor === "warning" ? "bg-ike-warning" : "bg-ike-error"
-                      }`}></div>
+                    <div>
+                      <h3 className="font-medium text-ike-neutral-dark">{municipality.name}</h3>
+                      <p className="text-sm text-ike-neutral">{municipality.students} students • Last sync: {municipality.lastSync}</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                  <div className="flex items-center space-x-4">
+                    <Badge 
+                      className={
+                        municipality.statusColor === "success" ? "bg-ike-success text-white" :
+                        municipality.statusColor === "warning" ? "bg-ike-warning text-white" :
+                        "bg-ike-error text-white"
+                      }
+                    >
+                      {municipality.integration}
+                    </Badge>
+                    <div className="w-3 h-3 bg-ike-success rounded-full"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
