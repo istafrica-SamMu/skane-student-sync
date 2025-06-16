@@ -2,8 +2,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { 
   TrendingUp, 
   Search, 
@@ -12,12 +12,22 @@ import {
   Filter,
   User,
   Building,
-  Euro
+  Euro,
+  MoreHorizontal,
+  Eye,
+  FileText,
+  Mail
 } from "lucide-react";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const MoneyToReceive = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
   const receivableData = [
     {
@@ -54,6 +64,32 @@ const MoneyToReceive = () => {
 
   const totalReceivable = receivableData.reduce((sum, item) => sum + item.amount, 0);
 
+  const handleViewDetails = (student) => {
+    setSelectedStudent(student);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleGenerateInvoice = (student) => {
+    setSelectedStudent(student);
+    setIsInvoiceModalOpen(true);
+  };
+
+  const handleSendReminder = (student) => {
+    toast({
+      title: "Reminder Sent",
+      description: `Payment reminder sent to ${student.homeMunicipality} for ${student.studentName}`,
+    });
+  };
+
+  const confirmGenerateInvoice = () => {
+    toast({
+      title: "Invoice Generated",
+      description: `Invoice generated for ${selectedStudent?.studentName}`,
+    });
+    setIsInvoiceModalOpen(false);
+    setSelectedStudent(null);
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -77,7 +113,7 @@ const MoneyToReceive = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">External Students</CardTitle>
@@ -94,24 +130,6 @@ const MoneyToReceive = () => {
           <CardContent>
             <div className="text-2xl font-bold text-ike-primary">{totalReceivable.toLocaleString()} SEK</div>
             <p className="text-xs text-ike-neutral">September 2024</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-ike-neutral">Confirmed</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-ike-success">1</div>
-            <p className="text-xs text-ike-neutral">Ready to receive</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-ike-neutral">Pending</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-ike-warning">2</div>
-            <p className="text-xs text-ike-neutral">Awaiting confirmation</p>
           </CardContent>
         </Card>
       </div>
@@ -152,7 +170,6 @@ const MoneyToReceive = () => {
                 <TableHead>Program</TableHead>
                 <TableHead>Period</TableHead>
                 <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -183,21 +200,47 @@ const MoneyToReceive = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge 
-                      variant={item.status === "Confirmed" ? "default" : item.status === "Invoiced" ? "secondary" : "outline"}
-                      className={
-                        item.status === "Confirmed" ? "bg-ike-success text-white" :
-                        item.status === "Invoiced" ? "bg-ike-warning text-white" :
-                        "border-ike-error text-ike-error"
-                      }
-                    >
-                      {item.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Button size="sm" variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-                      View Details
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button size="sm" variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="bg-white">
+                        <DialogHeader>
+                          <DialogTitle>Student Actions</DialogTitle>
+                          <DialogDescription>
+                            Choose an action for {item.studentName}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-3">
+                          <Button 
+                            onClick={() => handleViewDetails(item)}
+                            variant="outline" 
+                            className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </Button>
+                          <Button 
+                            onClick={() => handleGenerateInvoice(item)}
+                            variant="outline" 
+                            className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
+                          >
+                            <FileText className="w-4 h-4 mr-2" />
+                            Generate Invoice
+                          </Button>
+                          <Button 
+                            onClick={() => handleSendReminder(item)}
+                            variant="outline" 
+                            className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
+                          >
+                            <Mail className="w-4 h-4 mr-2" />
+                            Send Payment Reminder
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </TableCell>
                 </TableRow>
               ))}
@@ -205,6 +248,79 @@ const MoneyToReceive = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Student Details Modal */}
+      <Dialog open={isDetailModalOpen} onOpenChange={setIsDetailModalOpen}>
+        <DialogContent className="bg-white max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Student Details</DialogTitle>
+            <DialogDescription>
+              Detailed information for {selectedStudent?.studentName}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedStudent && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Student Name</label>
+                  <p className="text-ike-neutral-dark">{selectedStudent.studentName}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Student ID</label>
+                  <p className="text-ike-neutral-dark">{selectedStudent.studentId}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Home Municipality</label>
+                  <p className="text-ike-neutral-dark">{selectedStudent.homeMunicipality}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Program</label>
+                  <p className="text-ike-neutral-dark">{selectedStudent.program}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Period</label>
+                  <p className="text-ike-neutral-dark">{selectedStudent.period}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Amount</label>
+                  <p className="text-ike-primary font-medium">{selectedStudent.amount.toLocaleString()} SEK</p>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button onClick={() => setIsDetailModalOpen(false)} variant="outline">
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invoice Generation Modal */}
+      <Dialog open={isInvoiceModalOpen} onOpenChange={setIsInvoiceModalOpen}>
+        <DialogContent className="bg-white">
+          <DialogHeader>
+            <DialogTitle>Generate Invoice</DialogTitle>
+            <DialogDescription>
+              Generate invoice for {selectedStudent?.studentName} from {selectedStudent?.homeMunicipality}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-ike-neutral">
+              This will generate an invoice for <strong>{selectedStudent?.amount?.toLocaleString()} SEK</strong> 
+              and send it to {selectedStudent?.homeMunicipality} municipality.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setIsInvoiceModalOpen(false)} variant="outline">
+              Cancel
+            </Button>
+            <Button onClick={confirmGenerateInvoice} className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+              Generate Invoice
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
