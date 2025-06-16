@@ -96,11 +96,6 @@ export const regionalAdminMenu: MenuItem[] = [
         url: "/operations/population",
         icon: Users,
       },
-      {
-        title: "Address Updates",
-        url: "/operations/addresses",
-        icon: MapPin,
-      },
     ],
   },
   {
