@@ -1,9 +1,9 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Book, Plus, Search, Filter, Edit, Trash2, Eye } from "lucide-react";
@@ -29,6 +29,10 @@ export default function StudyPaths() {
     { id: "4", name: "Arts", code: "AR004", status: "Active", municipality: "Malmö", priceCode: "PC004", students: 45 },
     { id: "5", name: "Business", code: "BU005", status: "Inactive", municipality: "Lund", students: 0 },
   ]);
+
+  // Predefined options for dropdowns
+  const municipalities = ["Malmö", "Lund", "Helsingborg", "Kristianstad", "Växjö"];
+  const priceCodes = ["PC001", "PC002", "PC003", "PC004", "PC005", "PC006"];
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -186,21 +190,33 @@ export default function StudyPaths() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="municipality">Municipality *</Label>
-                <Input
-                  id="municipality"
-                  value={formData.municipality}
-                  onChange={(e) => setFormData({ ...formData, municipality: e.target.value })}
-                  placeholder="e.g., Malmö"
-                />
+                <Select value={formData.municipality} onValueChange={(value) => setFormData({ ...formData, municipality: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select municipality" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {municipalities.map((municipality) => (
+                      <SelectItem key={municipality} value={municipality}>
+                        {municipality}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="priceCode">Price Code</Label>
-                <Input
-                  id="priceCode"
-                  value={formData.priceCode}
-                  onChange={(e) => setFormData({ ...formData, priceCode: e.target.value })}
-                  placeholder="e.g., PC001"
-                />
+                <Select value={formData.priceCode} onValueChange={(value) => setFormData({ ...formData, priceCode: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select price code" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {priceCodes.map((priceCode) => (
+                      <SelectItem key={priceCode} value={priceCode}>
+                        {priceCode}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <DialogFooter>
@@ -371,34 +387,46 @@ export default function StudyPaths() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="edit-municipality">Municipality *</Label>
-              <Input
-                id="edit-municipality"
-                value={formData.municipality}
-                onChange={(e) => setFormData({ ...formData, municipality: e.target.value })}
-                placeholder="e.g., Malmö"
-              />
+              <Select value={formData.municipality} onValueChange={(value) => setFormData({ ...formData, municipality: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select municipality" />
+                </SelectTrigger>
+                <SelectContent>
+                  {municipalities.map((municipality) => (
+                    <SelectItem key={municipality} value={municipality}>
+                      {municipality}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="edit-priceCode">Price Code</Label>
-              <Input
-                id="edit-priceCode"
-                value={formData.priceCode}
-                onChange={(e) => setFormData({ ...formData, priceCode: e.target.value })}
-                placeholder="e.g., PC001"
-              />
+              <Select value={formData.priceCode} onValueChange={(value) => setFormData({ ...formData, priceCode: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select price code" />
+                </SelectTrigger>
+                <SelectContent>
+                  {priceCodes.map((priceCode) => (
+                    <SelectItem key={priceCode} value={priceCode}>
+                      {priceCode}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="edit-status">Status</Label>
-              <select
-                id="edit-status"
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as StudyPath["status"] })}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="Active">Active</option>
-                <option value="Pending">Pending</option>
-                <option value="Inactive">Inactive</option>
-              </select>
+              <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value as StudyPath["status"] })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>
