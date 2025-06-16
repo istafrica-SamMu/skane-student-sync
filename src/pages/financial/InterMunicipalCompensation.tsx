@@ -1,7 +1,6 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { 
   Table,
   TableBody,
@@ -10,9 +9,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowUpDown, FileText, CheckCircle, Clock } from "lucide-react";
+import { ArrowUpDown, FileText, CheckCircle, Clock, Download } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const InterMunicipalCompensation = () => {
+  const { toast } = useToast();
+
   const compensationData = [
     {
       id: 1,
@@ -68,7 +70,38 @@ const InterMunicipalCompensation = () => {
 
   const handleViewDetails = (municipalityName: string) => {
     console.log(`Viewing details for ${municipalityName}`);
-    // This would open a detailed view modal or navigate to details page
+    toast({
+      title: "Details Loading",
+      description: `Loading detailed compensation information for ${municipalityName}...`,
+      duration: 2000
+    });
+    
+    // Simulate loading time
+    setTimeout(() => {
+      toast({
+        title: "Details Available",
+        description: `Detailed compensation report for ${municipalityName} is now ready.`,
+        duration: 3000
+      });
+    }, 2000);
+  };
+
+  const handleExportReport = () => {
+    console.log("Exporting compensation report");
+    toast({
+      title: "Export Started",
+      description: "Preparing your inter-municipal compensation report...",
+      duration: 2000
+    });
+
+    // Simulate export process
+    setTimeout(() => {
+      toast({
+        title: "Export Complete",
+        description: "Your compensation report has been downloaded successfully.",
+        duration: 3000
+      });
+    }, 2000);
   };
 
   return (
@@ -82,16 +115,20 @@ const InterMunicipalCompensation = () => {
           </p>
         </div>
         <div className="flex space-x-3">
-          <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+          <Button 
+            variant="outline" 
+            className="border-ike-primary text-ike-primary hover:bg-ike-primary/10 transition-colors"
+            onClick={handleExportReport}
+          >
             <FileText className="w-4 h-4 mr-2" />
             Export Report
           </Button>
         </div>
       </div>
 
-      {/* Financial Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-l-4 border-l-ike-success">
+      {/* Financial Overview - Only 2 cards now */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="border-l-4 border-l-ike-success hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
               Total Incoming
@@ -105,7 +142,7 @@ const InterMunicipalCompensation = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-ike-error">
+        <Card className="border-l-4 border-l-ike-error hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
               Total Outgoing
@@ -118,22 +155,10 @@ const InterMunicipalCompensation = () => {
             <div className="text-xs text-ike-neutral">To other municipalities</div>
           </CardContent>
         </Card>
-
-        <Card className="border-l-4 border-l-ike-warning">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-ike-neutral">
-              Active Agreements
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-ike-neutral-dark">{compensationData.length}</div>
-            <div className="text-xs text-ike-neutral">Current period</div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Compensation Tracking */}
-      <Card>
+      <Card className="hover:shadow-md transition-shadow">
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <ArrowUpDown className="w-5 h-5 mr-2 text-ike-primary" />
@@ -144,48 +169,51 @@ const InterMunicipalCompensation = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="font-medium">Municipality</TableHead>
-                <TableHead className="font-medium">Type</TableHead>
-                <TableHead className="font-medium">Students</TableHead>
-                <TableHead className="font-medium text-right">Total Amount</TableHead>
-                <TableHead className="font-medium">Period</TableHead>
-                <TableHead className="font-medium text-center">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {compensationData.map((item) => (
-                <TableRow key={item.id} className="hover:bg-ike-neutral-light/50 transition-colors">
-                  <TableCell className="font-medium text-ike-neutral-dark">
-                    {item.municipality}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      {getStatusIcon(item.type)}
-                      <span className={getTypeColor(item.type)}>{item.type}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{item.students}</TableCell>
-                  <TableCell className={`text-right font-medium ${getTypeColor(item.type)}`}>
-                    {item.type === "Incoming" ? "+" : "-"}{item.totalAmount.toLocaleString('sv-SE')} SEK
-                  </TableCell>
-                  <TableCell>{item.period}</TableCell>
-                  <TableCell className="text-center">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-ike-neutral hover:text-ike-primary hover:bg-ike-primary/10 transition-colors"
-                      onClick={() => handleViewDetails(item.municipality)}
-                    >
-                      Details
-                    </Button>
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="font-medium">Municipality</TableHead>
+                  <TableHead className="font-medium">Type</TableHead>
+                  <TableHead className="font-medium">Students</TableHead>
+                  <TableHead className="font-medium text-right">Total Amount</TableHead>
+                  <TableHead className="font-medium">Period</TableHead>
+                  <TableHead className="font-medium text-center">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {compensationData.map((item) => (
+                  <TableRow key={item.id} className="hover:bg-ike-neutral-light/50 transition-colors">
+                    <TableCell className="font-medium text-ike-neutral-dark">
+                      {item.municipality}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        {getStatusIcon(item.type)}
+                        <span className={getTypeColor(item.type)}>{item.type}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium">{item.students}</TableCell>
+                    <TableCell className={`text-right font-medium ${getTypeColor(item.type)}`}>
+                      {item.type === "Incoming" ? "+" : "-"}{item.totalAmount.toLocaleString('sv-SE')} SEK
+                    </TableCell>
+                    <TableCell className="text-ike-neutral">{item.period}</TableCell>
+                    <TableCell className="text-center">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-ike-neutral hover:text-ike-primary hover:bg-ike-primary/10 transition-colors"
+                        onClick={() => handleViewDetails(item.municipality)}
+                      >
+                        <Download className="w-4 h-4 mr-1" />
+                        Details
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
