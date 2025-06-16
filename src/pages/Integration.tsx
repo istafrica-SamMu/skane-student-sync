@@ -4,104 +4,127 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { 
-  Database, 
-  Upload,
-  User,
+  Calculator, 
+  TrendingUp,
+  Euro,
   FileText,
   CheckCircle,
   XCircle,
   Clock,
   RefreshCcw,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  Play,
+  Pause,
+  AlertTriangle
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useState } from "react";
 
 const Integration = () => {
   const { t } = useLanguage();
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [calculationProgress, setCalculationProgress] = useState(0);
   
-  const integrations = [
+  const calculationJobs = [
     {
       id: 1,
-      name: "Municipal SIS - Malmö",
-      type: "ist_admin",
-      status: "success",
-      lastSync: "2024-11-15 14:30",
+      name: "September 2024 Payment Calculations",
+      type: "monthly",
+      status: "completed",
+      lastRun: "2024-11-15 14:30",
       processed: 1245,
       errors: 0,
-      nextScheduled: "2024-11-16 02:00"
+      totalAmount: 2847500,
+      municipalities: 12
     },
     {
       id: 2,
-      name: "SS12000 Import - Lund",
-      type: "ss12000",
+      name: "October 2024 Payment Calculations",
+      type: "monthly",
       status: "running",
-      lastSync: "2024-11-15 15:45",
+      lastRun: "2024-11-15 15:45",
       processed: 458,
       errors: 0,
-      nextScheduled: t('integration.ongoing')
+      totalAmount: 0,
+      municipalities: 8
     },
     {
       id: 3,
-      name: "Navet Integration",
-      type: "navet",
+      name: "Annual Reconciliation 2024",
+      type: "annual",
       status: "scheduled",
-      lastSync: "2024-11-15 08:00",
-      processed: 2847,
-      errors: 3,
-      nextScheduled: "2024-11-15 20:00"
+      lastRun: "2024-01-15 08:00",
+      processed: 0,
+      errors: 0,
+      totalAmount: 34500000,
+      municipalities: 33
     },
     {
       id: 4,
-      name: "File Import - Helsingborg",
-      type: "file",
+      name: "August 2024 Correction Run",
+      type: "correction",
       status: "error",
-      lastSync: "2024-11-15 10:15",
+      lastRun: "2024-11-10 10:15",
       processed: 342,
       errors: 12,
-      nextScheduled: t('integration.manual.action.required')
+      totalAmount: 0,
+      municipalities: 5
     }
   ];
 
+  const handleStartCalculation = () => {
+    setIsCalculating(true);
+    setCalculationProgress(0);
+    
+    // Simulate calculation progress
+    const interval = setInterval(() => {
+      setCalculationProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setIsCalculating(false);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 500);
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "success":
-        return <Badge className="bg-ike-success text-white">{t('integration.status.successful')}</Badge>;
+      case "completed":
+        return <Badge className="bg-ike-success text-white">Completed</Badge>;
       case "running":
-        return <Badge className="bg-ike-primary text-white">{t('integration.status.running')}</Badge>;
+        return <Badge className="bg-ike-primary text-white">Running</Badge>;
       case "scheduled":
-        return <Badge className="bg-ike-warning text-white">{t('integration.status.scheduled')}</Badge>;
+        return <Badge className="bg-ike-warning text-white">Scheduled</Badge>;
       case "error":
-        return <Badge className="bg-ike-error text-white">{t('integration.status.error')}</Badge>;
+        return <Badge className="bg-ike-error text-white">Error</Badge>;
       default:
-        return <Badge variant="secondary">{t('integration.status.unknown')}</Badge>;
+        return <Badge variant="secondary">Unknown</Badge>;
     }
   };
 
-  const getIntegrationIcon = (type: string) => {
+  const getJobIcon = (type: string) => {
     switch (type) {
-      case "ist_admin":
-        return <Database className="w-5 h-5 text-white" />;
-      case "ss12000":
-        return <Upload className="w-5 h-5 text-white" />;
-      case "navet":
-        return <User className="w-5 h-5 text-white" />;
-      case "file":
-        return <FileText className="w-5 h-5 text-white" />;
+      case "monthly":
+        return <Calculator className="w-5 h-5 text-white" />;
+      case "annual":
+        return <TrendingUp className="w-5 h-5 text-white" />;
+      case "correction":
+        return <RefreshCcw className="w-5 h-5 text-white" />;
       default:
-        return <Database className="w-5 h-5 text-white" />;
+        return <Calculator className="w-5 h-5 text-white" />;
     }
   };
 
-  const getIntegrationIconBg = (type: string) => {
+  const getJobIconBg = (type: string) => {
     switch (type) {
-      case "ist_admin":
+      case "monthly":
         return "bg-blue-500";
-      case "ss12000":
+      case "annual":
         return "bg-ike-primary";
-      case "navet":
-        return "bg-green-500";
-      case "file":
+      case "correction":
         return "bg-amber-500";
       default:
         return "bg-gray-500";
@@ -113,14 +136,27 @@ const Integration = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ike-neutral-dark">{t('integration.title')}</h1>
+          <h1 className="text-3xl font-bold text-ike-neutral-dark">Regional Payment Calculations</h1>
           <p className="text-ike-neutral mt-2">
-            {t('integration.subtitle')}
+            Trigger and monitor inter-municipal payment calculation jobs
           </p>
         </div>
-        <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
-          <RefreshCcw className="w-4 h-4 mr-2" />
-          {t('integration.sync.now')}
+        <Button 
+          className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+          onClick={handleStartCalculation}
+          disabled={isCalculating}
+        >
+          {isCalculating ? (
+            <>
+              <Pause className="w-4 h-4 mr-2" />
+              Calculating...
+            </>
+          ) : (
+            <>
+              <Play className="w-4 h-4 mr-2" />
+              Start New Calculation
+            </>
+          )}
         </Button>
       </div>
 
@@ -129,14 +165,14 @@ const Integration = () => {
         <Card className="border-l-4 border-l-ike-success">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              {t('integration.successful.syncs')}
+              Completed This Month
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-ike-neutral-dark">24</div>
+            <div className="text-2xl font-bold text-ike-neutral-dark">3</div>
             <div className="flex items-center text-xs text-ike-success mt-1">
               <ArrowUp className="w-3 h-3 mr-1" />
-              {t('integration.last.24.hours')}
+              +1 from last month
             </div>
           </CardContent>
         </Card>
@@ -144,13 +180,13 @@ const Integration = () => {
         <Card className="border-l-4 border-l-ike-warning">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              {t('integration.processed.records')}
+              Total Amount Processed
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-ike-neutral-dark">48,234</div>
+            <div className="text-2xl font-bold text-ike-neutral-dark">€2.8M</div>
             <div className="flex items-center text-xs text-ike-neutral mt-1">
-              {t('integration.last.24.hours')}
+              This month
             </div>
           </CardContent>
         </Card>
@@ -158,14 +194,14 @@ const Integration = () => {
         <Card className="border-l-4 border-l-ike-error">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              {t('integration.integration.issues')}
+              Failed Calculations
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-ike-neutral-dark">3</div>
+            <div className="text-2xl font-bold text-ike-neutral-dark">1</div>
             <div className="flex items-center text-xs text-ike-error mt-1">
-              <ArrowUp className="w-3 h-3 mr-1" />
-              {t('integration.requires.action')}
+              <AlertTriangle className="w-3 h-3 mr-1" />
+              Requires attention
             </div>
           </CardContent>
         </Card>
@@ -173,73 +209,105 @@ const Integration = () => {
         <Card className="border-l-4 border-l-ike-primary">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              {t('integration.average.sync.time')}
+              Participating Municipalities
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-ike-neutral-dark">1.8h</div>
+            <div className="text-2xl font-bold text-ike-neutral-dark">33</div>
             <div className="flex items-center text-xs text-ike-success mt-1">
-              <ArrowDown className="w-3 h-3 mr-1" />
-              -0.5h {t('integration.from.previous.month')}
+              <ArrowUp className="w-3 h-3 mr-1" />
+              +2 new this year
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Integration Status */}
+      {/* Active Calculation Progress */}
+      {isCalculating && (
+        <Card className="border-ike-primary">
+          <CardHeader>
+            <CardTitle className="flex items-center text-ike-neutral-dark">
+              <RefreshCcw className="w-5 h-5 mr-2 text-ike-primary animate-spin" />
+              Calculation in Progress
+            </CardTitle>
+            <CardDescription>
+              Processing November 2024 payment calculations...
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between text-sm mb-1">
+                <span className="text-ike-neutral">Progress</span>
+                <span className="text-ike-neutral">{calculationProgress}%</span>
+              </div>
+              <Progress value={calculationProgress} className="h-3" />
+              <div className="text-sm text-ike-neutral">
+                Processing municipality data and calculating inter-municipal payments...
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Calculation Jobs Status */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
-            <Database className="w-5 h-5 mr-2 text-ike-primary" />
-            {t('integration.integration.status')}
+            <Calculator className="w-5 h-5 mr-2 text-ike-primary" />
+            Payment Calculation Jobs
           </CardTitle>
           <CardDescription>
-            {t('integration.status.description')}
+            Monitor and manage regional payment calculation jobs
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {integrations.map((integration) => (
+            {calculationJobs.map((job) => (
               <div 
-                key={integration.id} 
+                key={job.id} 
                 className={`border rounded-lg p-4 ${
-                  integration.status === 'error' ? 'border-ike-error/30 bg-ike-error/5' : ''
+                  job.status === 'error' ? 'border-ike-error/30 bg-ike-error/5' : ''
                 }`}
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getIntegrationIconBg(integration.type)}`}>
-                      {getIntegrationIcon(integration.type)}
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getJobIconBg(job.type)}`}>
+                      {getJobIcon(job.type)}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-ike-neutral-dark">{integration.name}</h3>
+                      <h3 className="font-semibold text-ike-neutral-dark">{job.name}</h3>
                       <p className="text-sm text-ike-neutral">
-                        {t('integration.last.sync')} {integration.lastSync}
+                        Last run: {job.lastRun}
                       </p>
                     </div>
                   </div>
-                  {getStatusBadge(integration.status)}
+                  {getStatusBadge(job.status)}
                 </div>
 
-                {integration.status === "running" && (
+                {job.status === "running" && (
                   <div className="mb-4">
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-ike-neutral">{t('integration.progress')}</span>
-                      <span className="text-ike-neutral">65%</span>
+                      <span className="text-ike-neutral">Processing...</span>
+                      <span className="text-ike-neutral">75%</span>
                     </div>
-                    <Progress value={65} className="h-2" />
+                    <Progress value={75} className="h-2" />
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
                   <div className="flex items-center justify-between bg-ike-neutral-light p-2 rounded-lg">
-                    <span className="text-ike-neutral">{t('integration.processed.records.count')}</span>
-                    <span className="font-medium">{integration.processed.toLocaleString()}</span>
+                    <span className="text-ike-neutral">Records Processed</span>
+                    <span className="font-medium">{job.processed.toLocaleString()}</span>
                   </div>
                   <div className="flex items-center justify-between bg-ike-neutral-light p-2 rounded-lg">
-                    <span className="text-ike-neutral">{t('integration.errors')}</span>
-                    <span className={`font-medium ${integration.errors > 0 ? 'text-ike-error' : ''}`}>
-                      {integration.errors}
+                    <span className="text-ike-neutral">Municipalities</span>
+                    <span className="font-medium">{job.municipalities}</span>
+                  </div>
+                  <div className="flex items-center justify-between bg-ike-neutral-light p-2 rounded-lg">
+                    <span className="text-ike-neutral">Total Amount</span>
+                    <span className={`font-medium flex items-center ${job.totalAmount > 0 ? 'text-ike-primary' : ''}`}>
+                      <Euro className="w-4 h-4 mr-1" />
+                      {job.totalAmount > 0 ? (job.totalAmount / 1000000).toFixed(1) + 'M' : 'Pending'}
                     </span>
                   </div>
                 </div>
@@ -247,32 +315,36 @@ const Integration = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center text-sm text-ike-neutral">
                     <Clock className="w-4 h-4 mr-1" />
-                    {t('integration.next')} {integration.nextScheduled}
+                    {job.status === 'scheduled' ? 'Next run: December 1, 2024' : 
+                     job.status === 'running' ? 'Estimated completion: 30 minutes' :
+                     job.status === 'error' ? 'Manual intervention required' :
+                     'Completed successfully'}
                   </div>
 
                   <div className="flex space-x-2">
-                    {integration.status === "error" && (
+                    {job.status === "error" && (
                       <Button size="sm" className="bg-ike-error hover:bg-ike-error/80 text-white">
                         <XCircle className="w-4 h-4 mr-1" />
-                        {t('integration.show.errors')}
+                        View Errors
                       </Button>
                     )}
 
-                    {integration.status === "running" && (
+                    {job.status === "running" && (
                       <Button size="sm" variant="outline" className="border-ike-error text-ike-error hover:bg-ike-error/10">
-                        {t('integration.cancel')}
+                        Cancel Job
                       </Button>
                     )}
 
-                    {(integration.status === "success" || integration.status === "error") && (
+                    {(job.status === "completed" || job.status === "error") && (
                       <Button size="sm" className="bg-ike-primary hover:bg-ike-primary-dark text-white">
                         <RefreshCcw className="w-4 h-4 mr-1" />
-                        {t('integration.synchronize')}
+                        Restart
                       </Button>
                     )}
 
                     <Button size="sm" variant="ghost" className="text-ike-neutral hover:text-ike-primary">
-                      {t('integration.configuration')}
+                      <FileText className="w-4 h-4 mr-1" />
+                      View Report
                     </Button>
                   </div>
                 </div>
@@ -282,35 +354,35 @@ const Integration = () => {
         </CardContent>
       </Card>
 
-      {/* Integration Options */}
+      {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center text-ike-neutral-dark">
-              <Database className="w-5 h-5 mr-2 text-blue-500" />
-              {t('integration.municipal.sis.sync')}
+              <Calculator className="w-5 h-5 mr-2 text-blue-500" />
+              Monthly Calculations
             </CardTitle>
             <CardDescription>
-              {t('integration.municipal.sis.description')}
+              Trigger monthly inter-municipal payment calculations
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-ike-success" />
-                <span className="text-sm">IST Admin</span>
+                <span className="text-sm">Student enrollment data</span>
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-ike-success" />
-                <span className="text-sm">Tieto Education</span>
+                <span className="text-sm">Municipal price lists</span>
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-ike-success" />
-                <span className="text-sm">Alfa E-skola</span>
+                <span className="text-sm">Additional amounts</span>
               </div>
               
               <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white mt-2">
-                {t('integration.configure.connections')}
+                Start Monthly Calculation
               </Button>
             </div>
           </CardContent>
@@ -319,30 +391,30 @@ const Integration = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center text-ike-neutral-dark">
-              <Upload className="w-5 h-5 mr-2 text-ike-primary" />
-              {t('integration.ss12000.import')}
+              <TrendingUp className="w-5 h-5 mr-2 text-ike-primary" />
+              Annual Reconciliation
             </CardTitle>
             <CardDescription>
-              {t('integration.ss12000.description')}
+              Run comprehensive annual payment reconciliation
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-ike-success" />
-                <span className="text-sm">{t('integration.full.support')}</span>
+                <span className="text-sm">Full year data validation</span>
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-ike-success" />
-                <span className="text-sm">{t('integration.batch.realtime')}</span>
+                <span className="text-sm">Cross-municipality verification</span>
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-ike-success" />
-                <span className="text-sm">{t('integration.validation.conflict')}</span>
+                <span className="text-sm">Adjustment calculations</span>
               </div>
               
               <Button className="w-full bg-ike-primary hover:bg-ike-primary-dark text-white mt-2">
-                {t('integration.import.ss12000')}
+                Start Annual Reconciliation
               </Button>
             </div>
           </CardContent>
@@ -351,77 +423,35 @@ const Integration = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center text-ike-neutral-dark">
-              <User className="w-5 h-5 mr-2 text-green-500" />
-              {t('integration.navet.integration')}
+              <RefreshCcw className="w-5 h-5 mr-2 text-amber-500" />
+              Correction Calculations
             </CardTitle>
             <CardDescription>
-              {t('integration.navet.description')}
+              Run correction calculations for specific periods or municipalities
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-ike-success" />
-                <span className="text-sm">{t('integration.population.data')}</span>
+                <span className="text-sm">Period-specific corrections</span>
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-ike-success" />
-                <span className="text-sm">{t('integration.address.updates')}</span>
+                <span className="text-sm">Data error corrections</span>
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-ike-success" />
-                <span className="text-sm">{t('integration.protected.personal.data')}</span>
+                <span className="text-sm">Manual adjustments</span>
               </div>
               
-              <Button className="w-full bg-green-500 hover:bg-green-600 text-white mt-2">
-                {t('integration.navet.settings')}
+              <Button className="w-full border-amber-500 text-amber-500 hover:bg-amber-500/10" variant="outline">
+                Start Correction Run
               </Button>
             </div>
           </CardContent>
         </Card>
       </div>
-
-      {/* File Processing */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center text-ike-neutral-dark">
-            <FileText className="w-5 h-5 mr-2 text-amber-500" />
-            {t('integration.file.processing')}
-          </CardTitle>
-          <CardDescription>
-            {t('integration.file.processing.description')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="border rounded-lg p-6 bg-ike-neutral-light/40">
-              <h3 className="font-medium text-ike-neutral-dark mb-4 flex items-center">
-                <Upload className="w-5 h-5 mr-2 text-ike-primary" />
-                {t('integration.import.data')}
-              </h3>
-              <p className="text-sm text-ike-neutral mb-4">
-                {t('integration.import.data.description')}
-              </p>
-              <Button className="w-full bg-ike-primary hover:bg-ike-primary-dark text-white">
-                {t('integration.choose.file.import')}
-              </Button>
-            </div>
-            
-            <div className="border rounded-lg p-6 bg-ike-neutral-light/40">
-              <h3 className="font-medium text-ike-neutral-dark mb-4 flex items-center">
-                <FileText className="w-5 h-5 mr-2 text-amber-500" />
-                {t('integration.export.data')}
-              </h3>
-              <p className="text-sm text-ike-neutral mb-4">
-                {t('integration.export.data.description')}
-              </p>
-              <Button className="w-full border-amber-500 text-amber-500 hover:bg-amber-500/10" variant="outline">
-                {t('integration.choose.data.export')}
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
