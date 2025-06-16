@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { 
   TrendingUp, 
   Search, 
@@ -14,9 +15,7 @@ import {
   Building,
   Euro,
   MoreHorizontal,
-  Eye,
-  FileText,
-  Mail
+  Eye
 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -27,7 +26,6 @@ const MoneyToReceive = () => {
   const { toast } = useToast();
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
   const receivableData = [
     {
@@ -37,8 +35,7 @@ const MoneyToReceive = () => {
       homeMunicipality: "Stockholm",
       program: "Samhällsvetenskap",
       period: "2024-09",
-      amount: 11900,
-      status: "Invoiced"
+      amount: 11900
     },
     {
       id: 2,
@@ -47,8 +44,7 @@ const MoneyToReceive = () => {
       homeMunicipality: "Göteborg",
       program: "Ekonomi",
       period: "2024-09",
-      amount: 12650,
-      status: "Confirmed"
+      amount: 12650
     },
     {
       id: 3,
@@ -57,8 +53,7 @@ const MoneyToReceive = () => {
       homeMunicipality: "Malmö",
       program: "Naturvetenskap",
       period: "2024-09",
-      amount: 13100,
-      status: "Pending"
+      amount: 13100
     }
   ];
 
@@ -69,25 +64,11 @@ const MoneyToReceive = () => {
     setIsDetailModalOpen(true);
   };
 
-  const handleGenerateInvoice = (student) => {
-    setSelectedStudent(student);
-    setIsInvoiceModalOpen(true);
-  };
-
-  const handleSendReminder = (student) => {
+  const handleExportReport = () => {
     toast({
-      title: "Reminder Sent",
-      description: `Payment reminder sent to ${student.homeMunicipality} for ${student.studentName}`,
+      title: "Report Exported",
+      description: "Money to Receive report has been exported successfully",
     });
-  };
-
-  const confirmGenerateInvoice = () => {
-    toast({
-      title: "Invoice Generated",
-      description: `Invoice generated for ${selectedStudent?.studentName}`,
-    });
-    setIsInvoiceModalOpen(false);
-    setSelectedStudent(null);
   };
 
   return (
@@ -105,7 +86,10 @@ const MoneyToReceive = () => {
             <Filter className="w-4 h-4 mr-2" />
             Filter
           </Button>
-          <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+          <Button 
+            onClick={handleExportReport}
+            className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+          >
             <Download className="w-4 h-4 mr-2" />
             Export Report
           </Button>
@@ -200,47 +184,22 @@ const MoneyToReceive = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Dialog>
-                      <DialogTrigger asChild>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
                         <Button size="sm" variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
                           <MoreHorizontal className="w-4 h-4" />
                         </Button>
-                      </DialogTrigger>
-                      <DialogContent className="bg-white">
-                        <DialogHeader>
-                          <DialogTitle>Student Actions</DialogTitle>
-                          <DialogDescription>
-                            Choose an action for {item.studentName}
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-3">
-                          <Button 
-                            onClick={() => handleViewDetails(item)}
-                            variant="outline" 
-                            className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
-                          >
-                            <Eye className="w-4 h-4 mr-2" />
-                            View Details
-                          </Button>
-                          <Button 
-                            onClick={() => handleGenerateInvoice(item)}
-                            variant="outline" 
-                            className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
-                          >
-                            <FileText className="w-4 h-4 mr-2" />
-                            Generate Invoice
-                          </Button>
-                          <Button 
-                            onClick={() => handleSendReminder(item)}
-                            variant="outline" 
-                            className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
-                          >
-                            <Mail className="w-4 h-4 mr-2" />
-                            Send Payment Reminder
-                          </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="bg-white border border-gray-200 shadow-md">
+                        <DropdownMenuItem 
+                          onClick={() => handleViewDetails(item)}
+                          className="cursor-pointer hover:bg-ike-primary/10"
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          View Details
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
@@ -251,7 +210,7 @@ const MoneyToReceive = () => {
 
       {/* Student Details Modal */}
       <Dialog open={isDetailModalOpen} onOpenChange={setIsDetailModalOpen}>
-        <DialogContent className="bg-white max-w-2xl">
+        <DialogContent className="bg-white max-w-2xl border border-gray-200 shadow-lg">
           <DialogHeader>
             <DialogTitle>Student Details</DialogTitle>
             <DialogDescription>
@@ -291,32 +250,6 @@ const MoneyToReceive = () => {
           <DialogFooter>
             <Button onClick={() => setIsDetailModalOpen(false)} variant="outline">
               Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Invoice Generation Modal */}
-      <Dialog open={isInvoiceModalOpen} onOpenChange={setIsInvoiceModalOpen}>
-        <DialogContent className="bg-white">
-          <DialogHeader>
-            <DialogTitle>Generate Invoice</DialogTitle>
-            <DialogDescription>
-              Generate invoice for {selectedStudent?.studentName} from {selectedStudent?.homeMunicipality}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <p className="text-ike-neutral">
-              This will generate an invoice for <strong>{selectedStudent?.amount?.toLocaleString()} SEK</strong> 
-              and send it to {selectedStudent?.homeMunicipality} municipality.
-            </p>
-          </div>
-          <DialogFooter>
-            <Button onClick={() => setIsInvoiceModalOpen(false)} variant="outline">
-              Cancel
-            </Button>
-            <Button onClick={confirmGenerateInvoice} className="bg-ike-primary hover:bg-ike-primary-dark text-white">
-              Generate Invoice
             </Button>
           </DialogFooter>
         </DialogContent>
