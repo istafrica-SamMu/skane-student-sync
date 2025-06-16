@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,6 +49,7 @@ import { useToast } from "@/hooks/use-toast";
 const Messages = () => {
   const [messageText, setMessageText] = useState("");
   const [isRecording, setIsRecording] = useState(false);
+  const [selectedConversationId, setSelectedConversationId] = useState(1);
   const { toast } = useToast();
 
   const conversations = [
@@ -85,6 +85,7 @@ const Messages = () => {
   const messages = [
     {
       id: 1,
+      conversationId: 1,
       text: "Hello! I hope you're doing well. I wanted to inform you about the upcoming system maintenance scheduled for January 20th.",
       sender: "System Administrator",
       timestamp: "10:28",
@@ -93,6 +94,7 @@ const Messages = () => {
     },
     {
       id: 2,
+      conversationId: 1,
       text: "The maintenance will occur from 2:00 AM to 4:00 AM. During this time, the system will be temporarily unavailable.",
       sender: "System Administrator", 
       timestamp: "10:29",
@@ -101,6 +103,7 @@ const Messages = () => {
     },
     {
       id: 3,
+      conversationId: 1,
       text: "Thank you for the notification. Will there be any data backup procedures in place?",
       timestamp: "10:35",
       isOwn: true,
@@ -108,15 +111,73 @@ const Messages = () => {
     },
     {
       id: 4,
+      conversationId: 1,
       text: "Yes, absolutely! All data will be automatically backed up before the maintenance begins. No action is required from your end.",
       sender: "System Administrator",
       timestamp: "10:37",
       isOwn: false,
       status: "read"
+    },
+    {
+      id: 5,
+      conversationId: 2,
+      text: "The enrollment period for the next school year begins on February 1st. Please ensure all documentation is ready.",
+      sender: "Regional Office",
+      timestamp: "15:40",
+      isOwn: false,
+      status: "read"
+    },
+    {
+      id: 6,
+      conversationId: 2,
+      text: "We'll need to coordinate with all participating schools for the enrollment process.",
+      sender: "Regional Office",
+      timestamp: "15:42",
+      isOwn: false,
+      status: "read"
+    },
+    {
+      id: 7,
+      conversationId: 2,
+      text: "I'll prepare the necessary documents and coordinate with the schools. When is the deadline for submissions?",
+      timestamp: "15:45",
+      isOwn: true,
+      status: "delivered"
+    },
+    {
+      id: 8,
+      conversationId: 3,
+      text: "Please review and validate student data for the upcoming semester. The validation deadline is approaching.",
+      sender: "Data Management Team",
+      timestamp: "09:10",
+      isOwn: false,
+      status: "read"
+    },
+    {
+      id: 9,
+      conversationId: 3,
+      text: "We need to ensure all student records are accurate before the semester begins.",
+      sender: "Data Management Team",
+      timestamp: "09:12",
+      isOwn: false,
+      status: "read"
+    },
+    {
+      id: 10,
+      conversationId: 3,
+      text: "I'll start the validation process today. How many records need to be reviewed?",
+      timestamp: "09:15",
+      isOwn: true,
+      status: "delivered"
     }
   ];
 
-  const selectedConversation = conversations[0];
+  const selectedConversation = conversations.find(conv => conv.id === selectedConversationId) || conversations[0];
+  const currentMessages = messages.filter(msg => msg.conversationId === selectedConversationId);
+
+  const handleConversationClick = (conversationId: number) => {
+    setSelectedConversationId(conversationId);
+  };
 
   const handleCall = (type: "phone" | "video") => {
     toast({
@@ -270,8 +331,9 @@ const Messages = () => {
             <div
               key={conversation.id}
               className={`p-4 border-b border-ike-neutral-light cursor-pointer hover:bg-ike-neutral-light/50 transition-colors ${
-                conversation.id === selectedConversation.id ? 'bg-ike-primary/5' : ''
+                conversation.id === selectedConversationId ? 'bg-ike-primary/5 border-l-4 border-l-ike-primary' : ''
               }`}
+              onClick={() => handleConversationClick(conversation.id)}
             >
               <div className="flex items-center space-x-3">
                 <div className="relative">
@@ -411,7 +473,7 @@ const Messages = () => {
         {/* Messages Area */}
         <ScrollArea className="flex-1 p-4 bg-gradient-to-b from-ike-neutral-light/30 to-ike-neutral-light/10">
           <div className="space-y-4">
-            {messages.map((message) => (
+            {currentMessages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${message.isOwn ? 'justify-end' : 'justify-start'}`}
