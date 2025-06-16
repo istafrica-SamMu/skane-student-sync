@@ -731,16 +731,6 @@ const Dashboard = () => {
               {currentDate} • System Overview for Region Skåne
             </p>
           </div>
-          <div className="flex space-x-3">
-            <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
-              <Download className="w-4 h-4 mr-2" />
-              Export Regional Report
-            </Button>
-            <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-              <FileText className="w-4 h-4 mr-2" />
-              Generate System Report
-            </Button>
-          </div>
         </div>
 
         {/* Regional Key Metrics */}
@@ -877,7 +867,7 @@ const Dashboard = () => {
                 asChild
                 className="w-full justify-start bg-ike-primary hover:bg-ike-primary-dark text-white"
               >
-                <Link to="/system/municipality-management">
+                <Link to="/system/municipalities">
                   <Building className="w-4 h-4 mr-2" />
                   Manage Municipalities
                 </Link>
@@ -887,7 +877,7 @@ const Dashboard = () => {
                 variant="outline" 
                 className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
               >
-                <Link to="/system/school-units">
+                <Link to="/system/schools">
                   <School className="w-4 h-4 mr-2" />
                   School Unit Overview
                 </Link>
@@ -897,7 +887,7 @@ const Dashboard = () => {
                 variant="outline" 
                 className="w-full justify-start"
               >
-                <Link to="/system/user-management">
+                <Link to="/system/users">
                   <Users className="w-4 h-4 mr-2" />
                   User Management
                 </Link>
