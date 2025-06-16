@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, UserPlus, Search, Filter, Edit, Trash2, Mail, Shield } from "lucide-react";
+import { Users, UserPlus, Search, Filter, Edit, Trash2, Mail, Shield, MoreVertical } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Dialog,
@@ -33,6 +32,19 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
@@ -43,6 +55,17 @@ const UserManagement = () => {
   const [isEditUserOpen, setIsEditUserOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [newUserRole, setNewUserRole] = useState("");
+  const [editUserRole, setEditUserRole] = useState("");
+
+  const roles = [
+    "Municipality Admin",
+    "School Admin", 
+    "Regional Admin",
+    "Teacher",
+    "Administrative Staff",
+    "School Principal"
+  ];
 
   const [users, setUsers] = useState([
     {
@@ -87,10 +110,12 @@ const UserManagement = () => {
       description: "New user has been successfully added to the system.",
     });
     setIsAddUserOpen(false);
+    setNewUserRole("");
   };
 
   const handleEditUser = (user) => {
     setSelectedUser(user);
+    setEditUserRole(user.role);
     setIsEditUserOpen(true);
   };
 
@@ -101,6 +126,7 @@ const UserManagement = () => {
     });
     setIsEditUserOpen(false);
     setSelectedUser(null);
+    setEditUserRole("");
   };
 
   const handleDeleteUser = (userId) => {
@@ -158,7 +184,18 @@ const UserManagement = () => {
                 <Label htmlFor="role" className="text-right">
                   Role
                 </Label>
-                <Input id="role" placeholder="Enter role" className="col-span-3" />
+                <Select value={newUserRole} onValueChange={setNewUserRole}>
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roles.map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {role}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="organization" className="text-right">
@@ -259,49 +296,46 @@ const UserManagement = () => {
                     </td>
                     <td className="p-4 text-ike-neutral">{user.lastLogin}</td>
                     <td className="p-4">
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleEditUser(user)}
-                        >
-                          <Edit className="w-4 h-4 mr-1" />
-                          Edit
-                        </Button>
-                        
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleSendEmail(user)}
-                        >
-                          <Mail className="w-4 h-4 mr-1" />
-                          Email
-                        </Button>
-                        
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              <Trash2 className="w-4 h-4 mr-1" />
-                              Delete
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete the user
-                                account for {user.name} and remove all associated data.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => handleDeleteUser(user.id)}>
-                                Delete User
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-white">
+                          <DropdownMenuItem onClick={() => handleEditUser(user)}>
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleSendEmail(user)}>
+                            <Mail className="w-4 h-4 mr-2" />
+                            Email
+                          </DropdownMenuItem>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will permanently delete the user
+                                  account for {user.name} and remove all associated data.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteUser(user.id)}>
+                                  Delete User
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </td>
                   </tr>
                 ))}
@@ -347,11 +381,18 @@ const UserManagement = () => {
                 <Label htmlFor="edit-role" className="text-right">
                   Role
                 </Label>
-                <Input 
-                  id="edit-role" 
-                  defaultValue={selectedUser.role} 
-                  className="col-span-3" 
-                />
+                <Select value={editUserRole} onValueChange={setEditUserRole}>
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roles.map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {role}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="edit-organization" className="text-right">
