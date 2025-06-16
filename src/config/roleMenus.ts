@@ -99,7 +99,7 @@ export const regionalAdminMenu: MenuItem[] = [
     ],
   },
   {
-    title: "Integrations",
+    title: "Calculation Engine",
     url: "/integration",
     icon: Calculator,
   },
