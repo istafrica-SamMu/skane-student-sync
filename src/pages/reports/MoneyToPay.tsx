@@ -26,6 +26,8 @@ const MoneyToPay = () => {
   const { toast } = useToast();
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const payableData = [
     {
@@ -33,6 +35,7 @@ const MoneyToPay = () => {
       studentName: "Anna Karlsson",
       studentId: "20050312-1234",
       studyingAt: "Malmö Gymnasium",
+      schoolMunicipality: "Malmö",
       program: "Naturvetenskap",
       period: "2024-09",
       amount: 12450
@@ -42,6 +45,7 @@ const MoneyToPay = () => {
       studentName: "Erik Lindström",
       studentId: "20040715-5678",
       studyingAt: "Lund Technical College",
+      schoolMunicipality: "Lund",
       program: "Teknik",
       period: "2024-09",
       amount: 13200
@@ -51,13 +55,23 @@ const MoneyToPay = () => {
       studentName: "Maria Andersson",
       studentId: "20051022-9012",
       studyingAt: "Helsingborg Arts School",
+      schoolMunicipality: "Helsingborg",
       program: "Estetiska",
       period: "2024-09",
       amount: 11800
     }
   ];
 
-  const totalPayable = payableData.reduce((sum, item) => sum + item.amount, 0);
+  // Filter data based on search term
+  const filteredData = payableData.filter(item => 
+    item.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.studentId.includes(searchTerm) ||
+    item.studyingAt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.schoolMunicipality.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.program.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPayable = filteredData.reduce((sum, item) => sum + item.amount, 0);
 
   const handleViewDetails = (student) => {
     setSelectedStudent(student);
@@ -68,6 +82,13 @@ const MoneyToPay = () => {
     toast({
       title: "Report Exported",
       description: "Money to Pay report has been exported successfully",
+    });
+  };
+
+  const handleFilter = () => {
+    toast({
+      title: "Filter Applied",
+      description: "Filtering options have been applied to the report",
     });
   };
 
@@ -82,7 +103,11 @@ const MoneyToPay = () => {
           </p>
         </div>
         <div className="flex space-x-2">
-          <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+          <Button 
+            variant="outline" 
+            className="border-ike-primary text-ike-primary hover:bg-ike-primary/10"
+            onClick={handleFilter}
+          >
             <Filter className="w-4 h-4 mr-2" />
             Filter
           </Button>
@@ -103,7 +128,7 @@ const MoneyToPay = () => {
             <CardTitle className="text-sm font-medium text-ike-neutral">Municipal Students</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-ike-neutral-dark">{payableData.length}</div>
+            <div className="text-2xl font-bold text-ike-neutral-dark">{filteredData.length}</div>
             <p className="text-xs text-ike-neutral">+2 from last month</p>
           </CardContent>
         </Card>
@@ -125,6 +150,8 @@ const MoneyToPay = () => {
           <Input
             placeholder="Search students..."
             className="pl-10 border-ike-primary/20 focus:border-ike-primary"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <Button variant="outline" size="sm">
@@ -151,6 +178,7 @@ const MoneyToPay = () => {
                 <TableHead>Student</TableHead>
                 <TableHead>Student ID</TableHead>
                 <TableHead>School</TableHead>
+                <TableHead>School Municipality</TableHead>
                 <TableHead>Program</TableHead>
                 <TableHead>Period</TableHead>
                 <TableHead>Amount</TableHead>
@@ -158,7 +186,7 @@ const MoneyToPay = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {payableData.map((item) => (
+              {filteredData.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>
                     <div className="flex items-center">
@@ -175,6 +203,7 @@ const MoneyToPay = () => {
                       <span>{item.studyingAt}</span>
                     </div>
                   </TableCell>
+                  <TableCell className="text-ike-neutral">{item.schoolMunicipality}</TableCell>
                   <TableCell>{item.program}</TableCell>
                   <TableCell>{item.period}</TableCell>
                   <TableCell>
@@ -190,7 +219,7 @@ const MoneyToPay = () => {
                           <MoreHorizontal className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="bg-white border border-gray-200 shadow-md">
+                      <DropdownMenuContent className="bg-white border border-gray-200 shadow-md z-50">
                         <DropdownMenuItem 
                           onClick={() => handleViewDetails(item)}
                           className="cursor-pointer hover:bg-ike-primary/10"
@@ -231,6 +260,10 @@ const MoneyToPay = () => {
                 <div>
                   <label className="text-sm font-medium text-ike-neutral">School</label>
                   <p className="text-ike-neutral-dark">{selectedStudent.studyingAt}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">School Municipality</label>
+                  <p className="text-ike-neutral-dark">{selectedStudent.schoolMunicipality}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-ike-neutral">Program</label>
