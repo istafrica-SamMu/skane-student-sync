@@ -27,6 +27,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { 
   ArrowUpDown, 
   Search, 
@@ -39,7 +49,8 @@ import {
   Calendar,
   User,
   Building,
-  GraduationCap
+  GraduationCap,
+  CheckCircle
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -48,6 +59,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface ExternalStudent {
   id: number;
@@ -65,12 +77,17 @@ interface ExternalStudent {
 
 const ExternalStudents = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [municipalityFilter, setMunicipalityFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedStudent, setSelectedStudent] = useState<ExternalStudent | null>(null);
   const [showStudentDetails, setShowStudentDetails] = useState(false);
   const [showIKECalculation, setShowIKECalculation] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [showCalculateDialog, setShowCalculateDialog] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isCalculating, setIsCalculating] = useState(false);
 
   // Mock data for external students (municipal residents attending other municipalities' schools)
   const externalStudents = [
@@ -173,8 +190,65 @@ const ExternalStudents = () => {
     setShowIKECalculation(true);
   };
 
-  const handleExportReport = () => {
-    console.log("Exporting external students report...");
+  const handleExportReport = async () => {
+    setIsExporting(true);
+    
+    try {
+      // Simulate export process
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      toast({
+        title: "Export Successful",
+        description: `External students report has been exported successfully. ${filteredStudents.length} students included.`,
+      });
+      
+      console.log("Exporting external students report...", {
+        totalStudents: filteredStudents.length,
+        filters: { municipalityFilter, statusFilter, searchTerm }
+      });
+      
+      setShowExportDialog(false);
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "Failed to export the report. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleCalculateIKE = async () => {
+    setIsCalculating(true);
+    
+    try {
+      // Simulate calculation process
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      const totalCost = filteredStudents.reduce((sum, student) => sum + student.ikeCost, 0);
+      
+      toast({
+        title: "IKE Calculation Complete",
+        description: `Total IKE cost calculated: ${totalCost.toLocaleString('sv-SE')} SEK for ${filteredStudents.length} students.`,
+      });
+      
+      console.log("IKE calculation completed", {
+        totalStudents: filteredStudents.length,
+        totalCost,
+        breakdown: filteredStudents.map(s => ({ name: s.name, cost: s.ikeCost }))
+      });
+      
+      setShowCalculateDialog(false);
+    } catch (error) {
+      toast({
+        title: "Calculation Failed",
+        description: "Failed to calculate IKE costs. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCalculating(false);
+    }
   };
 
   return (
@@ -188,18 +262,134 @@ const ExternalStudents = () => {
           </p>
         </div>
         <div className="flex space-x-3">
-          <Button 
-            variant="outline" 
-            className="border-ike-primary text-ike-primary hover:bg-ike-primary/10"
-            onClick={handleExportReport}
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Export Report
-          </Button>
-          <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
-            <Calculator className="w-4 h-4 mr-2" />
-            Calculate IKE
-          </Button>
+          <AlertDialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+            <Button 
+              variant="outline" 
+              className="border-ike-primary text-ike-primary hover:bg-ike-primary/10"
+              onClick={() => setShowExportDialog(true)}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export Report
+            </Button>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center text-ike-neutral-dark">
+                  <Download className="w-5 h-5 mr-2 text-ike-primary" />
+                  Export External Students Report
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will export a comprehensive report of all external students ({filteredStudents.length} students) 
+                  based on your current filters. The report will include student details, payment status, and IKE costs.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <div className="bg-ike-neutral-light p-4 rounded-lg">
+                <h4 className="font-medium text-ike-neutral-dark mb-2">Export Details</h4>
+                <div className="space-y-2 text-sm text-ike-neutral">
+                  <div className="flex justify-between">
+                    <span>Total Students:</span>
+                    <span className="font-medium">{filteredStudents.length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Municipality Filter:</span>
+                    <span className="font-medium">{municipalityFilter === "all" ? "All" : municipalityFilter}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Status Filter:</span>
+                    <span className="font-medium">{statusFilter === "all" ? "All" : statusFilter}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Format:</span>
+                    <span className="font-medium">Excel (.xlsx)</span>
+                  </div>
+                </div>
+              </div>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isExporting}>Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={handleExportReport}
+                  disabled={isExporting}
+                  className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+                >
+                  {isExporting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Exporting...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4 mr-2" />
+                      Export Report
+                    </>
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          <AlertDialog open={showCalculateDialog} onOpenChange={setShowCalculateDialog}>
+            <Button 
+              className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+              onClick={() => setShowCalculateDialog(true)}
+            >
+              <Calculator className="w-4 h-4 mr-2" />
+              Calculate IKE
+            </Button>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center text-ike-neutral-dark">
+                  <Calculator className="w-5 h-5 mr-2 text-ike-primary" />
+                  Calculate IKE Costs
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will recalculate the Inter-municipal compensation (IKE) costs for all external students 
+                  ({filteredStudents.length} students) based on current rates and program supplements.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <div className="bg-ike-neutral-light p-4 rounded-lg">
+                <h4 className="font-medium text-ike-neutral-dark mb-2">Calculation Preview</h4>
+                <div className="space-y-2 text-sm text-ike-neutral">
+                  <div className="flex justify-between">
+                    <span>Students to Calculate:</span>
+                    <span className="font-medium">{filteredStudents.length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Current Total Cost:</span>
+                    <span className="font-medium">
+                      {filteredStudents.reduce((sum, s) => sum + s.ikeCost, 0).toLocaleString('sv-SE')} SEK
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Calculation Method:</span>
+                    <span className="font-medium">Program-based rates</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Reference Year:</span>
+                    <span className="font-medium">2024/2025</span>
+                  </div>
+                </div>
+              </div>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isCalculating}>Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={handleCalculateIKE}
+                  disabled={isCalculating}
+                  className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+                >
+                  {isCalculating ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Calculating...
+                    </>
+                  ) : (
+                    <>
+                      <Calculator className="w-4 h-4 mr-2" />
+                      Start Calculation
+                    </>
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 
