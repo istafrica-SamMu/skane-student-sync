@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   Settings, 
   Calendar, 
@@ -23,146 +24,191 @@ import {
   GraduationCap,
   AlertTriangle,
   Check,
-  Globe,
-  Building
+  Building,
+  FileText,
+  Save
 } from "lucide-react";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const EnrollmentSettings = () => {
-  const [systemSettings, setSystemSettings] = useState({
-    globalEnrollmentStart: "2024-01-15",
-    globalEnrollmentEnd: "2024-03-31",
-    allowMunicipalOverrides: true,
-    autoEnforceRules: true,
-    requireDocumentation: true,
-    enableLateEnrollment: false,
-    lateEnrollmentDeadline: "2024-04-15",
-    maxLateEnrollmentDays: 14
+  const { toast } = useToast();
+  
+  const [municipalSettings, setMunicipalSettings] = useState({
+    enrollmentStart: "2024-01-15",
+    enrollmentEnd: "2024-03-31",
+    priorityDeadline: "2024-02-15",
+    allowLateApplications: true,
+    lateApplicationDeadline: "2024-04-15",
+    requireResidencyProof: true,
+    enableWaitingLists: true,
+    autoProcessApplications: false
   });
 
-  const [gradeSettings, setGradeSettings] = useState([
-    { grade: "Förskoleklass", maxStudents: 25, priorityDeadline: "2024-02-15", enabled: true },
-    { grade: "Årskurs 1", maxStudents: 30, priorityDeadline: "2024-02-20", enabled: true },
-    { grade: "Årskurs 2", maxStudents: 30, priorityDeadline: "2024-02-20", enabled: true },
-    { grade: "Årskurs 3", maxStudents: 30, priorityDeadline: "2024-02-20", enabled: true },
-    { grade: "Årskurs 4", maxStudents: 32, priorityDeadline: "2024-02-25", enabled: true },
-    { grade: "Årskurs 5", maxStudents: 32, priorityDeadline: "2024-02-25", enabled: true },
-    { grade: "Årskurs 6", maxStudents: 32, priorityDeadline: "2024-02-25", enabled: true }
+  const [schoolSettings, setSchoolSettings] = useState([
+    { 
+      school: "Centralskolan", 
+      maxCapacity: 180, 
+      currentEnrolled: 165, 
+      waitingList: 12, 
+      acceptingApplications: true 
+    },
+    { 
+      school: "Västerskolan", 
+      maxCapacity: 150, 
+      currentEnrolled: 142, 
+      waitingList: 8, 
+      acceptingApplications: true 
+    },
+    { 
+      school: "Norrskolan", 
+      maxCapacity: 200, 
+      currentEnrolled: 195, 
+      waitingList: 25, 
+      acceptingApplications: false 
+    }
   ]);
 
-  const [enrollmentRules, setEnrollmentRules] = useState({
-    residencyRequired: true,
-    siblingPriority: true,
-    specialNeedsPriority: true,
-    geographicZoning: false,
-    capacityLimits: true,
-    waitingListEnabled: true
+  const [documentRequirements, setDocumentRequirements] = useState({
+    residencyProof: true,
+    birthCertificate: true,
+    previousSchoolRecords: false,
+    specialNeedsDocumentation: true,
+    parentalConsent: true
   });
 
-  const handleSystemSettingChange = (field: string, value: any) => {
-    setSystemSettings(prev => ({ ...prev, [field]: value }));
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+
+  const handleMunicipalSettingChange = (field: string, value: any) => {
+    setMunicipalSettings(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleGradeSettingChange = (index: number, field: string, value: any) => {
-    setGradeSettings(prev => 
-      prev.map((grade, i) => 
-        i === index ? { ...grade, [field]: value } : grade
+  const handleSchoolSettingChange = (index: number, field: string, value: any) => {
+    setSchoolSettings(prev => 
+      prev.map((school, i) => 
+        i === index ? { ...school, [field]: value } : school
       )
     );
   };
 
-  const handleRuleChange = (rule: string, value: boolean) => {
-    setEnrollmentRules(prev => ({ ...prev, [rule]: value }));
+  const handleDocumentRequirementChange = (requirement: string, value: boolean) => {
+    setDocumentRequirements(prev => ({ ...prev, [requirement]: value }));
+  };
+
+  const handleSaveConfiguration = () => {
+    setIsSaveModalOpen(true);
+  };
+
+  const handleConfirmSave = () => {
+    toast({
+      title: "Configuration Saved",
+      description: "Municipal enrollment settings have been saved successfully",
+    });
+    setIsSaveModalOpen(false);
+  };
+
+  const handleExportConfiguration = () => {
+    setIsExportModalOpen(true);
+  };
+
+  const handleConfirmExport = () => {
+    toast({
+      title: "Configuration Exported",
+      description: "Enrollment configuration has been exported successfully",
+    });
+    setIsExportModalOpen(false);
+  };
+
+  const handleResetToDefaults = () => {
+    setIsResetModalOpen(true);
+  };
+
+  const handleConfirmReset = () => {
+    toast({
+      title: "Settings Reset",
+      description: "All enrollment settings have been reset to defaults",
+    });
+    setIsResetModalOpen(false);
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-ike-primary">System Enrollment Management</h1>
+        <h1 className="text-3xl font-bold text-ike-primary">Municipal Enrollment Management</h1>
         <p className="text-ike-neutral-dark mt-2">
-          Configure system-wide enrollment periods, restrictions, and default rules for all municipalities
+          Configure enrollment periods, school capacities, and application requirements for your municipality
         </p>
       </div>
 
-      {/* System-wide Enrollment Periods */}
+      {/* Municipal Enrollment Periods */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Globe className="w-5 h-5 text-ike-primary" />
-            <span>Global Enrollment Periods</span>
+            <Calendar className="w-5 h-5 text-ike-primary" />
+            <span>Municipal Enrollment Periods</span>
           </CardTitle>
           <CardDescription>
-            Set system-wide enrollment periods that apply to all municipalities by default
+            Set enrollment periods and deadlines for your municipal schools
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="global-start">Global Enrollment Start</Label>
+              <Label htmlFor="enrollment-start">Enrollment Period Start</Label>
               <Input
-                id="global-start"
+                id="enrollment-start"
                 type="date"
-                value={systemSettings.globalEnrollmentStart}
-                onChange={(e) => handleSystemSettingChange('globalEnrollmentStart', e.target.value)}
+                value={municipalSettings.enrollmentStart}
+                onChange={(e) => handleMunicipalSettingChange('enrollmentStart', e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="global-end">Global Enrollment End</Label>
+              <Label htmlFor="enrollment-end">Enrollment Period End</Label>
               <Input
-                id="global-end"
+                id="enrollment-end"
                 type="date"
-                value={systemSettings.globalEnrollmentEnd}
-                onChange={(e) => handleSystemSettingChange('globalEnrollmentEnd', e.target.value)}
+                value={municipalSettings.enrollmentEnd}
+                onChange={(e) => handleMunicipalSettingChange('enrollmentEnd', e.target.value)}
               />
             </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="priority-deadline">Priority Application Deadline</Label>
+            <Input
+              id="priority-deadline"
+              type="date"
+              value={municipalSettings.priorityDeadline}
+              onChange={(e) => handleMunicipalSettingChange('priorityDeadline', e.target.value)}
+            />
           </div>
           
           <Separator />
           
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <Label>Allow Municipal Overrides</Label>
+              <Label>Allow Late Applications</Label>
               <p className="text-sm text-ike-neutral">
-                Permit municipalities to customize enrollment periods within guidelines
+                Accept applications after the standard deadline
               </p>
             </div>
             <Switch
-              checked={systemSettings.allowMunicipalOverrides}
-              onCheckedChange={(checked) => handleSystemSettingChange('allowMunicipalOverrides', checked)}
+              checked={municipalSettings.allowLateApplications}
+              onCheckedChange={(checked) => handleMunicipalSettingChange('allowLateApplications', checked)}
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <Label>Enable Late Enrollment</Label>
-              <p className="text-sm text-ike-neutral">
-                Allow enrollments after the standard deadline
-              </p>
-            </div>
-            <Switch
-              checked={systemSettings.enableLateEnrollment}
-              onCheckedChange={(checked) => handleSystemSettingChange('enableLateEnrollment', checked)}
-            />
-          </div>
-
-          {systemSettings.enableLateEnrollment && (
-            <div className="grid grid-cols-2 gap-4 p-4 border border-ike-primary/20 rounded-lg bg-ike-primary/5">
+          {municipalSettings.allowLateApplications && (
+            <div className="p-4 border border-ike-primary/20 rounded-lg bg-ike-primary/5">
               <div className="space-y-2">
-                <Label htmlFor="late-deadline">Late Enrollment Deadline</Label>
+                <Label htmlFor="late-deadline">Late Application Deadline</Label>
                 <Input
                   id="late-deadline"
                   type="date"
-                  value={systemSettings.lateEnrollmentDeadline}
-                  onChange={(e) => handleSystemSettingChange('lateEnrollmentDeadline', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="max-late-days">Max Late Enrollment Days</Label>
-                <Input
-                  id="max-late-days"
-                  type="number"
-                  value={systemSettings.maxLateEnrollmentDays}
-                  onChange={(e) => handleSystemSettingChange('maxLateEnrollmentDays', parseInt(e.target.value))}
+                  value={municipalSettings.lateApplicationDeadline}
+                  onChange={(e) => handleMunicipalSettingChange('lateApplicationDeadline', e.target.value)}
                 />
               </div>
             </div>
@@ -170,15 +216,74 @@ const EnrollmentSettings = () => {
         </CardContent>
       </Card>
 
-      {/* Default Enrollment Rules */}
+      {/* School Capacity Management */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Shield className="w-5 h-5 text-ike-primary" />
-            <span>Default Enrollment Rules</span>
+            <Building className="w-5 h-5 text-ike-primary" />
+            <span>School Capacity Management</span>
           </CardTitle>
           <CardDescription>
-            Configure default enrollment rules that municipalities can customize
+            Monitor and manage enrollment capacity for each school in your municipality
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-3">
+            {schoolSettings.map((school, index) => (
+              <div key={school.school} className="p-4 border border-ike-neutral-light rounded-lg">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-3">
+                    <h4 className="font-medium text-ike-neutral-dark">{school.school}</h4>
+                    <Badge variant={school.acceptingApplications ? "default" : "secondary"}>
+                      {school.acceptingApplications ? "Accepting Applications" : "Closed"}
+                    </Badge>
+                  </div>
+                  <Switch
+                    checked={school.acceptingApplications}
+                    onCheckedChange={(checked) => handleSchoolSettingChange(index, 'acceptingApplications', checked)}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-4 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor={`max-capacity-${index}`}>Max Capacity</Label>
+                    <Input
+                      id={`max-capacity-${index}`}
+                      type="number"
+                      value={school.maxCapacity}
+                      onChange={(e) => handleSchoolSettingChange(index, 'maxCapacity', parseInt(e.target.value))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Current Enrolled</Label>
+                    <div className="text-lg font-medium text-ike-neutral-dark pt-2">{school.currentEnrolled}</div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Waiting List</Label>
+                    <div className="text-lg font-medium text-ike-warning pt-2">{school.waitingList}</div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Available Spots</Label>
+                    <div className="text-lg font-medium text-ike-success pt-2">
+                      {school.maxCapacity - school.currentEnrolled}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Document Requirements */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <FileText className="w-5 h-5 text-ike-primary" />
+            <span>Document Requirements</span>
+          </CardTitle>
+          <CardDescription>
+            Configure required documentation for enrollment applications
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -186,34 +291,34 @@ const EnrollmentSettings = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <Label>Residency Requirement</Label>
-                  <p className="text-xs text-ike-neutral">Student must reside in municipality</p>
+                  <Label>Residency Proof</Label>
+                  <p className="text-xs text-ike-neutral">Utility bill or lease agreement</p>
                 </div>
                 <Switch
-                  checked={enrollmentRules.residencyRequired}
-                  onCheckedChange={(checked) => handleRuleChange('residencyRequired', checked)}
+                  checked={documentRequirements.residencyProof}
+                  onCheckedChange={(checked) => handleDocumentRequirementChange('residencyProof', checked)}
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <Label>Sibling Priority</Label>
-                  <p className="text-xs text-ike-neutral">Priority for siblings at same school</p>
+                  <Label>Birth Certificate</Label>
+                  <p className="text-xs text-ike-neutral">Official birth certificate copy</p>
                 </div>
                 <Switch
-                  checked={enrollmentRules.siblingPriority}
-                  onCheckedChange={(checked) => handleRuleChange('siblingPriority', checked)}
+                  checked={documentRequirements.birthCertificate}
+                  onCheckedChange={(checked) => handleDocumentRequirementChange('birthCertificate', checked)}
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <Label>Special Needs Priority</Label>
-                  <p className="text-xs text-ike-neutral">Priority for special needs students</p>
+                  <Label>Previous School Records</Label>
+                  <p className="text-xs text-ike-neutral">Transcripts from previous school</p>
                 </div>
                 <Switch
-                  checked={enrollmentRules.specialNeedsPriority}
-                  onCheckedChange={(checked) => handleRuleChange('specialNeedsPriority', checked)}
+                  checked={documentRequirements.previousSchoolRecords}
+                  onCheckedChange={(checked) => handleDocumentRequirementChange('previousSchoolRecords', checked)}
                 />
               </div>
             </div>
@@ -221,34 +326,23 @@ const EnrollmentSettings = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <Label>Geographic Zoning</Label>
-                  <p className="text-xs text-ike-neutral">Restrict enrollment by catchment areas</p>
+                  <Label>Special Needs Documentation</Label>
+                  <p className="text-xs text-ike-neutral">IEP or medical documentation</p>
                 </div>
                 <Switch
-                  checked={enrollmentRules.geographicZoning}
-                  onCheckedChange={(checked) => handleRuleChange('geographicZoning', checked)}
+                  checked={documentRequirements.specialNeedsDocumentation}
+                  onCheckedChange={(checked) => handleDocumentRequirementChange('specialNeedsDocumentation', checked)}
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <Label>Capacity Limits</Label>
-                  <p className="text-xs text-ike-neutral">Enforce maximum class sizes</p>
+                  <Label>Parental Consent</Label>
+                  <p className="text-xs text-ike-neutral">Signed consent forms</p>
                 </div>
                 <Switch
-                  checked={enrollmentRules.capacityLimits}
-                  onCheckedChange={(checked) => handleRuleChange('capacityLimits', checked)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label>Waiting Lists</Label>
-                  <p className="text-xs text-ike-neutral">Enable waiting lists when capacity reached</p>
-                </div>
-                <Switch
-                  checked={enrollmentRules.waitingListEnabled}
-                  onCheckedChange={(checked) => handleRuleChange('waitingListEnabled', checked)}
+                  checked={documentRequirements.parentalConsent}
+                  onCheckedChange={(checked) => handleDocumentRequirementChange('parentalConsent', checked)}
                 />
               </div>
             </div>
@@ -258,97 +352,54 @@ const EnrollmentSettings = () => {
 
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <Label>Automatic Rule Enforcement</Label>
+              <Label>Require Residency Proof</Label>
               <p className="text-sm text-ike-neutral">
-                Automatically enforce enrollment rules and restrictions
+                Require proof of municipal residency for enrollment
               </p>
             </div>
             <Switch
-              checked={systemSettings.autoEnforceRules}
-              onCheckedChange={(checked) => handleSystemSettingChange('autoEnforceRules', checked)}
+              checked={municipalSettings.requireResidencyProof}
+              onCheckedChange={(checked) => handleMunicipalSettingChange('requireResidencyProof', checked)}
             />
           </div>
 
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <Label>Require Documentation</Label>
+              <Label>Enable Waiting Lists</Label>
               <p className="text-sm text-ike-neutral">
-                Require supporting documents for enrollment
+                Create waiting lists when schools reach capacity
               </p>
             </div>
             <Switch
-              checked={systemSettings.requireDocumentation}
-              onCheckedChange={(checked) => handleSystemSettingChange('requireDocumentation', checked)}
+              checked={municipalSettings.enableWaitingLists}
+              onCheckedChange={(checked) => handleMunicipalSettingChange('enableWaitingLists', checked)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <Label>Auto-Process Applications</Label>
+              <p className="text-sm text-ike-neutral">
+                Automatically process applications when requirements are met
+              </p>
+            </div>
+            <Switch
+              checked={municipalSettings.autoProcessApplications}
+              onCheckedChange={(checked) => handleMunicipalSettingChange('autoProcessApplications', checked)}
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Grade-Specific Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <GraduationCap className="w-5 h-5 text-ike-primary" />
-            <span>Grade-Specific Enrollment Windows</span>
-          </CardTitle>
-          <CardDescription>
-            Configure enrollment windows and capacity limits for each grade level
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
-            {gradeSettings.map((grade, index) => (
-              <div key={grade.grade} className="p-4 border border-ike-neutral-light rounded-lg">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center space-x-3">
-                    <h4 className="font-medium text-ike-neutral-dark">{grade.grade}</h4>
-                    <Badge variant={grade.enabled ? "default" : "secondary"}>
-                      {grade.enabled ? "Active" : "Inactive"}
-                    </Badge>
-                  </div>
-                  <Switch
-                    checked={grade.enabled}
-                    onCheckedChange={(checked) => handleGradeSettingChange(index, 'enabled', checked)}
-                  />
-                </div>
-                
-                {grade.enabled && (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor={`max-students-${index}`}>Maximum Students</Label>
-                      <Input
-                        id={`max-students-${index}`}
-                        type="number"
-                        value={grade.maxStudents}
-                        onChange={(e) => handleGradeSettingChange(index, 'maxStudents', parseInt(e.target.value))}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor={`priority-deadline-${index}`}>Priority Deadline</Label>
-                      <Input
-                        id={`priority-deadline-${index}`}
-                        type="date"
-                        value={grade.priorityDeadline}
-                        onChange={(e) => handleGradeSettingChange(index, 'priorityDeadline', e.target.value)}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* System Status & Actions */}
+      {/* Configuration Actions */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Settings className="w-5 h-5 text-ike-primary" />
-            <span>System Configuration</span>
+            <span>Configuration Management</span>
           </CardTitle>
           <CardDescription>
-            Review and apply enrollment management configuration
+            Save, export, or reset your enrollment configuration
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -358,20 +409,20 @@ const EnrollmentSettings = () => {
               <div>
                 <p className="text-sm font-medium text-green-800">Configuration Status</p>
                 <p className="text-sm text-green-700 mt-1">
-                  All enrollment settings are properly configured and ready to deploy
+                  All enrollment settings are properly configured and ready to use
                 </p>
               </div>
             </div>
           </div>
 
-          {!systemSettings.allowMunicipalOverrides && (
+          {!municipalSettings.enableWaitingLists && (
             <div className="p-4 border border-yellow-200 bg-yellow-50 rounded-lg">
               <div className="flex items-start space-x-2">
                 <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-yellow-800">Restricted Municipal Access</p>
+                  <p className="text-sm font-medium text-yellow-800">Waiting Lists Disabled</p>
                   <p className="text-sm text-yellow-700 mt-1">
-                    Municipalities cannot override these settings. Ensure all configurations meet regional requirements.
+                    Applications may be rejected when schools reach capacity without waiting lists enabled.
                   </p>
                 </div>
               </div>
@@ -380,24 +431,111 @@ const EnrollmentSettings = () => {
 
           <div className="flex justify-between space-x-4">
             <div className="flex space-x-3">
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleExportConfiguration}>
                 Export Configuration
               </Button>
-              <Button variant="outline">
-                Import Configuration
-              </Button>
-            </div>
-            <div className="flex space-x-3">
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleResetToDefaults}>
                 Reset to Defaults
               </Button>
-              <Button className="bg-ike-primary hover:bg-ike-primary/90">
-                Apply Configuration
-              </Button>
             </div>
+            <Button 
+              className="bg-ike-primary hover:bg-ike-primary/90"
+              onClick={handleSaveConfiguration}
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Save Configuration
+            </Button>
           </div>
         </CardContent>
       </Card>
+
+      {/* Save Configuration Modal */}
+      <Dialog open={isSaveModalOpen} onOpenChange={setIsSaveModalOpen}>
+        <DialogContent className="bg-white max-w-md border border-gray-200 shadow-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-ike-neutral-dark">
+              <Save className="w-5 h-5 mr-2 text-ike-primary" />
+              Save Configuration
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to save the current enrollment configuration? This will apply all settings immediately.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsSaveModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleConfirmSave}
+              className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Save Configuration
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Export Configuration Modal */}
+      <Dialog open={isExportModalOpen} onOpenChange={setIsExportModalOpen}>
+        <DialogContent className="bg-white max-w-md border border-gray-200 shadow-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-ike-neutral-dark">
+              <FileText className="w-5 h-5 mr-2 text-ike-primary" />
+              Export Configuration
+            </DialogTitle>
+            <DialogDescription>
+              This will export your current enrollment configuration to a file that can be imported later or shared with other administrators.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsExportModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleConfirmExport}
+              className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+            >
+              Export Configuration
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reset Configuration Modal */}
+      <Dialog open={isResetModalOpen} onOpenChange={setIsResetModalOpen}>
+        <DialogContent className="bg-white max-w-md border border-gray-200 shadow-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-ike-neutral-dark">
+              <AlertTriangle className="w-5 h-5 mr-2 text-ike-error" />
+              Reset to Defaults
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to reset all enrollment settings to their default values? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsResetModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleConfirmReset}
+              variant="destructive"
+            >
+              Reset to Defaults
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
