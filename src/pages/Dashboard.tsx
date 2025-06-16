@@ -737,16 +737,6 @@ const Dashboard = () => {
               {currentDate} • System Overview for Region Skåne
             </p>
           </div>
-          <div className="flex space-x-3">
-            <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
-              <Download className="w-4 h-4 mr-2" />
-              Export Regional Report
-            </Button>
-            <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-              <FileText className="w-4 h-4 mr-2" />
-              Generate System Report
-            </Button>
-          </div>
         </div>
 
         {/* Regional Key Metrics */}
