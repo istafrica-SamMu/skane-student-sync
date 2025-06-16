@@ -807,7 +807,7 @@ const Dashboard = () => {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Regional System Status */}
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-1">
             <CardHeader>
               <CardTitle className="flex items-center text-ike-neutral-dark">
                 <Database className="w-5 h-5 mr-2 text-ike-primary" />
@@ -914,16 +914,19 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Municipality Overview */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-ike-neutral-dark">Municipality Status Overview</CardTitle>
-              <CardDescription>
+          {/* Municipality Overview - Enhanced Design */}
+          <Card className="w-full">
+            <CardHeader className="pb-6">
+              <CardTitle className="text-xl font-bold text-ike-neutral-dark flex items-center gap-3">
+                <Building className="w-6 h-6 text-ike-primary" />
+                Municipality Status Overview
+              </CardTitle>
+              <CardDescription className="text-base">
                 Real-time status of municipalities in the region
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {[
                   {
                     name: "Malmö",
@@ -958,27 +961,31 @@ const Dashboard = () => {
                     statusColor: "error"
                   }
                 ].map((municipality, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-ike-primary/10 rounded-lg flex items-center justify-center">
-                        <Building className="w-6 h-6 text-ike-primary" />
+                  <div key={index} className="flex items-center justify-between p-6 border rounded-xl bg-gradient-to-r from-white to-gray-50 hover:shadow-md transition-shadow">
+                    <div className="flex items-center space-x-6">
+                      <div className="w-16 h-16 bg-ike-primary/10 rounded-xl flex items-center justify-center">
+                        <Building className="w-8 h-8 text-ike-primary" />
                       </div>
                       <div>
-                        <h3 className="font-medium text-ike-neutral-dark">{municipality.name}</h3>
-                        <p className="text-sm text-ike-neutral">{municipality.students} students • Last sync: {municipality.lastSync}</p>
+                        <h3 className="text-lg font-semibold text-ike-neutral-dark">{municipality.name}</h3>
+                        <p className="text-sm text-ike-neutral font-medium">{municipality.students.toLocaleString()} students</p>
+                        <p className="text-xs text-ike-neutral">Last sync: {municipality.lastSync}</p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex flex-col items-end space-y-3">
                       <Badge 
-                        className={
+                        className={`px-3 py-1 text-sm font-medium ${
                           municipality.statusColor === "success" ? "bg-ike-success text-white" :
                           municipality.statusColor === "warning" ? "bg-ike-warning text-white" :
                           "bg-ike-error text-white"
-                        }
+                        }`}
                       >
                         {municipality.integration}
                       </Badge>
-                      <div className="w-3 h-3 bg-ike-success rounded-full"></div>
+                      <div className={`w-4 h-4 rounded-full ${
+                        municipality.statusColor === "success" ? "bg-ike-success" : 
+                        municipality.statusColor === "warning" ? "bg-ike-warning" : "bg-ike-error"
+                      }`}></div>
                     </div>
                   </div>
                 ))}
