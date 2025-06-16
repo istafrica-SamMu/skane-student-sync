@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -62,14 +61,6 @@ const MunicipalStatistics = () => {
           </p>
         </div>
         <div className="flex space-x-2">
-          <Button 
-            variant="outline" 
-            className="border-ike-primary text-ike-primary hover:bg-ike-primary/10"
-            onClick={handleChangePeriod}
-          >
-            <Calendar className="w-4 h-4 mr-2" />
-            Change Period
-          </Button>
           <Button 
             className="bg-ike-primary hover:bg-ike-primary-dark text-white"
             onClick={handleExportAnalytics}
