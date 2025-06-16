@@ -19,14 +19,15 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const Integration = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [isCalculating, setIsCalculating] = useState(false);
   const [calculationProgress, setCalculationProgress] = useState(0);
-  
-  const calculationJobs = [
+  const [calculationJobs, setCalculationJobs] = useState([
     {
       id: 1,
       name: "September 2024 Payment Calculations",
@@ -71,11 +72,16 @@ const Integration = () => {
       totalAmount: 0,
       municipalities: 5
     }
-  ];
+  ]);
 
   const handleStartCalculation = () => {
     setIsCalculating(true);
     setCalculationProgress(0);
+    
+    toast({
+      title: "Calculation Started",
+      description: "Regional payment calculation has been initiated.",
+    });
     
     // Simulate calculation progress
     const interval = setInterval(() => {
@@ -83,11 +89,123 @@ const Integration = () => {
         if (prev >= 100) {
           clearInterval(interval);
           setIsCalculating(false);
+          toast({
+            title: "Calculation Complete",
+            description: "Regional payment calculation has been completed successfully.",
+          });
           return 100;
         }
         return prev + 10;
       });
     }, 500);
+  };
+
+  const handleCancelJob = (jobId: number) => {
+    setCalculationJobs(prev => 
+      prev.map(job => 
+        job.id === jobId 
+          ? { ...job, status: "cancelled" }
+          : job
+      )
+    );
+    
+    toast({
+      title: "Job Cancelled",
+      description: "The calculation job has been cancelled.",
+      variant: "destructive"
+    });
+  };
+
+  const handleRestartJob = (jobId: number) => {
+    setCalculationJobs(prev => 
+      prev.map(job => 
+        job.id === jobId 
+          ? { ...job, status: "running", processed: 0 }
+          : job
+      )
+    );
+    
+    toast({
+      title: "Job Restarted",
+      description: "The calculation job has been restarted.",
+    });
+  };
+
+  const handleViewErrors = (jobId: number) => {
+    toast({
+      title: "Error Details",
+      description: "Viewing error details for the calculation job.",
+    });
+  };
+
+  const handleViewReport = (jobId: number) => {
+    toast({
+      title: "Report Generated",
+      description: "Opening calculation report for the selected job.",
+    });
+  };
+
+  const handleStartMonthlyCalculation = () => {
+    const newJob = {
+      id: Date.now(),
+      name: "November 2024 Payment Calculations",
+      type: "monthly",
+      status: "running",
+      lastRun: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      processed: 0,
+      errors: 0,
+      totalAmount: 0,
+      municipalities: 15
+    };
+
+    setCalculationJobs(prev => [newJob, ...prev]);
+    
+    toast({
+      title: "Monthly Calculation Started",
+      description: "Monthly inter-municipal payment calculation has been initiated.",
+    });
+  };
+
+  const handleStartAnnualReconciliation = () => {
+    const newJob = {
+      id: Date.now(),
+      name: "Annual Reconciliation 2024",
+      type: "annual",
+      status: "running",
+      lastRun: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      processed: 0,
+      errors: 0,
+      totalAmount: 0,
+      municipalities: 33
+    };
+
+    setCalculationJobs(prev => [newJob, ...prev]);
+    
+    toast({
+      title: "Annual Reconciliation Started",
+      description: "Annual payment reconciliation has been initiated.",
+    });
+  };
+
+  const handleStartCorrectionRun = () => {
+    const newJob = {
+      id: Date.now(),
+      name: "November 2024 Correction Run",
+      type: "correction",
+      status: "running",
+      lastRun: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      processed: 0,
+      errors: 0,
+      totalAmount: 0,
+      municipalities: 8
+    };
+
+    setCalculationJobs(prev => [newJob, ...prev]);
+    
+    toast({
+      title: "Correction Run Started",
+      description: "Correction calculation has been initiated.",
+    });
   };
 
   const getStatusBadge = (status: string) => {
@@ -100,6 +218,8 @@ const Integration = () => {
         return <Badge className="bg-ike-warning text-white">Scheduled</Badge>;
       case "error":
         return <Badge className="bg-ike-error text-white">Error</Badge>;
+      case "cancelled":
+        return <Badge variant="secondary">Cancelled</Badge>;
       default:
         return <Badge variant="secondary">Unknown</Badge>;
     }
@@ -323,26 +443,44 @@ const Integration = () => {
 
                   <div className="flex space-x-2">
                     {job.status === "error" && (
-                      <Button size="sm" className="bg-ike-error hover:bg-ike-error/80 text-white">
+                      <Button 
+                        size="sm" 
+                        className="bg-ike-error hover:bg-ike-error/80 text-white"
+                        onClick={() => handleViewErrors(job.id)}
+                      >
                         <XCircle className="w-4 h-4 mr-1" />
                         View Errors
                       </Button>
                     )}
 
                     {job.status === "running" && (
-                      <Button size="sm" variant="outline" className="border-ike-error text-ike-error hover:bg-ike-error/10">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="border-ike-error text-ike-error hover:bg-ike-error/10"
+                        onClick={() => handleCancelJob(job.id)}
+                      >
                         Cancel Job
                       </Button>
                     )}
 
                     {(job.status === "completed" || job.status === "error") && (
-                      <Button size="sm" className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+                      <Button 
+                        size="sm" 
+                        className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+                        onClick={() => handleRestartJob(job.id)}
+                      >
                         <RefreshCcw className="w-4 h-4 mr-1" />
                         Restart
                       </Button>
                     )}
 
-                    <Button size="sm" variant="ghost" className="text-ike-neutral hover:text-ike-primary">
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      className="text-ike-neutral hover:text-ike-primary"
+                      onClick={() => handleViewReport(job.id)}
+                    >
                       <FileText className="w-4 h-4 mr-1" />
                       View Report
                     </Button>
@@ -381,7 +519,10 @@ const Integration = () => {
                 <span className="text-sm">Additional amounts</span>
               </div>
               
-              <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white mt-2">
+              <Button 
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white mt-2"
+                onClick={handleStartMonthlyCalculation}
+              >
                 Start Monthly Calculation
               </Button>
             </div>
@@ -413,7 +554,10 @@ const Integration = () => {
                 <span className="text-sm">Adjustment calculations</span>
               </div>
               
-              <Button className="w-full bg-ike-primary hover:bg-ike-primary-dark text-white mt-2">
+              <Button 
+                className="w-full bg-ike-primary hover:bg-ike-primary-dark text-white mt-2"
+                onClick={handleStartAnnualReconciliation}
+              >
                 Start Annual Reconciliation
               </Button>
             </div>
@@ -445,7 +589,11 @@ const Integration = () => {
                 <span className="text-sm">Manual adjustments</span>
               </div>
               
-              <Button className="w-full border-amber-500 text-amber-500 hover:bg-amber-500/10" variant="outline">
+              <Button 
+                className="w-full border-amber-500 text-amber-500 hover:bg-amber-500/10" 
+                variant="outline"
+                onClick={handleStartCorrectionRun}
+              >
                 Start Correction Run
               </Button>
             </div>
