@@ -26,7 +26,13 @@ import {
   MapPin,
   DollarSign,
   Book,
-  BarChart3
+  BarChart3,
+  Building2,
+  AlertCircle,
+  XCircle,
+  ArrowUpRight,
+  ArrowDownRight,
+  TrendingDown
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -864,12 +870,15 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Regional Actions */}
-          <Card>
+          {/* Regional Operations */}
+          <Card className="lg:col-span-1">
             <CardHeader>
-              <CardTitle className="text-ike-neutral-dark">Regional Operations</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="w-5 h-5 text-ike-primary" />
+                Regional Operations
+              </CardTitle>
               <CardDescription>
-                System administration and oversight
+                Manage regional system components
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -877,7 +886,7 @@ const Dashboard = () => {
                 asChild
                 className="w-full justify-start bg-ike-primary hover:bg-ike-primary-dark text-white"
               >
-                <Link to="/system/municipality-management">
+                <Link to="/system/municipalities">
                   <Building className="w-4 h-4 mr-2" />
                   Manage Municipalities
                 </Link>
@@ -887,7 +896,7 @@ const Dashboard = () => {
                 variant="outline" 
                 className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
               >
-                <Link to="/system/school-units">
+                <Link to="/system/schools">
                   <School className="w-4 h-4 mr-2" />
                   School Unit Overview
                 </Link>
@@ -897,7 +906,7 @@ const Dashboard = () => {
                 variant="outline" 
                 className="w-full justify-start"
               >
-                <Link to="/system/user-management">
+                <Link to="/system/users">
                   <Users className="w-4 h-4 mr-2" />
                   User Management
                 </Link>
@@ -914,79 +923,79 @@ const Dashboard = () => {
               </Button>
             </CardContent>
           </Card>
-        </div>
 
-        {/* Municipality Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-ike-neutral-dark">Municipality Status Overview</CardTitle>
-            <CardDescription>
-              Real-time status of municipalities in the region
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[
-                {
-                  name: "Malmö",
-                  students: 12450,
-                  status: "Active",
-                  lastSync: "2 min ago",
-                  integration: "Healthy",
-                  statusColor: "success"
-                },
-                {
-                  name: "Lund",
-                  students: 8200,
-                  status: "Active",
-                  lastSync: "5 min ago",
-                  integration: "Healthy",
-                  statusColor: "success"
-                },
-                {
-                  name: "Helsingborg",
-                  students: 9800,
-                  status: "Active",
-                  lastSync: "1 min ago",
-                  integration: "Warning",
-                  statusColor: "warning"
-                },
-                {
-                  name: "Kristianstad",
-                  students: 5600,
-                  status: "Active",
-                  lastSync: "15 min ago",
-                  integration: "Error",
-                  statusColor: "error"
-                }
-              ].map((municipality, index) => (
-                <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-ike-primary/10 rounded-lg flex items-center justify-center">
-                      <Building className="w-6 h-6 text-ike-primary" />
+          {/* Municipality Overview */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-ike-neutral-dark">Municipality Status Overview</CardTitle>
+              <CardDescription>
+                Real-time status of municipalities in the region
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[
+                  {
+                    name: "Malmö",
+                    students: 12450,
+                    status: "Active",
+                    lastSync: "2 min ago",
+                    integration: "Healthy",
+                    statusColor: "success"
+                  },
+                  {
+                    name: "Lund",
+                    students: 8200,
+                    status: "Active",
+                    lastSync: "5 min ago",
+                    integration: "Healthy",
+                    statusColor: "success"
+                  },
+                  {
+                    name: "Helsingborg",
+                    students: 9800,
+                    status: "Active",
+                    lastSync: "1 min ago",
+                    integration: "Warning",
+                    statusColor: "warning"
+                  },
+                  {
+                    name: "Kristianstad",
+                    students: 5600,
+                    status: "Active",
+                    lastSync: "15 min ago",
+                    integration: "Error",
+                    statusColor: "error"
+                  }
+                ].map((municipality, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-ike-primary/10 rounded-lg flex items-center justify-center">
+                        <Building className="w-6 h-6 text-ike-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-ike-neutral-dark">{municipality.name}</h3>
+                        <p className="text-sm text-ike-neutral">{municipality.students} students • Last sync: {municipality.lastSync}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-medium text-ike-neutral-dark">{municipality.name}</h3>
-                      <p className="text-sm text-ike-neutral">{municipality.students} students • Last sync: {municipality.lastSync}</p>
+                    <div className="flex items-center space-x-4">
+                      <Badge 
+                        className={
+                          municipality.statusColor === "success" ? "bg-ike-success text-white" :
+                          municipality.statusColor === "warning" ? "bg-ike-warning text-white" :
+                          "bg-ike-error text-white"
+                        }
+                      >
+                        {municipality.integration}
+                      </Badge>
+                      <div className="w-3 h-3 bg-ike-success rounded-full"></div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-4">
-                    <Badge 
-                      className={
-                        municipality.statusColor === "success" ? "bg-ike-success text-white" :
-                        municipality.statusColor === "warning" ? "bg-ike-warning text-white" :
-                        "bg-ike-error text-white"
-                      }
-                    >
-                      {municipality.integration}
-                    </Badge>
-                    <div className="w-3 h-3 bg-ike-success rounded-full"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
