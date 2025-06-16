@@ -34,8 +34,6 @@ import PopulationData from "./pages/operations/PopulationData";
 import AddressUpdates from "./pages/operations/AddressUpdates";
 import MunicipalSchoolUnits from "./pages/operations/MunicipalSchoolUnits";
 import MunicipalUserAdmin from "./pages/operations/MunicipalUserAdmin";
-import EnrollmentControl from "./pages/operations/EnrollmentControl";
-import LocationControl from "./pages/operations/LocationControl";
 import RegionalStatistics from "./pages/reports/RegionalStatistics";
 import MonthlyCompilation from "./pages/reports/MonthlyCompilation";
 import FinancialAnalysis from "./pages/reports/FinancialAnalysis";
@@ -155,16 +153,6 @@ const AppContent = () => {
               <Route path="/operations/municipal-users" element={
                 <ProtectedRoute>
                   <MunicipalUserAdmin />
-                </ProtectedRoute>
-              } />
-              <Route path="/operations/enrollment-control" element={
-                <ProtectedRoute>
-                  <EnrollmentControl />
-                </ProtectedRoute>
-              } />
-              <Route path="/operations/location-control" element={
-                <ProtectedRoute>
-                  <LocationControl />
                 </ProtectedRoute>
               } />
               <Route path="/students" element={

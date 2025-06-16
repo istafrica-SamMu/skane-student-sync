@@ -234,16 +234,6 @@ export const municipalityAdminMenu: MenuItem[] = [
         url: "/operations/municipal-users",
         icon: Users,
       },
-      {
-        title: "Enrollment Control & Scheduling",
-        url: "/operations/enrollment-control",
-        icon: Calendar,
-      },
-      {
-        title: "Location Control & Double Placement",
-        url: "/operations/location-control",
-        icon: MapPin,
-      },
     ],
   },
   {
