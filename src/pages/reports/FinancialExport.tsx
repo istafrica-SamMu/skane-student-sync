@@ -8,7 +8,6 @@ import {
   FileSpreadsheet, 
   Download, 
   Calendar, 
-  Settings,
   Clock,
   CheckCircle,
   AlertCircle,
@@ -47,33 +46,19 @@ const FinancialExport = () => {
     }
   ];
 
-  const handleRunExport = (job = null) => {
+  const handleRunNow = (job) => {
     setSelectedJob(job);
     setIsRunExportModalOpen(true);
   };
 
   const handleConfirmRunExport = () => {
-    const jobName = selectedJob ? selectedJob.name : "New Export";
+    const jobName = selectedJob ? selectedJob.name : "Export";
     toast({
       title: "Export Started",
       description: `${jobName} has been started successfully`,
     });
     setIsRunExportModalOpen(false);
     setSelectedJob(null);
-  };
-
-  const handleRunNow = (job) => {
-    toast({
-      title: "Export Started",
-      description: `${job.name} is now running`,
-    });
-  };
-
-  const handleSettings = (job) => {
-    toast({
-      title: "Settings",
-      description: `Opening settings for ${job.name}`,
-    });
   };
 
   return (
@@ -85,15 +70,6 @@ const FinancialExport = () => {
           <p className="text-ike-neutral mt-2">
             Export data to municipal financial systems and external platforms
           </p>
-        </div>
-        <div className="flex space-x-2">
-          <Button 
-            className="bg-ike-primary hover:bg-ike-primary-dark text-white"
-            onClick={() => handleRunExport()}
-          >
-            <Play className="w-4 h-4 mr-2" />
-            Run Export
-          </Button>
         </div>
       </div>
 
@@ -189,24 +165,15 @@ const FinancialExport = () => {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <div className="flex space-x-2">
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="border-ike-primary text-ike-primary hover:bg-ike-primary/10"
-                        onClick={() => handleRunNow(job)}
-                      >
-                        <Play className="w-3 h-3 mr-1" />
-                        Run Now
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => handleSettings(job)}
-                      >
-                        <Settings className="w-3 h-3" />
-                      </Button>
-                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="border-ike-primary text-ike-primary hover:bg-ike-primary/10"
+                      onClick={() => handleRunNow(job)}
+                    >
+                      <Play className="w-3 h-3 mr-1" />
+                      Run Now
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -226,7 +193,7 @@ const FinancialExport = () => {
             <DialogDescription>
               {selectedJob 
                 ? `Are you sure you want to run "${selectedJob.name}" now?`
-                : "Are you sure you want to run a new export job?"
+                : "Are you sure you want to run the export job?"
               }
             </DialogDescription>
           </DialogHeader>
