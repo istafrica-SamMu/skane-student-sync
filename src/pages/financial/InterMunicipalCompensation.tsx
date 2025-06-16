@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowUpDown, DollarSign, TrendingUp, CheckCircle, Clock, FileText } from "lucide-react";
+import { ArrowUpDown, FileText, CheckCircle, Clock } from "lucide-react";
 
 const InterMunicipalCompensation = () => {
   const compensationData = [
@@ -20,10 +20,7 @@ const InterMunicipalCompensation = () => {
       type: "Outgoing",
       students: 45,
       totalAmount: 5625000,
-      avgPerStudent: 125000,
-      status: "confirmed",
-      period: "2024-11",
-      dueDate: "2024-12-15"
+      period: "2024-11"
     },
     {
       id: 2,
@@ -31,10 +28,7 @@ const InterMunicipalCompensation = () => {
       type: "Incoming",
       students: 32,
       totalAmount: 4032000,
-      avgPerStudent: 126000,
-      status: "pending",
-      period: "2024-11",
-      dueDate: "2024-12-10"
+      period: "2024-11"
     },
     {
       id: 3,
@@ -42,10 +36,7 @@ const InterMunicipalCompensation = () => {
       type: "Outgoing",
       students: 18,
       totalAmount: 2268000,
-      avgPerStudent: 126000,
-      status: "paid",
-      period: "2024-11",
-      dueDate: "2024-12-05"
+      period: "2024-11"
     },
     {
       id: 4,
@@ -53,39 +44,14 @@ const InterMunicipalCompensation = () => {
       type: "Incoming",
       students: 12,
       totalAmount: 1512000,
-      avgPerStudent: 126000,
-      status: "confirmed",
-      period: "2024-11",
-      dueDate: "2024-12-20"
+      period: "2024-11"
     }
   ];
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "paid":
-        return <Badge className="bg-ike-success text-white">Paid</Badge>;
-      case "confirmed":
-        return <Badge className="bg-ike-primary text-white">Confirmed</Badge>;
-      case "pending":
-        return <Badge className="bg-ike-warning text-white">Pending</Badge>;
-      case "overdue":
-        return <Badge className="bg-ike-error text-white">Overdue</Badge>;
-      default:
-        return <Badge variant="secondary">Unknown</Badge>;
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "paid":
-        return <CheckCircle className="w-4 h-4 text-ike-success" />;
-      case "confirmed":
-        return <CheckCircle className="w-4 h-4 text-ike-primary" />;
-      case "pending":
-        return <Clock className="w-4 h-4 text-ike-warning" />;
-      default:
-        return <Clock className="w-4 h-4 text-ike-neutral" />;
-    }
+  const getStatusIcon = (type: string) => {
+    return type === "Incoming" ? 
+      <CheckCircle className="w-4 h-4 text-ike-success" /> : 
+      <Clock className="w-4 h-4 text-ike-warning" />;
   };
 
   const getTypeColor = (type: string) => {
@@ -100,7 +66,10 @@ const InterMunicipalCompensation = () => {
     .filter(item => item.type === "Outgoing")
     .reduce((sum, item) => sum + item.totalAmount, 0);
 
-  const netBalance = totalIncoming - totalOutgoing;
+  const handleViewDetails = (municipalityName: string) => {
+    console.log(`Viewing details for ${municipalityName}`);
+    // This would open a detailed view modal or navigate to details page
+  };
 
   return (
     <div className="space-y-6">
@@ -117,15 +86,11 @@ const InterMunicipalCompensation = () => {
             <FileText className="w-4 h-4 mr-2" />
             Export Report
           </Button>
-          <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
-            <ArrowUpDown className="w-4 h-4 mr-2" />
-            Process Payments
-          </Button>
         </div>
       </div>
 
       {/* Financial Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="border-l-4 border-l-ike-success">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
@@ -154,29 +119,15 @@ const InterMunicipalCompensation = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-ike-primary">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-ike-neutral">
-              Net Balance
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${netBalance >= 0 ? 'text-ike-success' : 'text-ike-error'}`}>
-              {netBalance >= 0 ? '+' : ''}{netBalance.toLocaleString('sv-SE')} SEK
-            </div>
-            <div className="text-xs text-ike-neutral">Current period</div>
-          </CardContent>
-        </Card>
-
         <Card className="border-l-4 border-l-ike-warning">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              Pending Payments
+              Active Agreements
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-ike-neutral-dark">3</div>
-            <div className="text-xs text-ike-neutral">Awaiting confirmation</div>
+            <div className="text-2xl font-bold text-ike-neutral-dark">{compensationData.length}</div>
+            <div className="text-xs text-ike-neutral">Current period</div>
           </CardContent>
         </Card>
       </div>
@@ -200,22 +151,19 @@ const InterMunicipalCompensation = () => {
                 <TableHead className="font-medium">Type</TableHead>
                 <TableHead className="font-medium">Students</TableHead>
                 <TableHead className="font-medium text-right">Total Amount</TableHead>
-                <TableHead className="font-medium text-right">Per Student</TableHead>
                 <TableHead className="font-medium">Period</TableHead>
-                <TableHead className="font-medium">Due Date</TableHead>
-                <TableHead className="font-medium">Status</TableHead>
                 <TableHead className="font-medium text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {compensationData.map((item) => (
-                <TableRow key={item.id} className="hover:bg-ike-neutral-light/50">
+                <TableRow key={item.id} className="hover:bg-ike-neutral-light/50 transition-colors">
                   <TableCell className="font-medium text-ike-neutral-dark">
                     {item.municipality}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
-                      {getStatusIcon(item.status)}
+                      {getStatusIcon(item.type)}
                       <span className={getTypeColor(item.type)}>{item.type}</span>
                     </div>
                   </TableCell>
@@ -223,14 +171,14 @@ const InterMunicipalCompensation = () => {
                   <TableCell className={`text-right font-medium ${getTypeColor(item.type)}`}>
                     {item.type === "Incoming" ? "+" : "-"}{item.totalAmount.toLocaleString('sv-SE')} SEK
                   </TableCell>
-                  <TableCell className="text-right">
-                    {item.avgPerStudent.toLocaleString('sv-SE')} SEK
-                  </TableCell>
                   <TableCell>{item.period}</TableCell>
-                  <TableCell>{item.dueDate}</TableCell>
-                  <TableCell>{getStatusBadge(item.status)}</TableCell>
                   <TableCell className="text-center">
-                    <Button variant="ghost" size="sm" className="text-ike-neutral hover:text-ike-primary">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-ike-neutral hover:text-ike-primary hover:bg-ike-primary/10 transition-colors"
+                      onClick={() => handleViewDetails(item.municipality)}
+                    >
                       Details
                     </Button>
                   </TableCell>
@@ -240,59 +188,6 @@ const InterMunicipalCompensation = () => {
           </Table>
         </CardContent>
       </Card>
-
-      {/* Payment Summary */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center text-ike-neutral-dark">
-              <TrendingUp className="w-5 h-5 mr-2 text-ike-primary" />
-              Monthly Trends
-            </CardTitle>
-            <CardDescription>
-              Compensation trends over the last 6 months
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64 flex items-center justify-center border rounded-lg">
-              <div className="text-center text-ike-neutral">
-                <TrendingUp className="w-12 h-12 mx-auto mb-2 text-ike-primary" />
-                <p>Interactive Compensation Chart</p>
-                <p className="text-sm">(Monthly trends visualization)</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-ike-neutral-dark">Payment Schedule</CardTitle>
-            <CardDescription>
-              Upcoming payment deadlines
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 border-l-4 border-l-ike-error bg-ike-error/5 rounded-r-lg">
-              <h4 className="font-medium text-ike-neutral-dark">Payment Due</h4>
-              <p className="text-sm text-ike-neutral mt-1">
-                Helsingborg - 4,032,000 SEK due December 10, 2024
-              </p>
-            </div>
-            <div className="p-4 border-l-4 border-l-ike-warning bg-ike-warning/5 rounded-r-lg">
-              <h4 className="font-medium text-ike-neutral-dark">Pending Confirmation</h4>
-              <p className="text-sm text-ike-neutral mt-1">
-                Lund - 5,625,000 SEK due December 15, 2024
-              </p>
-            </div>
-            <div className="p-4 border-l-4 border-l-ike-success bg-ike-success/5 rounded-r-lg">
-              <h4 className="font-medium text-ike-neutral-dark">Incoming Payment</h4>
-              <p className="text-sm text-ike-neutral mt-1">
-                Landskrona - 1,512,000 SEK due December 20, 2024
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 };
