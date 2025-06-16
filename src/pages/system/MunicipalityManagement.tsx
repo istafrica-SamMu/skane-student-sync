@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -102,10 +101,8 @@ const MunicipalityManagement = () => {
   };
 
   const handleManageMunicipality = (municipality) => {
-    toast({
-      title: "Municipality Management",
-      description: `Opening management panel for ${municipality.name}`,
-    });
+    setSelectedMunicipality(municipality);
+    setIsEditMunicipalityOpen(true);
   };
 
   return (
