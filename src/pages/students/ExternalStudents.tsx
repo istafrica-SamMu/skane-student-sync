@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { 
   ArrowUpDown, 
   Search, 
@@ -26,7 +34,12 @@ import {
   MoreHorizontal,
   Eye,
   Calculator,
-  MapPin
+  MapPin,
+  FileText,
+  Calendar,
+  User,
+  Building,
+  GraduationCap
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -36,11 +49,28 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+interface ExternalStudent {
+  id: number;
+  name: string;
+  personalNumber: string;
+  residenceMunicipality: string;
+  schoolMunicipality: string;
+  school: string;
+  program: string;
+  class: string;
+  status: string;
+  ikeCost: number;
+  paymentStatus: string;
+}
+
 const ExternalStudents = () => {
   const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
   const [municipalityFilter, setMunicipalityFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedStudent, setSelectedStudent] = useState<ExternalStudent | null>(null);
+  const [showStudentDetails, setShowStudentDetails] = useState(false);
+  const [showIKECalculation, setShowIKECalculation] = useState(false);
 
   // Mock data for external students (municipal residents attending other municipalities' schools)
   const externalStudents = [
@@ -133,6 +163,20 @@ const ExternalStudents = () => {
     return matchesSearch && matchesMunicipality && matchesStatus;
   });
 
+  const handleViewDetails = (student: ExternalStudent) => {
+    setSelectedStudent(student);
+    setShowStudentDetails(true);
+  };
+
+  const handleIKECalculation = (student: ExternalStudent) => {
+    setSelectedStudent(student);
+    setShowIKECalculation(true);
+  };
+
+  const handleExportReport = () => {
+    console.log("Exporting external students report...");
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -144,7 +188,11 @@ const ExternalStudents = () => {
           </p>
         </div>
         <div className="flex space-x-3">
-          <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+          <Button 
+            variant="outline" 
+            className="border-ike-primary text-ike-primary hover:bg-ike-primary/10"
+            onClick={handleExportReport}
+          >
             <Download className="w-4 h-4 mr-2" />
             Export Report
           </Button>
@@ -304,18 +352,14 @@ const ExternalStudents = () => {
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                      <DropdownMenuContent align="end" className="bg-white border shadow-lg z-50">
+                        <DropdownMenuItem onClick={() => handleViewDetails(student)}>
                           <Eye className="mr-2 h-4 w-4" />
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleIKECalculation(student)}>
                           <Calculator className="mr-2 h-4 w-4" />
                           IKE Calculation
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <ArrowUpDown className="mr-2 h-4 w-4" />
-                          Transfer Request
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -326,6 +370,165 @@ const ExternalStudents = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Student Details Modal */}
+      <Dialog open={showStudentDetails} onOpenChange={setShowStudentDetails}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-ike-neutral-dark">
+              <User className="w-5 h-5 mr-2 text-ike-primary" />
+              Student Details
+            </DialogTitle>
+            <DialogDescription>
+              Detailed information about the external student
+            </DialogDescription>
+          </DialogHeader>
+          {selectedStudent && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-ike-neutral">Full Name</label>
+                    <p className="text-ike-neutral-dark font-medium">{selectedStudent.name}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-ike-neutral">Personal Number</label>
+                    <p className="text-ike-neutral-dark font-mono">{selectedStudent.personalNumber}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-ike-neutral">Residence Municipality</label>
+                    <p className="text-ike-neutral-dark">{selectedStudent.residenceMunicipality}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-ike-neutral">Status</label>
+                    <div className="mt-1">{getStatusBadge(selectedStudent.status)}</div>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-ike-neutral">School Municipality</label>
+                    <p className="text-ike-neutral-dark">{selectedStudent.schoolMunicipality}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-ike-neutral">School</label>
+                    <p className="text-ike-neutral-dark">{selectedStudent.school}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-ike-neutral">Program</label>
+                    <p className="text-ike-neutral-dark">{selectedStudent.program}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-ike-neutral">Class</label>
+                    <p className="text-ike-neutral-dark">{selectedStudent.class}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-ike-neutral-light p-4 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-ike-neutral-dark">Payment Information</h4>
+                    <p className="text-sm text-ike-neutral">Current payment status and IKE cost</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="mb-2">{getPaymentBadge(selectedStudent.paymentStatus)}</div>
+                    <p className="text-lg font-bold text-ike-neutral-dark">
+                      {selectedStudent.ikeCost.toLocaleString('sv-SE')} SEK
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowStudentDetails(false)}>
+              Close
+            </Button>
+            <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+              <FileText className="w-4 h-4 mr-2" />
+              Generate Report
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* IKE Calculation Modal */}
+      <Dialog open={showIKECalculation} onOpenChange={setShowIKECalculation}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-ike-neutral-dark">
+              <Calculator className="w-5 h-5 mr-2 text-ike-primary" />
+              IKE Cost Calculation
+            </DialogTitle>
+            <DialogDescription>
+              Detailed breakdown of Inter-municipal compensation costs
+            </DialogDescription>
+          </DialogHeader>
+          {selectedStudent && (
+            <div className="space-y-6">
+              <div className="bg-ike-neutral-light p-4 rounded-lg">
+                <h4 className="font-medium text-ike-neutral-dark mb-2">Student Information</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-ike-neutral">Name:</span>
+                    <span className="ml-2 text-ike-neutral-dark font-medium">{selectedStudent.name}</span>
+                  </div>
+                  <div>
+                    <span className="text-ike-neutral">Program:</span>
+                    <span className="ml-2 text-ike-neutral-dark">{selectedStudent.program}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h4 className="font-medium text-ike-neutral-dark">Cost Breakdown</h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center py-2 border-b">
+                    <span className="text-ike-neutral">Base education cost</span>
+                    <span className="font-medium text-ike-neutral-dark">95,000 SEK</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b">
+                    <span className="text-ike-neutral">Program supplement</span>
+                    <span className="font-medium text-ike-neutral-dark">25,000 SEK</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b">
+                    <span className="text-ike-neutral">Administrative fee</span>
+                    <span className="font-medium text-ike-neutral-dark">8,000 SEK</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b">
+                    <span className="text-ike-neutral">Special needs adjustment</span>
+                    <span className="font-medium text-ike-neutral-dark">8,000 SEK</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3 bg-ike-primary/10 px-4 rounded font-bold">
+                    <span className="text-ike-primary">Total IKE Cost</span>
+                    <span className="text-ike-primary text-lg">{selectedStudent.ikeCost.toLocaleString('sv-SE')} SEK</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="flex items-start">
+                  <Calendar className="w-5 h-5 text-blue-600 mr-2 mt-0.5" />
+                  <div>
+                    <h5 className="font-medium text-blue-900">Payment Schedule</h5>
+                    <p className="text-sm text-blue-700 mt-1">
+                      Annual cost paid in 10 monthly installments (Aug-May): {Math.round(selectedStudent.ikeCost / 10).toLocaleString('sv-SE')} SEK/month
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowIKECalculation(false)}>
+              Close
+            </Button>
+            <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+              <Download className="w-4 h-4 mr-2" />
+              Export Calculation
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
