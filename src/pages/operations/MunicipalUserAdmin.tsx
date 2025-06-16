@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, UserPlus, Search, Filter, Shield, Mail, Edit, Trash2, MoreVertical } from "lucide-react";
+import { Users, UserPlus, Search, Filter, Edit, Trash2, MoreVertical } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -47,6 +46,12 @@ const MunicipalUserAdmin = () => {
   const [showEditUser, setShowEditUser] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
+  const [newUserData, setNewUserData] = useState({
+    name: "",
+    email: "",
+    role: "",
+    school: ""
+  });
 
   const roles = [
     "School Principal",
@@ -54,6 +59,15 @@ const MunicipalUserAdmin = () => {
     "Teacher",
     "Municipal Coordinator",
     "IT Administrator"
+  ];
+
+  const schools = [
+    "Malmö Central Elementary",
+    "Malmö North High School", 
+    "Malmö Tech Academy",
+    "Malmö International School",
+    "Malmö Arts College",
+    "Malmö Science Institute"
   ];
 
   const [municipalUsers, setMunicipalUsers] = useState([
@@ -97,11 +111,31 @@ const MunicipalUserAdmin = () => {
   );
 
   const handleAddUser = () => {
+    if (!newUserData.name || !newUserData.email || !newUserData.role) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields (name, email, role).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newUser = {
+      id: municipalUsers.length + 1,
+      ...newUserData,
+      status: "Active",
+      lastLogin: "Never",
+      permissions: []
+    };
+
+    setMunicipalUsers([...municipalUsers, newUser]);
+    setNewUserData({ name: "", email: "", role: "", school: "" });
+    setShowAddUser(false);
+    
     toast({
       title: "User Added",
       description: "New municipal user has been successfully added to the system.",
     });
-    setShowAddUser(false);
     console.log("Adding new municipal user");
   };
 
@@ -144,22 +178,6 @@ const MunicipalUserAdmin = () => {
       variant: "destructive",
     });
     console.log("Deleted user with ID:", userId);
-  };
-
-  const handleSendEmail = (user) => {
-    toast({
-      title: "Email Sent",
-      description: `Email has been sent to ${user.name} at ${user.email}`,
-    });
-    console.log("Sending email to:", user.email);
-  };
-
-  const handleManagePermissions = (user) => {
-    toast({
-      title: "Permissions Manager",
-      description: `Opening permissions manager for ${user.name}`,
-    });
-    console.log("Managing permissions for:", user.name);
   };
 
   return (
@@ -245,14 +263,6 @@ const MunicipalUserAdmin = () => {
                             <Edit className="w-4 h-4 mr-2" />
                             Edit User
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleManagePermissions(user)}>
-                            <Shield className="w-4 h-4 mr-2" />
-                            Manage Permissions
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleSendEmail(user)}>
-                            <Mail className="w-4 h-4 mr-2" />
-                            Send Email
-                          </DropdownMenuItem>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
@@ -308,19 +318,35 @@ const MunicipalUserAdmin = () => {
               <Label htmlFor="name" className="text-right">
                 Name *
               </Label>
-              <Input id="name" placeholder="Enter full name" className="col-span-3" />
+              <Input 
+                id="name" 
+                placeholder="Enter full name" 
+                className="col-span-3"
+                value={newUserData.name}
+                onChange={(e) => setNewUserData({...newUserData, name: e.target.value})}
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="email" className="text-right">
                 Email *
               </Label>
-              <Input id="email" type="email" placeholder="Enter email address" className="col-span-3" />
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="Enter email address" 
+                className="col-span-3"
+                value={newUserData.email}
+                onChange={(e) => setNewUserData({...newUserData, email: e.target.value})}
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="role" className="text-right">
                 Role *
               </Label>
-              <Select>
+              <Select 
+                value={newUserData.role} 
+                onValueChange={(value) => setNewUserData({...newUserData, role: value})}
+              >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
@@ -337,7 +363,21 @@ const MunicipalUserAdmin = () => {
               <Label htmlFor="school" className="text-right">
                 School
               </Label>
-              <Input id="school" placeholder="Enter school name" className="col-span-3" />
+              <Select 
+                value={newUserData.school} 
+                onValueChange={(value) => setNewUserData({...newUserData, school: value})}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select a school" />
+                </SelectTrigger>
+                <SelectContent>
+                  {schools.map((school) => (
+                    <SelectItem key={school} value={school}>
+                      {school}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>
@@ -407,12 +447,21 @@ const MunicipalUserAdmin = () => {
                 <Label htmlFor="edit-school" className="text-right">
                   School
                 </Label>
-                <Input 
-                  id="edit-school" 
-                  value={editingUser.school}
-                  onChange={(e) => setEditingUser({...editingUser, school: e.target.value})}
-                  className="col-span-3" 
-                />
+                <Select 
+                  value={editingUser.school} 
+                  onValueChange={(value) => setEditingUser({...editingUser, school: value})}
+                >
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select a school" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {schools.map((school) => (
+                      <SelectItem key={school} value={school}>
+                        {school}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           )}
