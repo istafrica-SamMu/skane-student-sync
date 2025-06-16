@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +30,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const { t } = useLanguage();
@@ -874,31 +874,43 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent className="space-y-3">
               <Button 
+                asChild
                 className="w-full justify-start bg-ike-primary hover:bg-ike-primary-dark text-white"
               >
-                <Building className="w-4 h-4 mr-2" />
-                Manage Municipalities
+                <Link to="/system/municipality-management">
+                  <Building className="w-4 h-4 mr-2" />
+                  Manage Municipalities
+                </Link>
               </Button>
               <Button 
+                asChild
                 variant="outline" 
                 className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
               >
-                <School className="w-4 h-4 mr-2" />
-                School Unit Overview
+                <Link to="/system/school-units">
+                  <School className="w-4 h-4 mr-2" />
+                  School Unit Overview
+                </Link>
               </Button>
               <Button 
+                asChild
                 variant="outline" 
                 className="w-full justify-start"
               >
-                <Users className="w-4 h-4 mr-2" />
-                User Management
+                <Link to="/system/user-management">
+                  <Users className="w-4 h-4 mr-2" />
+                  User Management
+                </Link>
               </Button>
               <Button 
+                asChild
                 variant="outline" 
                 className="w-full justify-start"
               >
-                <Shield className="w-4 h-4 mr-2" />
-                System Settings
+                <Link to="/settings">
+                  <Shield className="w-4 h-4 mr-2" />
+                  System Settings
+                </Link>
               </Button>
             </CardContent>
           </Card>
