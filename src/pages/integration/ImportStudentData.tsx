@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +23,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { ErrorDetailsModal } from "@/components/ErrorDetailsModal";
 import { Database, Upload, FileText, AlertTriangle, CheckCircle, X, Eye, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -34,6 +34,8 @@ const ImportStudentData = () => {
   const [showJobDetails, setShowJobDetails] = useState(false);
   const [selectedJob, setSelectedJob] = useState<any>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [selectedJobForErrors, setSelectedJobForErrors] = useState<any>(null);
   const [confirmAction, setConfirmAction] = useState<{
     type: 'cancel' | 'retry';
     jobId: number;
@@ -80,6 +82,55 @@ const ImportStudentData = () => {
       errors: 15
     }
   ]);
+
+  // Sample error data for demonstration
+  const getErrorsForJob = (jobId: number) => {
+    const errorSamples = [
+      {
+        id: 1,
+        municipality: "Stockholm Municipality",
+        error: "Invalid date format in enrollment field. Expected YYYY-MM-DD but received DD/MM/YYYY",
+        timestamp: "2024-01-15 13:17:23",
+        severity: "high" as const
+      },
+      {
+        id: 2,
+        municipality: "Göteborg Municipality", 
+        error: "Student ID conflict: ID 12345 already exists in system with different personal information",
+        timestamp: "2024-01-15 13:18:45",
+        severity: "high" as const
+      },
+      {
+        id: 3,
+        municipality: "Malmö Municipality",
+        error: "Missing required field: guardian contact information",
+        timestamp: "2024-01-15 13:19:12",
+        severity: "medium" as const
+      },
+      {
+        id: 4,
+        municipality: "Uppsala Municipality",
+        error: "School code not found in registry: SCH-9876",
+        timestamp: "2024-01-15 13:19:34",
+        severity: "medium" as const
+      },
+      {
+        id: 5,
+        municipality: "Västerås Municipality",
+        error: "Grade level validation warning: Grade 13 is unusual for this age group",
+        timestamp: "2024-01-15 13:19:56",
+        severity: "low" as const
+      }
+    ];
+    
+    if (jobId === 2) {
+      return errorSamples.slice(0, 2);
+    } else if (jobId === 3) {
+      return errorSamples;
+    }
+    
+    return [];
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -195,6 +246,12 @@ const ImportStudentData = () => {
     setSelectedJob(job);
     setShowJobDetails(true);
     console.log("Viewing job details:", job);
+  };
+
+  const handleViewErrors = (job: any) => {
+    setSelectedJobForErrors(job);
+    setShowErrorModal(true);
+    console.log("Viewing errors for job:", job);
   };
 
   const handleCancelJob = (job: any) => {
@@ -434,7 +491,12 @@ const ImportStudentData = () => {
               <div className="flex items-center justify-between">
                 <div className="flex space-x-2">
                   {job.errors > 0 && (
-                    <Button variant="outline" size="sm" className="border-ike-error text-ike-error hover:bg-ike-error/10">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="border-ike-error text-ike-error hover:bg-ike-error/10"
+                      onClick={() => handleViewErrors(job)}
+                    >
                       <AlertTriangle className="w-4 h-4 mr-1" />
                       View Errors
                     </Button>
@@ -594,6 +656,16 @@ const ImportStudentData = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Error Details Modal */}
+      {selectedJobForErrors && (
+        <ErrorDetailsModal
+          isOpen={showErrorModal}
+          onClose={() => setShowErrorModal(false)}
+          jobName={selectedJobForErrors.name}
+          errors={getErrorsForJob(selectedJobForErrors.id)}
+        />
+      )}
 
       {/* Confirmation Dialog */}
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
