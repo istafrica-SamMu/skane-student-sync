@@ -4,8 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { School, Plus, Search, MapPin, Users, Settings, Calendar, Phone, Mail, GraduationCap, Building } from "lucide-react";
+import { School, Plus, Search, MapPin, Users, Settings, Phone, Mail, GraduationCap, Building } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const MunicipalSchoolUnits = () => {
@@ -14,6 +15,20 @@ const MunicipalSchoolUnits = () => {
   const [selectedSchool, setSelectedSchool] = useState(null);
   const [showSchoolDetails, setShowSchoolDetails] = useState(false);
   const [showAddSchool, setShowAddSchool] = useState(false);
+  const [showManageSchool, setShowManageSchool] = useState(false);
+  const [managedSchool, setManagedSchool] = useState(null);
+
+  // Form state for adding new school
+  const [newSchool, setNewSchool] = useState({
+    name: "",
+    address: "",
+    phone: "",
+    email: "",
+    principal: "",
+    grades: "",
+    capacity: "",
+    type: "Municipal Elementary"
+  });
 
   const schoolUnits = [
     {
@@ -73,19 +88,9 @@ const MunicipalSchoolUnits = () => {
   };
 
   const handleManageSchool = (school) => {
-    toast({
-      title: "Managing School",
-      description: `Opening management interface for ${school.name}`,
-    });
+    setManagedSchool(school);
+    setShowManageSchool(true);
     console.log("Managing school:", school.name);
-  };
-
-  const handleScheduleManagement = (school) => {
-    toast({
-      title: "Schedule Management",
-      description: `Opening schedule management for ${school.name}`,
-    });
-    console.log("Managing schedule for:", school.name);
   };
 
   const handleAddNewSchool = () => {
@@ -93,13 +98,51 @@ const MunicipalSchoolUnits = () => {
     console.log("Opening add new school dialog");
   };
 
-  const confirmAddSchool = () => {
+  const handleSubmitNewSchool = () => {
+    // Validate required fields
+    if (!newSchool.name || !newSchool.address || !newSchool.principal) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields (name, address, principal).",
+        variant: "destructive",
+      });
+      return;
+    }
+
     toast({
       title: "School Unit Added",
-      description: "New school unit has been successfully added to the system.",
+      description: `${newSchool.name} has been successfully added to the system.`,
     });
+    
+    // Reset form
+    setNewSchool({
+      name: "",
+      address: "",
+      phone: "",
+      email: "",
+      principal: "",
+      grades: "",
+      capacity: "",
+      type: "Municipal Elementary"
+    });
+    
     setShowAddSchool(false);
-    console.log("Adding new school unit");
+    console.log("Adding new school unit:", newSchool);
+  };
+
+  const handleCloseAddSchool = () => {
+    setShowAddSchool(false);
+    // Reset form when closing
+    setNewSchool({
+      name: "",
+      address: "",
+      phone: "",
+      email: "",
+      principal: "",
+      grades: "",
+      capacity: "",
+      type: "Municipal Elementary"
+    });
   };
 
   return (
@@ -172,30 +215,18 @@ const MunicipalSchoolUnits = () => {
                       <span className="text-ike-neutral">Grades: {school.grades}</span>
                     </div>
 
-                    <div className="pt-3 border-t flex gap-2">
+                    <div className="pt-3 border-t">
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="flex-1"
+                        className="w-full"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleManageSchool(school);
                         }}
                       >
                         <Settings className="w-4 h-4 mr-2" />
-                        Manage
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleScheduleManagement(school);
-                        }}
-                      >
-                        <Calendar className="w-4 h-4 mr-2" />
-                        Schedule
+                        Manage School
                       </Button>
                     </div>
                   </div>
@@ -316,46 +347,211 @@ const MunicipalSchoolUnits = () => {
       </Dialog>
 
       {/* Add New School Modal */}
-      <Dialog open={showAddSchool} onOpenChange={setShowAddSchool}>
-        <DialogContent className="max-w-md">
+      <Dialog open={showAddSchool} onOpenChange={handleCloseAddSchool}>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center text-ike-primary">
               <Plus className="w-5 h-5 mr-2" />
               Add New School Unit
             </DialogTitle>
             <DialogDescription>
-              This will open the school creation wizard
+              Create a new school unit in your municipal system
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <p className="text-ike-neutral mb-4">
-              You are about to create a new school unit in your municipal system. 
-              This will open the comprehensive school setup wizard.
-            </p>
-            <div className="bg-ike-neutral-light p-3 rounded-lg">
-              <p className="text-sm text-ike-neutral">
-                The wizard will guide you through setting up:
-              </p>
-              <ul className="text-sm text-ike-neutral mt-2 space-y-1">
-                <li>• Basic school information</li>
-                <li>• Contact details and address</li>
-                <li>• Capacity and grade levels</li>
-                <li>• Principal assignment</li>
-              </ul>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+            <div>
+              <Label htmlFor="schoolName">School Name *</Label>
+              <Input
+                id="schoolName"
+                value={newSchool.name}
+                onChange={(e) => setNewSchool({...newSchool, name: e.target.value})}
+                placeholder="Enter school name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="schoolType">School Type</Label>
+              <Input
+                id="schoolType"
+                value={newSchool.type}
+                onChange={(e) => setNewSchool({...newSchool, type: e.target.value})}
+                placeholder="Municipal Elementary"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <Label htmlFor="address">Address *</Label>
+              <Input
+                id="address"
+                value={newSchool.address}
+                onChange={(e) => setNewSchool({...newSchool, address: e.target.value})}
+                placeholder="Street address, postal code, city"
+              />
+            </div>
+            <div>
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                value={newSchool.phone}
+                onChange={(e) => setNewSchool({...newSchool, phone: e.target.value})}
+                placeholder="040-123 45 67"
+              />
+            </div>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={newSchool.email}
+                onChange={(e) => setNewSchool({...newSchool, email: e.target.value})}
+                placeholder="info@school.se"
+              />
+            </div>
+            <div>
+              <Label htmlFor="principal">Principal Name *</Label>
+              <Input
+                id="principal"
+                value={newSchool.principal}
+                onChange={(e) => setNewSchool({...newSchool, principal: e.target.value})}
+                placeholder="Enter principal name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="grades">Grade Levels</Label>
+              <Input
+                id="grades"
+                value={newSchool.grades}
+                onChange={(e) => setNewSchool({...newSchool, grades: e.target.value})}
+                placeholder="K-6 or 7-12"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <Label htmlFor="capacity">School Capacity</Label>
+              <Input
+                id="capacity"
+                type="number"
+                value={newSchool.capacity}
+                onChange={(e) => setNewSchool({...newSchool, capacity: e.target.value})}
+                placeholder="450"
+              />
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setShowAddSchool(false)}>
+            <Button variant="outline" onClick={handleCloseAddSchool}>
               Cancel
             </Button>
             <Button 
               className="bg-ike-primary hover:bg-ike-primary/90"
-              onClick={confirmAddSchool}
+              onClick={handleSubmitNewSchool}
             >
               <Plus className="w-4 h-4 mr-2" />
-              Open School Wizard
+              Add School Unit
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Manage School Modal */}
+      <Dialog open={showManageSchool} onOpenChange={setShowManageSchool}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-ike-primary">
+              <Settings className="w-5 h-5 mr-2" />
+              Manage School Unit
+            </DialogTitle>
+            <DialogDescription>
+              Administrative management for {managedSchool?.name}
+            </DialogDescription>
+          </DialogHeader>
+          {managedSchool && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card className="cursor-pointer hover:bg-ike-neutral-light/50 transition-colors">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <Users className="w-8 h-8 text-ike-primary" />
+                      <div>
+                        <h3 className="font-semibold">Student Management</h3>
+                        <p className="text-sm text-ike-neutral">Manage enrollments and student data</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="cursor-pointer hover:bg-ike-neutral-light/50 transition-colors">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <GraduationCap className="w-8 h-8 text-ike-primary" />
+                      <div>
+                        <h3 className="font-semibold">Staff Management</h3>
+                        <p className="text-sm text-ike-neutral">Manage teachers and staff</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="cursor-pointer hover:bg-ike-neutral-light/50 transition-colors">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <Building className="w-8 h-8 text-ike-primary" />
+                      <div>
+                        <h3 className="font-semibold">Facilities</h3>
+                        <p className="text-sm text-ike-neutral">Manage school facilities and resources</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="cursor-pointer hover:bg-ike-neutral-light/50 transition-colors">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <Settings className="w-8 h-8 text-ike-primary" />
+                      <div>
+                        <h3 className="font-semibold">School Settings</h3>
+                        <p className="text-sm text-ike-neutral">Configure school policies and settings</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="bg-ike-neutral-light p-4 rounded-lg">
+                <h4 className="font-medium text-ike-neutral-dark mb-2">Quick Stats</h4>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <p className="text-lg font-bold text-ike-primary">{managedSchool.students}</p>
+                    <p className="text-xs text-ike-neutral">Total Students</p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-ike-neutral-dark">25</p>
+                    <p className="text-xs text-ike-neutral">Staff Members</p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-ike-success">
+                      {Math.round((managedSchool.students / managedSchool.capacity) * 100)}%
+                    </p>
+                    <p className="text-xs text-ike-neutral">Capacity Used</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4">
+                <Button variant="outline" onClick={() => setShowManageSchool(false)}>
+                  Close
+                </Button>
+                <Button 
+                  className="bg-ike-primary hover:bg-ike-primary/90"
+                  onClick={() => {
+                    toast({
+                      title: "Feature Access",
+                      description: `Opening detailed management interface for ${managedSchool.name}`,
+                    });
+                  }}
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Advanced Management
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
