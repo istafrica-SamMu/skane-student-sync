@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,58 +20,146 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { ErrorDetailsModal } from "@/components/ErrorDetailsModal";
+import { ReportViewModal } from "@/components/ReportViewModal";
+import { ConfirmationModal } from "@/components/ConfirmationModal";
 
 const Integration = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [isCalculating, setIsCalculating] = useState(false);
   const [calculationProgress, setCalculationProgress] = useState(0);
-  const [calculationJobs, setCalculationJobs] = useState([
+  
+  // Modal states
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [confirmationAction, setConfirmationAction] = useState<{
+    type: 'cancel' | 'restart' | 'delete';
+    title: string;
+    description: string;
+    onConfirm: () => void;
+  } | null>(null);
+
+  // Mock data for modals
+  const mockErrorData = [
     {
       id: 1,
-      name: "September 2024 Payment Calculations",
-      type: "monthly",
-      status: "completed",
-      lastRun: "2024-11-15 14:30",
-      processed: 1245,
-      errors: 0,
-      totalAmount: 2847500,
-      municipalities: 12
+      municipality: "Municipality A",
+      error: "Student enrollment data validation failed: Missing required field 'grade_level' for student ID 12345",
+      timestamp: "2024-11-15 14:32:15",
+      severity: 'high' as const
     },
     {
       id: 2,
-      name: "October 2024 Payment Calculations",
-      type: "monthly",
-      status: "running",
-      lastRun: "2024-11-15 15:45",
-      processed: 458,
-      errors: 0,
-      totalAmount: 0,
-      municipalities: 8
+      municipality: "Municipality B",
+      error: "Price calculation mismatch: Expected €450 per student, calculated €425",
+      timestamp: "2024-11-15 14:35:22",
+      severity: 'medium' as const
     },
     {
       id: 3,
-      name: "Annual Reconciliation 2024",
-      type: "annual",
-      status: "scheduled",
-      lastRun: "2024-01-15 08:00",
-      processed: 0,
-      errors: 0,
-      totalAmount: 34500000,
-      municipalities: 33
-    },
-    {
-      id: 4,
-      name: "August 2024 Correction Run",
-      type: "correction",
-      status: "error",
-      lastRun: "2024-11-10 10:15",
-      processed: 342,
-      errors: 12,
-      totalAmount: 0,
-      municipalities: 5
+      municipality: "Municipality C",
+      error: "Network timeout while retrieving additional amounts data",
+      timestamp: "2024-11-15 14:38:10",
+      severity: 'low' as const
     }
-  ]);
+  ];
+
+  const mockReportData = {
+    summary: {
+      totalAmount: 2847500,
+      municipalitiesCount: 12,
+      processingDate: "2024-11-15",
+      status: "Completed"
+    },
+    details: [
+      {
+        municipality: "Municipality A",
+        studentCount: 245,
+        amountToPay: 125000,
+        amountToReceive: 98000,
+        netAmount: -27000
+      },
+      {
+        municipality: "Municipality B",
+        studentCount: 189,
+        amountToPay: 87000,
+        amountToReceive: 134000,
+        netAmount: 47000
+      },
+      {
+        municipality: "Municipality C",
+        studentCount: 312,
+        amountToPay: 156000,
+        amountToReceive: 89000,
+        netAmount: -67000
+      }
+    ]
+  };
+
+  // Enhanced handlers with modal integration
+  const handleViewErrors = (job: any) => {
+    setSelectedJob(job);
+    setErrorModalOpen(true);
+  };
+
+  const handleViewReport = (job: any) => {
+    setSelectedJob(job);
+    setReportModalOpen(true);
+  };
+
+  const handleCancelJob = (job: any) => {
+    setSelectedJob(job);
+    setConfirmationAction({
+      type: 'cancel',
+      title: 'Cancel Calculation Job',
+      description: 'Are you sure you want to cancel this calculation job? This action cannot be undone and any progress will be lost.',
+      onConfirm: () => {
+        setCalculationJobs(prev => 
+          prev.map(j => 
+            j.id === job.id 
+              ? { ...j, status: "cancelled" }
+              : j
+          )
+        );
+        toast({
+          title: "Job Cancelled",
+          description: `"${job.name}" has been cancelled successfully.`,
+          variant: "destructive"
+        });
+        setConfirmationModalOpen(false);
+        setConfirmationAction(null);
+      }
+    });
+    setConfirmationModalOpen(true);
+  };
+
+  const handleRestartJob = (job: any) => {
+    setSelectedJob(job);
+    setConfirmationAction({
+      type: 'restart',
+      title: 'Restart Calculation Job',
+      description: 'Are you sure you want to restart this calculation job? This will reset all progress and start the calculation from the beginning.',
+      onConfirm: () => {
+        setCalculationJobs(prev => 
+          prev.map(j => 
+            j.id === job.id 
+              ? { ...j, status: "running", processed: 0, errors: 0 }
+              : j
+          )
+        );
+        toast({
+          title: "Job Restarted",
+          description: `"${job.name}" has been restarted successfully.`,
+        });
+        setConfirmationModalOpen(false);
+        setConfirmationAction(null);
+      }
+    });
+    setConfirmationModalOpen(true);
+  };
 
   const handleStartCalculation = () => {
     setIsCalculating(true);
@@ -98,51 +185,6 @@ const Integration = () => {
         return prev + 10;
       });
     }, 500);
-  };
-
-  const handleCancelJob = (jobId: number) => {
-    setCalculationJobs(prev => 
-      prev.map(job => 
-        job.id === jobId 
-          ? { ...job, status: "cancelled" }
-          : job
-      )
-    );
-    
-    toast({
-      title: "Job Cancelled",
-      description: "The calculation job has been cancelled.",
-      variant: "destructive"
-    });
-  };
-
-  const handleRestartJob = (jobId: number) => {
-    setCalculationJobs(prev => 
-      prev.map(job => 
-        job.id === jobId 
-          ? { ...job, status: "running", processed: 0 }
-          : job
-      )
-    );
-    
-    toast({
-      title: "Job Restarted",
-      description: "The calculation job has been restarted.",
-    });
-  };
-
-  const handleViewErrors = (jobId: number) => {
-    toast({
-      title: "Error Details",
-      description: "Viewing error details for the calculation job.",
-    });
-  };
-
-  const handleViewReport = (jobId: number) => {
-    toast({
-      title: "Report Generated",
-      description: "Opening calculation report for the selected job.",
-    });
   };
 
   const handleStartMonthlyCalculation = () => {
@@ -442,14 +484,14 @@ const Integration = () => {
                   </div>
 
                   <div className="flex space-x-2">
-                    {job.status === "error" && (
+                    {job.status === "error" && job.errors > 0 && (
                       <Button 
                         size="sm" 
                         className="bg-ike-error hover:bg-ike-error/80 text-white"
-                        onClick={() => handleViewErrors(job.id)}
+                        onClick={() => handleViewErrors(job)}
                       >
                         <XCircle className="w-4 h-4 mr-1" />
-                        View Errors
+                        View Errors ({job.errors})
                       </Button>
                     )}
 
@@ -458,7 +500,7 @@ const Integration = () => {
                         size="sm" 
                         variant="outline" 
                         className="border-ike-error text-ike-error hover:bg-ike-error/10"
-                        onClick={() => handleCancelJob(job.id)}
+                        onClick={() => handleCancelJob(job)}
                       >
                         Cancel Job
                       </Button>
@@ -468,7 +510,7 @@ const Integration = () => {
                       <Button 
                         size="sm" 
                         className="bg-ike-primary hover:bg-ike-primary-dark text-white"
-                        onClick={() => handleRestartJob(job.id)}
+                        onClick={() => handleRestartJob(job)}
                       >
                         <RefreshCcw className="w-4 h-4 mr-1" />
                         Restart
@@ -479,7 +521,7 @@ const Integration = () => {
                       size="sm" 
                       variant="ghost" 
                       className="text-ike-neutral hover:text-ike-primary"
-                      onClick={() => handleViewReport(job.id)}
+                      onClick={() => handleViewReport(job)}
                     >
                       <FileText className="w-4 h-4 mr-1" />
                       View Report
@@ -600,6 +642,34 @@ const Integration = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Modal Components */}
+      <ErrorDetailsModal
+        isOpen={errorModalOpen}
+        onClose={() => setErrorModalOpen(false)}
+        jobName={selectedJob?.name || ""}
+        errors={mockErrorData}
+      />
+
+      <ReportViewModal
+        isOpen={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+        jobName={selectedJob?.name || ""}
+        reportData={mockReportData}
+      />
+
+      <ConfirmationModal
+        isOpen={confirmationModalOpen}
+        onClose={() => {
+          setConfirmationModalOpen(false);
+          setConfirmationAction(null);
+        }}
+        onConfirm={confirmationAction?.onConfirm || (() => {})}
+        title={confirmationAction?.title || ""}
+        description={confirmationAction?.description || ""}
+        actionType={confirmationAction?.type || 'cancel'}
+        jobName={selectedJob?.name}
+      />
     </div>
   );
 };
