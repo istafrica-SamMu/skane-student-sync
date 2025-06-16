@@ -103,8 +103,15 @@ const MunicipalSchoolUnits = () => {
       return;
     }
 
+    // Ensure proper type conversion for numeric fields
+    const updatedSchool = {
+      ...editingSchool,
+      capacity: typeof editingSchool.capacity === 'string' ? parseInt(editingSchool.capacity) || 0 : editingSchool.capacity,
+      students: typeof editingSchool.students === 'string' ? parseInt(editingSchool.students) || 0 : editingSchool.students
+    };
+
     setSchoolUnits(schoolUnits.map(school => 
-      school.id === editingSchool.id ? editingSchool : school
+      school.id === editingSchool.id ? updatedSchool : school
     ));
     
     setShowEditSchool(false);
@@ -115,7 +122,7 @@ const MunicipalSchoolUnits = () => {
       description: `${editingSchool.name} has been successfully updated.`,
     });
     
-    console.log("Updated school:", editingSchool);
+    console.log("Updated school:", updatedSchool);
   };
 
   const handleAddNewSchool = () => {
@@ -134,12 +141,14 @@ const MunicipalSchoolUnits = () => {
       return;
     }
 
+    // Ensure proper type conversion for numeric fields
     const schoolToAdd = {
       ...newSchool,
       id: schoolUnits.length + 1,
       students: 0,
       status: "Active",
-      founded: new Date().getFullYear().toString()
+      founded: new Date().getFullYear().toString(),
+      capacity: parseInt(newSchool.capacity) || 0
     };
 
     setSchoolUnits([...schoolUnits, schoolToAdd]);
@@ -162,7 +171,7 @@ const MunicipalSchoolUnits = () => {
     });
     
     setShowAddSchool(false);
-    console.log("Adding new school unit:", newSchool);
+    console.log("Adding new school unit:", schoolToAdd);
   };
 
   const handleCloseAddSchool = () => {
