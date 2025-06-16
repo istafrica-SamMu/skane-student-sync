@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   FileSpreadsheet, 
   Download, 
@@ -13,10 +14,15 @@ import {
   AlertCircle,
   Play
 } from "lucide-react";
+import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useToast } from "@/hooks/use-toast";
 
 const FinancialExport = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
+  const [isRunExportModalOpen, setIsRunExportModalOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
 
   const exportJobs = [
     {
@@ -38,49 +44,37 @@ const FinancialExport = () => {
       status: "Running",
       records: 892,
       format: "CSV"
-    },
-    {
-      id: 3,
-      name: "Municipal Statistics",
-      system: "Local DB",
-      lastRun: "2024-11-12 14:15",
-      nextRun: "2024-11-19 14:15",
-      status: "Failed",
-      records: 0,
-      format: "JSON"
     }
   ];
 
-  const availableExports = [
-    {
-      id: 1,
-      name: "IKE Transaction Export",
-      description: "Export all IKE transactions for financial reconciliation",
-      format: "XML, CSV",
-      frequency: "Monthly"
-    },
-    {
-      id: 2,
-      name: "Student Cost Breakdown",
-      description: "Detailed cost breakdown per student for budget planning",
-      format: "Excel, CSV",
-      frequency: "Weekly"
-    },
-    {
-      id: 3,
-      name: "Municipal Summary",
-      description: "High-level summary for municipal reporting",
-      format: "PDF, Excel",
-      frequency: "Quarterly"
-    },
-    {
-      id: 4,
-      name: "Inter-Municipal Reconciliation",
-      description: "Data for inter-municipal cost settlements",
-      format: "XML, JSON",
-      frequency: "Monthly"
-    }
-  ];
+  const handleRunExport = (job = null) => {
+    setSelectedJob(job);
+    setIsRunExportModalOpen(true);
+  };
+
+  const handleConfirmRunExport = () => {
+    const jobName = selectedJob ? selectedJob.name : "New Export";
+    toast({
+      title: "Export Started",
+      description: `${jobName} has been started successfully`,
+    });
+    setIsRunExportModalOpen(false);
+    setSelectedJob(null);
+  };
+
+  const handleRunNow = (job) => {
+    toast({
+      title: "Export Started",
+      description: `${job.name} is now running`,
+    });
+  };
+
+  const handleSettings = (job) => {
+    toast({
+      title: "Settings",
+      description: `Opening settings for ${job.name}`,
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -93,11 +87,10 @@ const FinancialExport = () => {
           </p>
         </div>
         <div className="flex space-x-2">
-          <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-            <Settings className="w-4 h-4 mr-2" />
-            Export Settings
-          </Button>
-          <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+          <Button 
+            className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+            onClick={() => handleRunExport()}
+          >
             <Play className="w-4 h-4 mr-2" />
             Run Export
           </Button>
@@ -138,7 +131,7 @@ const FinancialExport = () => {
             <CardTitle className="text-sm font-medium text-ike-neutral">Failed</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-ike-error">1</div>
+            <div className="text-2xl font-bold text-ike-error">0</div>
             <p className="text-xs text-ike-neutral">Requires attention</p>
           </CardContent>
         </Card>
@@ -197,11 +190,20 @@ const FinancialExport = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="border-ike-primary text-ike-primary hover:bg-ike-primary/10"
+                        onClick={() => handleRunNow(job)}
+                      >
                         <Play className="w-3 h-3 mr-1" />
                         Run Now
                       </Button>
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleSettings(job)}
+                      >
                         <Settings className="w-3 h-3" />
                       </Button>
                     </div>
@@ -213,57 +215,52 @@ const FinancialExport = () => {
         </CardContent>
       </Card>
 
-      {/* Available Export Templates */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center text-ike-neutral-dark">
-            <FileSpreadsheet className="w-5 h-5 mr-2 text-ike-primary" />
-            Available Export Templates
-          </CardTitle>
-          <CardDescription>
-            Pre-configured export templates for different financial systems
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {availableExports.map((export_template) => (
-              <div 
-                key={export_template.id} 
-                className="p-4 border rounded-lg hover:bg-ike-neutral-light/50 transition-colors"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center">
-                    <div className="h-10 w-10 bg-ike-primary/10 text-ike-primary rounded-lg flex items-center justify-center mr-3">
-                      <FileSpreadsheet className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-ike-neutral-dark">{export_template.name}</h3>
-                      <div className="text-sm text-ike-neutral mt-1">
-                        <span>{export_template.format}</span>
-                        <span className="mx-2">•</span>
-                        <span>{export_template.frequency}</span>
-                      </div>
-                    </div>
-                  </div>
+      {/* Run Export Confirmation Modal */}
+      <Dialog open={isRunExportModalOpen} onOpenChange={setIsRunExportModalOpen}>
+        <DialogContent className="bg-white max-w-md border border-gray-200 shadow-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-ike-neutral-dark">
+              <Play className="w-5 h-5 mr-2 text-ike-primary" />
+              Run Export Job
+            </DialogTitle>
+            <DialogDescription>
+              {selectedJob 
+                ? `Are you sure you want to run "${selectedJob.name}" now?`
+                : "Are you sure you want to run a new export job?"
+              }
+            </DialogDescription>
+          </DialogHeader>
+          {selectedJob && (
+            <div className="space-y-3 py-4">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="font-medium text-ike-neutral">Target System:</span>
+                  <p className="text-ike-neutral-dark">{selectedJob.system}</p>
                 </div>
-                <p className="text-sm text-ike-neutral mt-3">
-                  {export_template.description}
-                </p>
-                <div className="flex space-x-2 mt-4">
-                  <Button size="sm" variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-                    <Download className="w-4 h-4 mr-1" />
-                    Export Now
-                  </Button>
-                  <Button size="sm" variant="outline" className="border-ike-neutral text-ike-neutral hover:bg-ike-neutral-light">
-                    <Calendar className="w-4 h-4 mr-1" />
-                    Schedule
-                  </Button>
+                <div>
+                  <span className="font-medium text-ike-neutral">Format:</span>
+                  <p className="text-ike-neutral-dark">{selectedJob.format}</p>
                 </div>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+          )}
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsRunExportModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleConfirmRunExport}
+              className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+            >
+              <Play className="w-4 h-4 mr-2" />
+              Run Export
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
