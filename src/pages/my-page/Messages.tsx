@@ -6,6 +6,27 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { 
   Send, 
   Search, 
   Phone, 
@@ -15,10 +36,22 @@ import {
   Mic,
   CheckCheck,
   Check,
-  Settings
+  Settings,
+  FileText,
+  Image,
+  Archive,
+  Bell,
+  Shield,
+  Palette
 } from "lucide-react";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const Messages = () => {
+  const [messageText, setMessageText] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
+  const { toast } = useToast();
+
   const conversations = [
     {
       id: 1,
@@ -85,6 +118,46 @@ const Messages = () => {
 
   const selectedConversation = conversations[0];
 
+  const handleCall = (type: "phone" | "video") => {
+    toast({
+      title: `${type === "phone" ? "Phone" : "Video"} call initiated`,
+      description: `Connecting to ${selectedConversation.name}...`,
+    });
+  };
+
+  const handleFileAttach = (type: string) => {
+    toast({
+      title: "File attached",
+      description: `${type} attachment ready to send`,
+    });
+  };
+
+  const handleRecording = () => {
+    if (isRecording) {
+      setIsRecording(false);
+      toast({
+        title: "Recording saved",
+        description: "Voice message is ready to send",
+      });
+    } else {
+      setIsRecording(true);
+      toast({
+        title: "Recording started",
+        description: "Speak your message now",
+      });
+    }
+  };
+
+  const handleSendMessage = () => {
+    if (messageText.trim()) {
+      toast({
+        title: "Message sent",
+        description: "Your message has been delivered",
+      });
+      setMessageText("");
+    }
+  };
+
   return (
     <div className="h-[calc(100vh-120px)] flex bg-ike-neutral-light">
       {/* Left Sidebar - Conversations List */}
@@ -93,9 +166,90 @@ const Messages = () => {
         <div className="p-4 border-b border-ike-neutral-light bg-ike-primary text-white">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Messages</h2>
-            <Button variant="ghost" size="sm" className="text-white hover:bg-ike-primary-dark">
-              <Settings className="w-5 h-5" />
-            </Button>
+            
+            {/* Settings Modal */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-white hover:bg-ike-primary-dark">
+                  <Settings className="w-5 h-5" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Settings className="w-5 h-5" />
+                    Message Settings
+                  </DialogTitle>
+                  <DialogDescription>
+                    Configure your messaging preferences and notifications
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-6 py-4">
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-semibold flex items-center gap-2">
+                      <Bell className="w-4 h-4" />
+                      Notifications
+                    </h4>
+                    <div className="space-y-3 pl-6">
+                      <label className="flex items-center space-x-2">
+                        <input type="checkbox" defaultChecked className="rounded" />
+                        <span className="text-sm">Desktop notifications</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input type="checkbox" defaultChecked className="rounded" />
+                        <span className="text-sm">Email notifications</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input type="checkbox" className="rounded" />
+                        <span className="text-sm">Sound alerts</span>
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-semibold flex items-center gap-2">
+                      <Shield className="w-4 h-4" />
+                      Privacy
+                    </h4>
+                    <div className="space-y-3 pl-6">
+                      <label className="flex items-center space-x-2">
+                        <input type="checkbox" defaultChecked className="rounded" />
+                        <span className="text-sm">Show online status</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input type="checkbox" defaultChecked className="rounded" />
+                        <span className="text-sm">Read receipts</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-semibold flex items-center gap-2">
+                      <Palette className="w-4 h-4" />
+                      Appearance
+                    </h4>
+                    <div className="space-y-3 pl-6">
+                      <div>
+                        <label className="text-sm font-medium">Theme</label>
+                        <select className="w-full mt-1 p-2 border rounded-md">
+                          <option>Light</option>
+                          <option>Dark</option>
+                          <option>Auto</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </DialogClose>
+                  <Button onClick={() => toast({ title: "Settings saved", description: "Your preferences have been updated" })}>
+                    Save Changes
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
@@ -172,15 +326,85 @@ const Messages = () => {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm">
-              <Phone className="w-5 h-5 text-ike-neutral" />
-            </Button>
-            <Button variant="ghost" size="sm">
-              <Video className="w-5 h-5 text-ike-neutral" />
-            </Button>
-            <Button variant="ghost" size="sm">
-              <MoreVertical className="w-5 h-5 text-ike-neutral" />
-            </Button>
+            {/* Phone Call Modal */}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <Phone className="w-5 h-5 text-ike-neutral" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="flex items-center gap-2">
+                    <Phone className="w-5 h-5" />
+                    Start Phone Call
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to start a phone call with {selectedConversation.name}?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => handleCall("phone")}>
+                    Start Call
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Video Call Modal */}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <Video className="w-5 h-5 text-ike-neutral" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="flex items-center gap-2">
+                    <Video className="w-5 h-5" />
+                    Start Video Call
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to start a video call with {selectedConversation.name}?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => handleCall("video")}>
+                    Start Call
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            {/* More Options Modal */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <MoreVertical className="w-5 h-5 text-ike-neutral" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[300px]">
+                <DialogHeader>
+                  <DialogTitle>Conversation Options</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-2 py-4">
+                  <Button variant="ghost" className="w-full justify-start" onClick={() => toast({ title: "Conversation archived" })}>
+                    <Archive className="w-4 h-4 mr-2" />
+                    Archive Conversation
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start" onClick={() => toast({ title: "Notifications muted" })}>
+                    <Bell className="w-4 h-4 mr-2" />
+                    Mute Notifications
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start text-red-600" onClick={() => toast({ title: "Conversation cleared" })}>
+                    <Archive className="w-4 h-4 mr-2" />
+                    Clear History
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
@@ -223,20 +447,108 @@ const Messages = () => {
         {/* Message Input */}
         <div className="p-4 border-t border-ike-neutral-light bg-white">
           <div className="flex items-end space-x-3">
-            <Button variant="ghost" size="sm" className="text-ike-neutral hover:text-ike-primary">
-              <Paperclip className="w-5 h-5" />
-            </Button>
+            {/* File Attachment Modal */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-ike-neutral hover:text-ike-primary">
+                  <Paperclip className="w-5 h-5" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[400px]">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Paperclip className="w-5 h-5" />
+                    Attach File
+                  </DialogTitle>
+                  <DialogDescription>
+                    Choose the type of file you want to attach
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-2 gap-4 py-4">
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex-col gap-2"
+                    onClick={() => handleFileAttach("Document")}
+                  >
+                    <FileText className="w-8 h-8" />
+                    Document
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex-col gap-2"
+                    onClick={() => handleFileAttach("Image")}
+                  >
+                    <Image className="w-8 h-8" />
+                    Image
+                  </Button>
+                </div>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
             <div className="flex-1">
               <Textarea
                 placeholder="Type a message..."
                 className="min-h-0 resize-none border-ike-neutral/20 focus:border-ike-primary"
                 rows={1}
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
               />
             </div>
-            <Button variant="ghost" size="sm" className="text-ike-neutral hover:text-ike-primary">
-              <Mic className="w-5 h-5" />
-            </Button>
-            <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+
+            {/* Voice Recording Modal */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className={`text-ike-neutral hover:text-ike-primary ${isRecording ? 'text-red-500' : ''}`}
+                >
+                  <Mic className="w-5 h-5" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[400px]">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Mic className="w-5 h-5" />
+                    Voice Message
+                  </DialogTitle>
+                  <DialogDescription>
+                    Record a voice message to send
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="py-8 text-center">
+                  <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 ${
+                    isRecording ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-ike-primary/10 text-ike-primary'
+                  }`}>
+                    <Mic className="w-8 h-8" />
+                  </div>
+                  <p className="text-sm text-ike-neutral mb-4">
+                    {isRecording ? 'Recording... Tap to stop' : 'Tap to start recording'}
+                  </p>
+                  <Button 
+                    onClick={handleRecording}
+                    className={isRecording ? 'bg-red-500 hover:bg-red-600' : ''}
+                  >
+                    {isRecording ? 'Stop Recording' : 'Start Recording'}
+                  </Button>
+                </div>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <Button 
+              className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+              onClick={handleSendMessage}
+            >
               <Send className="w-4 h-4" />
             </Button>
           </div>
