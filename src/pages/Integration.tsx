@@ -30,6 +30,43 @@ const Integration = () => {
   const [isCalculating, setIsCalculating] = useState(false);
   const [calculationProgress, setCalculationProgress] = useState(0);
   
+  // Add missing state for calculation jobs
+  const [calculationJobs, setCalculationJobs] = useState([
+    {
+      id: 1,
+      name: "November 2024 Payment Calculations",
+      type: "monthly",
+      status: "completed",
+      lastRun: "2024-11-15 14:30",
+      processed: 15420,
+      errors: 0,
+      totalAmount: 2847500,
+      municipalities: 15
+    },
+    {
+      id: 2,
+      name: "October 2024 Correction Run",
+      type: "correction",
+      status: "error",
+      lastRun: "2024-11-10 09:15",
+      processed: 8934,
+      errors: 3,
+      totalAmount: 0,
+      municipalities: 8
+    },
+    {
+      id: 3,
+      name: "Annual Reconciliation 2024",
+      type: "annual",
+      status: "scheduled",
+      lastRun: "2024-12-01 00:00",
+      processed: 0,
+      errors: 0,
+      totalAmount: 0,
+      municipalities: 33
+    }
+  ]);
+  
   // Modal states
   const [errorModalOpen, setErrorModalOpen] = useState(false);
   const [reportModalOpen, setReportModalOpen] = useState(false);
