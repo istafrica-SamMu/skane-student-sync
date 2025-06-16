@@ -190,15 +190,9 @@ export const municipalityAdminMenu: MenuItem[] = [
     ],
   },
   {
-    title: "Municipal Integration",
+    title: "Import Student Data",
+    url: "/integration/import",
     icon: Database,
-    items: [
-      {
-        title: "Import Student Data",
-        url: "/integration/import",
-        icon: Database,
-      },
-    ],
   },
   {
     title: "Financial Management",
