@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,34 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { 
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { 
   Users, 
   Search, 
@@ -35,7 +64,9 @@ import {
   ArrowUpDown,
   Eye,
   GraduationCap,
-  School
+  School,
+  Trash2,
+  FileText
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -44,6 +75,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useForm } from "react-hook-form";
 
 const Students = () => {
   const { t } = useLanguage();
@@ -52,8 +84,29 @@ const Students = () => {
   const [programFilter, setProgramFilter] = useState("all");
   const [classFilter, setClassFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState("all");
+  const [schoolUnitFilter, setSchoolUnitFilter] = useState("all");
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [isStudentDialogOpen, setIsStudentDialogOpen] = useState(false);
+  const [isNewStudentDialogOpen, setIsNewStudentDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [studentToDelete, setStudentToDelete] = useState(null);
 
-  // Mock student data with enhanced class/program information
+  const form = useForm({
+    defaultValues: {
+      name: "",
+      personalNumber: "",
+      municipality: "",
+      school: "",
+      schoolUnit: "",
+      program: "",
+      class: "",
+      year: "",
+      teacher: "",
+      status: "active"
+    }
+  });
+
+  // Mock student data with enhanced school unit information
   const students = [
     {
       id: 1,
@@ -61,6 +114,7 @@ const Students = () => {
       personalNumber: "200501-1234",
       municipality: "Malmö",
       school: "Malmö Gymnasium",
+      schoolUnit: "Huvudenhet",
       program: "Naturvetenskapsprogrammet",
       class: "NA21A",
       year: "År 3",
@@ -75,6 +129,7 @@ const Students = () => {
       personalNumber: "200403-5678",
       municipality: "Lund",
       school: "Katedralskolan",
+      schoolUnit: "Estetisk enhet",
       program: "Samhällsvetenskapsprogrammet",
       class: "SA22B",
       year: "År 2",
@@ -89,6 +144,7 @@ const Students = () => {
       personalNumber: "200502-9012",
       municipality: "Helsingborg",
       school: "Nicolai Gymnasium",
+      schoolUnit: "Teknikcentrum",
       program: "Teknikprogrammet",
       class: "TE21C",
       year: "År 3",
@@ -103,6 +159,7 @@ const Students = () => {
       personalNumber: "200406-3456",
       municipality: "Kristianstad",
       school: "Kristianstad Gymnasium",
+      schoolUnit: "Ekonomicentrum",
       program: "Ekonomiprogrammet",
       class: "EK22A",
       year: "År 2",
@@ -117,6 +174,7 @@ const Students = () => {
       personalNumber: "200501-7890",
       municipality: "Malmö",
       school: "Jensen Gymnasium",
+      schoolUnit: "Kreativ enhet",
       program: "Estetiska programmet",
       class: "ES21B",
       year: "År 3",
@@ -136,7 +194,8 @@ const Students = () => {
       year: "År 3",
       students: 28,
       capacity: 30,
-      teacher: "Anna Andersson"
+      teacher: "Anna Andersson",
+      schoolUnit: "Huvudenhet"
     },
     {
       id: 2,
@@ -145,7 +204,8 @@ const Students = () => {
       year: "År 2",
       students: 32,
       capacity: 32,
-      teacher: "Erik Johansson"
+      teacher: "Erik Johansson",
+      schoolUnit: "Estetisk enhet"
     },
     {
       id: 3,
@@ -154,7 +214,8 @@ const Students = () => {
       year: "År 3",
       students: 25,
       capacity: 28,
-      teacher: "Maria Lindström"
+      teacher: "Maria Lindström",
+      schoolUnit: "Teknikcentrum"
     },
     {
       id: 4,
@@ -163,7 +224,8 @@ const Students = () => {
       year: "År 2",
       students: 30,
       capacity: 30,
-      teacher: "Carl Petersson"
+      teacher: "Carl Petersson",
+      schoolUnit: "Ekonomicentrum"
     }
   ];
 
@@ -198,15 +260,65 @@ const Students = () => {
     const matchesProgram = programFilter === "all" || student.program === programFilter;
     const matchesClass = classFilter === "all" || student.class === classFilter;
     const matchesYear = yearFilter === "all" || student.year === yearFilter;
+    const matchesSchoolUnit = schoolUnitFilter === "all" || student.schoolUnit === schoolUnitFilter;
     
-    return matchesSearch && matchesStatus && matchesProgram && matchesClass && matchesYear;
+    return matchesSearch && matchesStatus && matchesProgram && matchesClass && matchesYear && matchesSchoolUnit;
   });
 
   const filteredClasses = classData.filter(classItem => {
     const matchesProgram = programFilter === "all" || classItem.program === programFilter;
     const matchesYear = yearFilter === "all" || classItem.year === yearFilter;
-    return matchesProgram && matchesYear;
+    const matchesSchoolUnit = schoolUnitFilter === "all" || classItem.schoolUnit === schoolUnitFilter;
+    return matchesProgram && matchesYear && matchesSchoolUnit;
   });
+
+  const handleViewStudent = (student) => {
+    setSelectedStudent(student);
+    setIsStudentDialogOpen(true);
+  };
+
+  const handleEditStudent = (student) => {
+    setSelectedStudent(student);
+    form.reset(student);
+    setIsNewStudentDialogOpen(true);
+  };
+
+  const handleDeleteStudent = (student) => {
+    setStudentToDelete(student);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    console.log('Deleting student:', studentToDelete);
+    setIsDeleteDialogOpen(false);
+    setStudentToDelete(null);
+  };
+
+  const handleNewStudent = () => {
+    setSelectedStudent(null);
+    form.reset({
+      name: "",
+      personalNumber: "",
+      municipality: "",
+      school: "",
+      schoolUnit: "",
+      program: "",
+      class: "",
+      year: "",
+      teacher: "",
+      status: "active"
+    });
+    setIsNewStudentDialogOpen(true);
+  };
+
+  const onSubmit = (data) => {
+    console.log('Submitting student data:', data);
+    setIsNewStudentDialogOpen(false);
+  };
+
+  const handleExportData = () => {
+    console.log('Exporting student data...');
+  };
 
   return (
     <div className="space-y-6">
@@ -219,11 +331,196 @@ const Students = () => {
           </p>
         </div>
         <div className="flex space-x-3">
-          <Button className="bg-ike-primary hover:bg-ike-primary/90 text-white">
-            <Plus className="w-4 h-4 mr-2" />
-            New Student
-          </Button>
-          <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+          <Dialog open={isNewStudentDialogOpen} onOpenChange={setIsNewStudentDialogOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                className="bg-ike-primary hover:bg-ike-primary/90 text-white"
+                onClick={handleNewStudent}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                New Student
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>
+                  {selectedStudent ? 'Edit Student' : 'Add New Student'}
+                </DialogTitle>
+                <DialogDescription>
+                  {selectedStudent ? 'Update student information below.' : 'Enter student information below.'}
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter full name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="personalNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Personal Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="YYYYMMDD-XXXX" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="school"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>School</FormLabel>
+                          <FormControl>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select school" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Malmö Gymnasium">Malmö Gymnasium</SelectItem>
+                                <SelectItem value="Katedralskolan">Katedralskolan</SelectItem>
+                                <SelectItem value="Nicolai Gymnasium">Nicolai Gymnasium</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="schoolUnit"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>School Unit</FormLabel>
+                          <FormControl>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select school unit" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Huvudenhet">Huvudenhet</SelectItem>
+                                <SelectItem value="Estetisk enhet">Estetisk enhet</SelectItem>
+                                <SelectItem value="Teknikcentrum">Teknikcentrum</SelectItem>
+                                <SelectItem value="Ekonomicentrum">Ekonomicentrum</SelectItem>
+                                <SelectItem value="Kreativ enhet">Kreativ enhet</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="program"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Program</FormLabel>
+                          <FormControl>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select program" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Naturvetenskapsprogrammet">Naturvetenskapsprogrammet</SelectItem>
+                                <SelectItem value="Samhällsvetenskapsprogrammet">Samhällsvetenskapsprogrammet</SelectItem>
+                                <SelectItem value="Teknikprogrammet">Teknikprogrammet</SelectItem>
+                                <SelectItem value="Ekonomiprogrammet">Ekonomiprogrammet</SelectItem>
+                                <SelectItem value="Estetiska programmet">Estetiska programmet</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="class"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Class</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g. NA21A" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="year"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Year</FormLabel>
+                          <FormControl>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select year" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="År 1">År 1</SelectItem>
+                                <SelectItem value="År 2">År 2</SelectItem>
+                                <SelectItem value="År 3">År 3</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="teacher"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Teacher</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Teacher name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <DialogFooter>
+                    <Button type="button" variant="outline" onClick={() => setIsNewStudentDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" className="bg-ike-primary hover:bg-ike-primary/90">
+                      {selectedStudent ? 'Update Student' : 'Add Student'}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+          <Button 
+            variant="outline" 
+            className="border-ike-primary text-ike-primary hover:bg-ike-primary/10"
+            onClick={handleExportData}
+          >
             <Download className="w-4 h-4 mr-2" />
             {t('students.export')}
           </Button>
@@ -293,6 +590,19 @@ const Students = () => {
                 className="pl-10 border-ike-primary/20 focus:border-ike-primary"
               />
             </div>
+            <Select value={schoolUnitFilter} onValueChange={setSchoolUnitFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="School Unit" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Units</SelectItem>
+                <SelectItem value="Huvudenhet">Huvudenhet</SelectItem>
+                <SelectItem value="Estetisk enhet">Estetisk enhet</SelectItem>
+                <SelectItem value="Teknikcentrum">Teknikcentrum</SelectItem>
+                <SelectItem value="Ekonomicentrum">Ekonomicentrum</SelectItem>
+                <SelectItem value="Kreativ enhet">Kreativ enhet</SelectItem>
+              </SelectContent>
+            </Select>
             <Select value={programFilter} onValueChange={setProgramFilter}>
               <SelectTrigger className="w-64">
                 <SelectValue placeholder="Select Program" />
@@ -379,6 +689,7 @@ const Students = () => {
                       </Button>
                     </TableHead>
                     <TableHead className="font-medium">{t('students.personal.number')}</TableHead>
+                    <TableHead className="font-medium">School Unit</TableHead>
                     <TableHead className="font-medium">{t('students.program')}</TableHead>
                     <TableHead className="font-medium">{t('students.class')}</TableHead>
                     <TableHead className="font-medium">Year</TableHead>
@@ -396,6 +707,11 @@ const Students = () => {
                       <TableCell className="font-mono text-sm">
                         {student.personalNumber}
                       </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-ike-primary border-ike-primary/20">
+                          {student.schoolUnit}
+                        </Badge>
+                      </TableCell>
                       <TableCell>{student.program}</TableCell>
                       <TableCell>{student.class}</TableCell>
                       <TableCell>{student.year}</TableCell>
@@ -408,18 +724,25 @@ const Students = () => {
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
+                          <DropdownMenuContent align="end" className="bg-white z-50">
+                            <DropdownMenuItem onClick={() => handleViewStudent(student)}>
                               <Eye className="mr-2 h-4 w-4" />
                               {t('students.view.details')}
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleEditStudent(student)}>
                               <Edit className="mr-2 h-4 w-4" />
                               {t('students.edit')}
                             </DropdownMenuItem>
                             <DropdownMenuItem>
                               <ArrowUpDown className="mr-2 h-4 w-4" />
                               {t('students.transfer')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleDeleteStudent(student)}
+                              className="text-ike-error focus:text-ike-error"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete Student
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -449,6 +772,7 @@ const Students = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="font-medium">Class</TableHead>
+                    <TableHead className="font-medium">School Unit</TableHead>
                     <TableHead className="font-medium">Program</TableHead>
                     <TableHead className="font-medium">Year</TableHead>
                     <TableHead className="font-medium">Teacher</TableHead>
@@ -461,6 +785,11 @@ const Students = () => {
                     <TableRow key={classItem.id} className="hover:bg-ike-neutral-light/50">
                       <TableCell className="font-medium text-ike-neutral-dark">
                         {classItem.className}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-ike-primary border-ike-primary/20">
+                          {classItem.schoolUnit}
+                        </Badge>
                       </TableCell>
                       <TableCell>{classItem.program}</TableCell>
                       <TableCell>{classItem.year}</TableCell>
@@ -478,6 +807,107 @@ const Students = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Student Details Modal */}
+      <Dialog open={isStudentDialogOpen} onOpenChange={setIsStudentDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <FileText className="w-5 h-5 mr-2 text-ike-primary" />
+              Student Details
+            </DialogTitle>
+            <DialogDescription>
+              Complete information for the selected student
+            </DialogDescription>
+          </DialogHeader>
+          {selectedStudent && (
+            <div className="grid grid-cols-2 gap-4 py-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-ike-neutral">Full Name</label>
+                <p className="text-ike-neutral-dark">{selectedStudent.name}</p>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-ike-neutral">Personal Number</label>
+                <p className="font-mono text-ike-neutral-dark">{selectedStudent.personalNumber}</p>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-ike-neutral">School</label>
+                <p className="text-ike-neutral-dark">{selectedStudent.school}</p>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-ike-neutral">School Unit</label>
+                <Badge variant="outline" className="text-ike-primary border-ike-primary/20">
+                  {selectedStudent.schoolUnit}
+                </Badge>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-ike-neutral">Program</label>
+                <p className="text-ike-neutral-dark">{selectedStudent.program}</p>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-ike-neutral">Class</label>
+                <p className="text-ike-neutral-dark">{selectedStudent.class}</p>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-ike-neutral">Year</label>
+                <p className="text-ike-neutral-dark">{selectedStudent.year}</p>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-ike-neutral">Teacher</label>
+                <p className="text-ike-neutral-dark">{selectedStudent.teacher}</p>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-ike-neutral">Status</label>
+                {getStatusBadge(selectedStudent.status)}
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-ike-neutral">Start Date</label>
+                <p className="text-ike-neutral-dark">{selectedStudent.startDate}</p>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsStudentDialogOpen(false)}>
+              Close
+            </Button>
+            <Button 
+              className="bg-ike-primary hover:bg-ike-primary/90"
+              onClick={() => {
+                setIsStudentDialogOpen(false);
+                handleEditStudent(selectedStudent);
+              }}
+            >
+              <Edit className="w-4 h-4 mr-2" />
+              Edit Student
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center text-ike-error">
+              <Trash2 className="w-5 h-5 mr-2" />
+              Delete Student
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete <strong>{studentToDelete?.name}</strong>? 
+              This action cannot be undone and will permanently remove the student from the system.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete}
+              className="bg-ike-error hover:bg-ike-error/90"
+            >
+              Delete Student
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
