@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { School, Plus, Search, MapPin, Users, Settings, Phone, Mail, GraduationCap, Building } from "lucide-react";
+import { School, Plus, Search, MapPin, Users, Settings, Phone, Mail, GraduationCap, Building, Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const MunicipalSchoolUnits = () => {
@@ -15,8 +15,8 @@ const MunicipalSchoolUnits = () => {
   const [selectedSchool, setSelectedSchool] = useState(null);
   const [showSchoolDetails, setShowSchoolDetails] = useState(false);
   const [showAddSchool, setShowAddSchool] = useState(false);
-  const [showManageSchool, setShowManageSchool] = useState(false);
-  const [managedSchool, setManagedSchool] = useState(null);
+  const [showEditSchool, setShowEditSchool] = useState(false);
+  const [editingSchool, setEditingSchool] = useState(null);
 
   // Form state for adding new school
   const [newSchool, setNewSchool] = useState({
@@ -30,7 +30,7 @@ const MunicipalSchoolUnits = () => {
     type: "Municipal Elementary"
   });
 
-  const schoolUnits = [
+  const [schoolUnits, setSchoolUnits] = useState([
     {
       id: 1,
       name: "Malmö Central Elementary",
@@ -73,7 +73,7 @@ const MunicipalSchoolUnits = () => {
       founded: "1998",
       type: "Technical Academy"
     }
-  ];
+  ]);
 
   const filteredSchools = schoolUnits.filter(school =>
     school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -88,9 +88,34 @@ const MunicipalSchoolUnits = () => {
   };
 
   const handleManageSchool = (school) => {
-    setManagedSchool(school);
-    setShowManageSchool(true);
-    console.log("Managing school:", school.name);
+    setEditingSchool({...school});
+    setShowEditSchool(true);
+    console.log("Opening edit modal for school:", school.name);
+  };
+
+  const handleUpdateSchool = () => {
+    if (!editingSchool.name || !editingSchool.address || !editingSchool.principal) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields (name, address, principal).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSchoolUnits(schoolUnits.map(school => 
+      school.id === editingSchool.id ? editingSchool : school
+    ));
+    
+    setShowEditSchool(false);
+    setEditingSchool(null);
+    
+    toast({
+      title: "School Updated",
+      description: `${editingSchool.name} has been successfully updated.`,
+    });
+    
+    console.log("Updated school:", editingSchool);
   };
 
   const handleAddNewSchool = () => {
@@ -108,6 +133,16 @@ const MunicipalSchoolUnits = () => {
       });
       return;
     }
+
+    const schoolToAdd = {
+      ...newSchool,
+      id: schoolUnits.length + 1,
+      students: 0,
+      status: "Active",
+      founded: new Date().getFullYear().toString()
+    };
+
+    setSchoolUnits([...schoolUnits, schoolToAdd]);
 
     toast({
       title: "School Unit Added",
@@ -225,7 +260,7 @@ const MunicipalSchoolUnits = () => {
                           handleManageSchool(school);
                         }}
                       >
-                        <Settings className="w-4 h-4 mr-2" />
+                        <Edit className="w-4 h-4 mr-2" />
                         Manage School
                       </Button>
                     </div>
@@ -338,7 +373,7 @@ const MunicipalSchoolUnits = () => {
                   }}
                 >
                   <Settings className="w-4 h-4 mr-2" />
-                  Manage School
+                  Edit School
                 </Button>
               </div>
             </div>
@@ -449,109 +484,127 @@ const MunicipalSchoolUnits = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Manage School Modal */}
-      <Dialog open={showManageSchool} onOpenChange={setShowManageSchool}>
+      {/* Edit School Modal */}
+      <Dialog open={showEditSchool} onOpenChange={setShowEditSchool}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center text-ike-primary">
-              <Settings className="w-5 h-5 mr-2" />
-              Manage School Unit
+              <Edit className="w-5 h-5 mr-2" />
+              Edit School Unit
             </DialogTitle>
             <DialogDescription>
-              Administrative management for {managedSchool?.name}
+              Update school unit information for {editingSchool?.name}
             </DialogDescription>
           </DialogHeader>
-          {managedSchool && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="cursor-pointer hover:bg-ike-neutral-light/50 transition-colors">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <Users className="w-8 h-8 text-ike-primary" />
-                      <div>
-                        <h3 className="font-semibold">Student Management</h3>
-                        <p className="text-sm text-ike-neutral">Manage enrollments and student data</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="cursor-pointer hover:bg-ike-neutral-light/50 transition-colors">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <GraduationCap className="w-8 h-8 text-ike-primary" />
-                      <div>
-                        <h3 className="font-semibold">Staff Management</h3>
-                        <p className="text-sm text-ike-neutral">Manage teachers and staff</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="cursor-pointer hover:bg-ike-neutral-light/50 transition-colors">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <Building className="w-8 h-8 text-ike-primary" />
-                      <div>
-                        <h3 className="font-semibold">Facilities</h3>
-                        <p className="text-sm text-ike-neutral">Manage school facilities and resources</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="cursor-pointer hover:bg-ike-neutral-light/50 transition-colors">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <Settings className="w-8 h-8 text-ike-primary" />
-                      <div>
-                        <h3 className="font-semibold">School Settings</h3>
-                        <p className="text-sm text-ike-neutral">Configure school policies and settings</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+          {editingSchool && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+              <div>
+                <Label htmlFor="editSchoolName">School Name *</Label>
+                <Input
+                  id="editSchoolName"
+                  value={editingSchool.name}
+                  onChange={(e) => setEditingSchool({...editingSchool, name: e.target.value})}
+                  placeholder="Enter school name"
+                />
               </div>
-
-              <div className="bg-ike-neutral-light p-4 rounded-lg">
-                <h4 className="font-medium text-ike-neutral-dark mb-2">Quick Stats</h4>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div>
-                    <p className="text-lg font-bold text-ike-primary">{managedSchool.students}</p>
-                    <p className="text-xs text-ike-neutral">Total Students</p>
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-ike-neutral-dark">25</p>
-                    <p className="text-xs text-ike-neutral">Staff Members</p>
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-ike-success">
-                      {Math.round((managedSchool.students / managedSchool.capacity) * 100)}%
-                    </p>
-                    <p className="text-xs text-ike-neutral">Capacity Used</p>
-                  </div>
-                </div>
+              <div>
+                <Label htmlFor="editSchoolType">School Type</Label>
+                <Input
+                  id="editSchoolType"
+                  value={editingSchool.type}
+                  onChange={(e) => setEditingSchool({...editingSchool, type: e.target.value})}
+                  placeholder="Municipal Elementary"
+                />
               </div>
-
-              <div className="flex justify-end gap-2 pt-4">
-                <Button variant="outline" onClick={() => setShowManageSchool(false)}>
-                  Close
-                </Button>
-                <Button 
-                  className="bg-ike-primary hover:bg-ike-primary/90"
-                  onClick={() => {
-                    toast({
-                      title: "Feature Access",
-                      description: `Opening detailed management interface for ${managedSchool.name}`,
-                    });
-                  }}
-                >
-                  <Settings className="w-4 h-4 mr-2" />
-                  Advanced Management
-                </Button>
+              <div className="md:col-span-2">
+                <Label htmlFor="editAddress">Address *</Label>
+                <Input
+                  id="editAddress"
+                  value={editingSchool.address}
+                  onChange={(e) => setEditingSchool({...editingSchool, address: e.target.value})}
+                  placeholder="Street address, postal code, city"
+                />
+              </div>
+              <div>
+                <Label htmlFor="editPhone">Phone</Label>
+                <Input
+                  id="editPhone"
+                  value={editingSchool.phone}
+                  onChange={(e) => setEditingSchool({...editingSchool, phone: e.target.value})}
+                  placeholder="040-123 45 67"
+                />
+              </div>
+              <div>
+                <Label htmlFor="editEmail">Email</Label>
+                <Input
+                  id="editEmail"
+                  type="email"
+                  value={editingSchool.email}
+                  onChange={(e) => setEditingSchool({...editingSchool, email: e.target.value})}
+                  placeholder="info@school.se"
+                />
+              </div>
+              <div>
+                <Label htmlFor="editPrincipal">Principal Name *</Label>
+                <Input
+                  id="editPrincipal"
+                  value={editingSchool.principal}
+                  onChange={(e) => setEditingSchool({...editingSchool, principal: e.target.value})}
+                  placeholder="Enter principal name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="editGrades">Grade Levels</Label>
+                <Input
+                  id="editGrades"
+                  value={editingSchool.grades}
+                  onChange={(e) => setEditingSchool({...editingSchool, grades: e.target.value})}
+                  placeholder="K-6 or 7-12"
+                />
+              </div>
+              <div>
+                <Label htmlFor="editCapacity">School Capacity</Label>
+                <Input
+                  id="editCapacity"
+                  type="number"
+                  value={editingSchool.capacity}
+                  onChange={(e) => setEditingSchool({...editingSchool, capacity: e.target.value})}
+                  placeholder="450"
+                />
+              </div>
+              <div>
+                <Label htmlFor="editStudents">Current Students</Label>
+                <Input
+                  id="editStudents"
+                  type="number"
+                  value={editingSchool.students}
+                  onChange={(e) => setEditingSchool({...editingSchool, students: parseInt(e.target.value) || 0})}
+                  placeholder="380"
+                />
+              </div>
+              <div>
+                <Label htmlFor="editFounded">Founded Year</Label>
+                <Input
+                  id="editFounded"
+                  value={editingSchool.founded}
+                  onChange={(e) => setEditingSchool({...editingSchool, founded: e.target.value})}
+                  placeholder="1985"
+                />
               </div>
             </div>
           )}
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowEditSchool(false)}>
+              Cancel
+            </Button>
+            <Button 
+              className="bg-ike-primary hover:bg-ike-primary/90"
+              onClick={handleUpdateSchool}
+            >
+              <Edit className="w-4 h-4 mr-2" />
+              Update School
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
