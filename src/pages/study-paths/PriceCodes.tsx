@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Euro, Plus, Calculator, TrendingUp, Edit, Trash2, History } from "lucide-react";
+import { Euro, Plus, Calculator, TrendingUp, Edit, Trash2, History, Download } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -34,6 +33,7 @@ export default function PriceCodes() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [editingPriceCode, setEditingPriceCode] = useState<PriceCode | null>(null);
   const [formData, setFormData] = useState({
     code: "",
@@ -162,6 +162,14 @@ export default function PriceCodes() {
     setIsHistoryDialogOpen(true);
   };
 
+  const handleImport = () => {
+    toast({
+      title: "Import Started",
+      description: "Importing regional pricelist from national database...",
+    });
+    setIsImportDialogOpen(false);
+  };
+
   const formatPrice = (price: number) => {
     return `${price.toLocaleString()} SEK`;
   };
@@ -185,69 +193,110 @@ export default function PriceCodes() {
             Manage price codes for study paths and inter-municipal compensation
           </p>
         </div>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-ike-primary hover:bg-ike-primary/90">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Price Code
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Add New Price Code</DialogTitle>
-              <DialogDescription>
-                Create a new price code for study path compensation.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="code">Price Code *</Label>
-                <Input
-                  id="code"
-                  value={formData.code}
-                  onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                  placeholder="e.g., PC005"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="name">Name *</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g., Computer Science"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="price">Price (SEK) *</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  placeholder="e.g., 95000"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="description">Description</Label>
-                <Input
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Optional description"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                Cancel
+        <div className="flex gap-2">
+          <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Download className="w-4 h-4 mr-2" />
+                Import Regional Pricelist
               </Button>
-              <Button onClick={handleAdd} className="bg-ike-primary hover:bg-ike-primary/90">
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Import Regional Pricelist</DialogTitle>
+                <DialogDescription>
+                  This will import the latest regional pricelist and price codes from the Swedish national database.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="p-4 bg-ike-neutral-light rounded-lg">
+                  <h4 className="font-medium mb-2">Import Options:</h4>
+                  <ul className="text-sm text-ike-neutral space-y-1">
+                    <li>• Regional price codes and compensation rates</li>
+                    <li>• Updated study path pricing information</li>
+                    <li>• Inter-municipal compensation rates</li>
+                    <li>• National price code mappings</li>
+                  </ul>
+                </div>
+                <p className="text-sm text-ike-neutral">
+                  Last import: December 10, 2024. This operation will update existing price codes and add new ones from the regional database.
+                </p>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsImportDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleImport} className="bg-ike-primary hover:bg-ike-primary/90">
+                  Start Import
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-ike-primary hover:bg-ike-primary/90">
+                <Plus className="w-4 h-4 mr-2" />
                 Add Price Code
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New Price Code</DialogTitle>
+                <DialogDescription>
+                  Create a new price code for study path compensation.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="code">Price Code *</Label>
+                  <Input
+                    id="code"
+                    value={formData.code}
+                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                    placeholder="e.g., PC005"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Name *</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="e.g., Computer Science"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="price">Price (SEK) *</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    placeholder="e.g., 95000"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Input
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Optional description"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleAdd} className="bg-ike-primary hover:bg-ike-primary/90">
+                  Add Price Code
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
