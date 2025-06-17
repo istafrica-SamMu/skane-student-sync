@@ -1,12 +1,16 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   Users, 
   Download,
   FileText,
-  GraduationCap
+  GraduationCap,
+  Eye,
+  CheckCircle
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,6 +18,8 @@ import { useAuth } from "@/contexts/AuthContext";
 const StudentLists = () => {
   const { t } = useLanguage();
   const { user } = useAuth();
+  const [previewModal, setPreviewModal] = useState({ isOpen: false, report: null });
+  const [generateModal, setGenerateModal] = useState({ isOpen: false, report: null });
 
   const availableReports = [
     {
@@ -36,14 +42,20 @@ const StudentLists = () => {
     }
   ];
 
-  const handleGenerateReport = (reportId: number) => {
-    console.log(`Generating report with ID: ${reportId}`);
-    // Add your report generation logic here
+  const handleGenerateReport = (report) => {
+    console.log(`Generating report with ID: ${report.id}`);
+    setGenerateModal({ isOpen: true, report });
   };
 
-  const handlePreviewReport = (reportId: number) => {
-    console.log(`Previewing report with ID: ${reportId}`);
-    // Add your report preview logic here
+  const handlePreviewReport = (report) => {
+    console.log(`Previewing report with ID: ${report.id}`);
+    setPreviewModal({ isOpen: true, report });
+  };
+
+  const confirmGenerate = () => {
+    // Add actual report generation logic here
+    console.log(`Confirmed generation of report: ${generateModal.report?.name}`);
+    setGenerateModal({ isOpen: false, report: null });
   };
 
   return (
@@ -133,14 +145,15 @@ const StudentLists = () => {
                     size="sm" 
                     variant="outline" 
                     className="border-ike-neutral text-ike-neutral hover:bg-ike-neutral-light"
-                    onClick={() => handlePreviewReport(report.id)}
+                    onClick={() => handlePreviewReport(report)}
                   >
+                    <Eye className="w-4 h-4 mr-1" />
                     Preview
                   </Button>
                   <Button 
                     size="sm" 
                     className="bg-ike-primary hover:bg-ike-primary-dark text-white"
-                    onClick={() => handleGenerateReport(report.id)}
+                    onClick={() => handleGenerateReport(report)}
                   >
                     <Download className="w-4 h-4 mr-1" />
                     Generate
@@ -151,6 +164,100 @@ const StudentLists = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Preview Modal */}
+      <Dialog open={previewModal.isOpen} onOpenChange={(open) => setPreviewModal({ isOpen: open, report: null })}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-ike-neutral-dark">
+              <Eye className="w-5 h-5 mr-2 text-ike-primary" />
+              Preview Report: {previewModal.report?.name}
+            </DialogTitle>
+            <DialogDescription>
+              Preview the content and structure of this report before generating
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-6">
+            <div className="bg-ike-neutral-light/30 border-2 border-dashed border-ike-neutral/30 rounded-lg p-8 text-center">
+              <FileText className="w-12 h-12 text-ike-neutral mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-ike-neutral-dark mb-2">Report Preview</h3>
+              <p className="text-ike-neutral mb-4">{previewModal.report?.description}</p>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="bg-white p-3 rounded border">
+                  <div className="font-medium text-ike-neutral-dark">Format</div>
+                  <div className="text-ike-neutral">{previewModal.report?.format}</div>
+                </div>
+                <div className="bg-white p-3 rounded border">
+                  <div className="font-medium text-ike-neutral-dark">Category</div>
+                  <div className="text-ike-neutral">{previewModal.report?.category}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setPreviewModal({ isOpen: false, report: null })}
+            >
+              Close
+            </Button>
+            <Button 
+              className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+              onClick={() => {
+                setPreviewModal({ isOpen: false, report: null });
+                handleGenerateReport(previewModal.report);
+              }}
+            >
+              <Download className="w-4 h-4 mr-1" />
+              Generate Report
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Generate Modal */}
+      <Dialog open={generateModal.isOpen} onOpenChange={(open) => setGenerateModal({ isOpen: open, report: null })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-ike-neutral-dark">
+              <Download className="w-5 h-5 mr-2 text-ike-primary" />
+              Generate Report
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to generate "{generateModal.report?.name}"?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="bg-ike-primary/5 border border-ike-primary/20 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-ike-primary mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-ike-neutral-dark">Report Details</h4>
+                  <p className="text-sm text-ike-neutral mt-1">{generateModal.report?.description}</p>
+                  <p className="text-sm text-ike-neutral mt-2">
+                    <span className="font-medium">Format:</span> {generateModal.report?.format}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setGenerateModal({ isOpen: false, report: null })}
+            >
+              Cancel
+            </Button>
+            <Button 
+              className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+              onClick={confirmGenerate}
+            >
+              <Download className="w-4 h-4 mr-1" />
+              Generate & Download
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
