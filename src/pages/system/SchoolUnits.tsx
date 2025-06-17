@@ -1,445 +1,646 @@
 
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { School, Plus, Search, MoreHorizontal, Edit, Trash2, Eye, MapPin, Users, Building } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { 
+  Building2, 
+  Edit, 
+  Trash2, 
+  Mail, 
+  Phone, 
+  MapPin, 
+  Users,
+  Calendar,
+  Search,
+  Plus,
+  Link,
+  Unlink,
+  GraduationCap
+} from "lucide-react";
+
+interface SchoolUnit {
+  id: string;
+  name: string;
+  code: string;
+  type: 'elementary' | 'middle' | 'high' | 'special';
+  email: string;
+  phone: string;
+  address: {
+    street: string;
+    postalCode: string;
+    city: string;
+    country: string;
+  };
+  municipality: string;
+  establishedDate: string;
+  status: 'active' | 'inactive';
+  capacity: number;
+  currentStudents: number;
+  principalId?: string;
+  principalName?: string;
+  groups: Array<{
+    id: string;
+    name: string;
+    municipality: string;
+  }>;
+}
+
+interface Group {
+  id: string;
+  name: string;
+  municipality: string;
+  status: 'active' | 'inactive';
+}
+
+interface Principal {
+  id: string;
+  name: string;
+  email: string;
+}
 
 const SchoolUnits = () => {
   const { toast } = useToast();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isAddSchoolOpen, setIsAddSchoolOpen] = useState(false);
-  const [isEditSchoolOpen, setIsEditSchoolOpen] = useState(false);
-  const [selectedSchool, setSelectedSchool] = useState(null);
-  const [deleteSchoolId, setDeleteSchoolId] = useState(null);
-  
-  // Mock data for schools in the region
-  const [schools, setSchools] = useState([
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isLinkGroupDialogOpen, setIsLinkGroupDialogOpen] = useState(false);
+  const [isAssignPrincipalDialogOpen, setIsAssignPrincipalDialogOpen] = useState(false);
+  const [selectedSchoolUnit, setSelectedSchoolUnit] = useState<SchoolUnit | null>(null);
+
+  // Mock data
+  const [schoolUnits, setSchoolUnits] = useState<SchoolUnit[]>([
     {
-      id: 1,
-      name: "Malmö International School",
-      organizationNumber: "556789-1234",
-      address: "Storgatan 12, 211 34 Malmö",
-      phone: "040-123 45 67",
-      email: "info@malmointernational.se",
-      principalName: "Anna Andersson",
-      principalEmail: "anna.andersson@malmointernational.se",
-      type: "Independent",
-      students: 450,
-      status: "Active"
+      id: '1',
+      name: 'Stockholm Elementary School',
+      code: 'SES001',
+      type: 'elementary',
+      email: 'info@ses.stockholm.se',
+      phone: '+46 8 123 4567',
+      address: {
+        street: 'Skolvägen 10',
+        postalCode: '11122',
+        city: 'Stockholm',
+        country: 'Sweden'
+      },
+      municipality: 'Stockholm',
+      establishedDate: '1985-08-15',
+      status: 'active',
+      capacity: 500,
+      currentStudents: 450,
+      principalId: '1',
+      principalName: 'Anna Andersson',
+      groups: [
+        { id: '1', name: 'Stockholm Central Group', municipality: 'Stockholm' }
+      ]
     },
     {
-      id: 2,
-      name: "Malmö Science Academy",
-      organizationNumber: "556789-5678",
-      address: "Vetenskapsgatan 5, 211 45 Malmö",
-      phone: "040-234 56 78",
-      email: "info@malmoscience.se",
-      principalName: "Erik Johansson",
-      principalEmail: "erik.johansson@malmoscience.se",
-      type: "Independent",
-      students: 320,
-      status: "Active"
-    },
-    {
-      id: 3,
-      name: "Lund Technical School",
-      organizationNumber: "556789-9012",
-      address: "Teknikvägen 15, 223 62 Lund",
-      phone: "046-345 67 89",
-      email: "info@lundtech.se",
-      principalName: "Maria Nilsson",
-      principalEmail: "maria.nilsson@lundtech.se",
-      type: "Independent",
-      students: 280,
-      status: "Active"
+      id: '2',
+      name: 'Göteborg High School',
+      code: 'GHS002',
+      type: 'high',
+      email: 'contact@ghs.goteborg.se',
+      phone: '+46 31 987 6543',
+      address: {
+        street: 'Gymnasievägen 25',
+        postalCode: '41255',
+        city: 'Göteborg',
+        country: 'Sweden'
+      },
+      municipality: 'Göteborg',
+      establishedDate: '1972-01-10',
+      status: 'active',
+      capacity: 800,
+      currentStudents: 720,
+      groups: []
     }
   ]);
 
-  const [newSchool, setNewSchool] = useState({
-    name: "",
-    organizationNumber: "",
-    address: "",
-    phone: "",
-    email: "",
-    principalName: "",
-    principalEmail: "",
-    type: "Independent"
-  });
+  const [availableGroups] = useState<Group[]>([
+    { id: '1', name: 'Stockholm Central Group', municipality: 'Stockholm', status: 'active' },
+    { id: '2', name: 'Northern District Group', municipality: 'Stockholm', status: 'active' },
+    { id: '3', name: 'Göteborg West Group', municipality: 'Göteborg', status: 'active' },
+    { id: '4', name: 'Malmö South Group', municipality: 'Malmö', status: 'active' }
+  ]);
 
-  const filteredSchools = schools.filter(school =>
-    school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    school.organizationNumber.includes(searchTerm) ||
-    school.principalName.toLowerCase().includes(searchTerm.toLowerCase())
+  const [availablePrincipals] = useState<Principal[]>([
+    { id: '1', name: 'Anna Andersson', email: 'anna.andersson@example.com' },
+    { id: '2', name: 'Erik Eriksson', email: 'erik.eriksson@example.com' },
+    { id: '3', name: 'Maria Johansson', email: 'maria.johansson@example.com' }
+  ]);
+
+  const filteredSchoolUnits = schoolUnits.filter(unit =>
+    unit.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    unit.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    unit.municipality.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAddSchool = () => {
-    const schoolToAdd = {
-      ...newSchool,
-      id: schools.length + 1,
-      students: 0,
-      status: "Active"
-    };
-    setSchools([...schools, schoolToAdd]);
-    setNewSchool({
-      name: "",
-      organizationNumber: "",
-      address: "",
-      phone: "",
-      email: "",
-      principalName: "",
-      principalEmail: "",
-      type: "Independent"
-    });
-    setIsAddSchoolOpen(false);
-    toast({
-      title: "School Added",
-      description: `${newSchool.name} has been successfully added.`,
-    });
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'elementary': return 'bg-blue-100 text-blue-800';
+      case 'middle': return 'bg-green-100 text-green-800';
+      case 'high': return 'bg-purple-100 text-purple-800';
+      case 'special': return 'bg-orange-100 text-orange-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
-  const handleEditSchool = (school) => {
-    setSelectedSchool(school);
-    setIsEditSchoolOpen(true);
-  };
+  const handleLinkGroup = (schoolUnitId: string, groupId: string) => {
+    const group = availableGroups.find(g => g.id === groupId);
+    if (!group) return;
 
-  const handleUpdateSchool = () => {
-    setSchools(schools.map(school => 
-      school.id === selectedSchool.id ? selectedSchool : school
+    setSchoolUnits(prev => prev.map(unit => 
+      unit.id === schoolUnitId
+        ? {
+            ...unit,
+            groups: [...unit.groups, { id: group.id, name: group.name, municipality: group.municipality }]
+          }
+        : unit
     ));
-    setIsEditSchoolOpen(false);
-    setSelectedSchool(null);
+
     toast({
-      title: "School Updated",
-      description: `${selectedSchool.name} has been successfully updated.`,
+      title: "Group Linked",
+      description: `School unit has been linked to ${group.name}`,
     });
   };
 
-  const handleDeleteSchool = () => {
-    setSchools(schools.filter(school => school.id !== deleteSchoolId));
-    setDeleteSchoolId(null);
+  const handleUnlinkGroup = (schoolUnitId: string, groupId: string) => {
+    setSchoolUnits(prev => prev.map(unit => 
+      unit.id === schoolUnitId
+        ? {
+            ...unit,
+            groups: unit.groups.filter(g => g.id !== groupId)
+          }
+        : unit
+    ));
+
     toast({
-      title: "School Deleted",
-      description: "The school has been successfully deleted.",
-      variant: "destructive",
+      title: "Group Unlinked",
+      description: "School unit has been unlinked from the group",
     });
   };
 
-  const handleViewSchool = (school) => {
+  const handleAssignPrincipal = (schoolUnitId: string, principalId: string) => {
+    const principal = availablePrincipals.find(p => p.id === principalId);
+    if (!principal) return;
+
+    setSchoolUnits(prev => prev.map(unit => 
+      unit.id === schoolUnitId
+        ? {
+            ...unit,
+            principalId: principal.id,
+            principalName: principal.name
+          }
+        : unit
+    ));
+
     toast({
-      title: "School Details",
-      description: `Opening detailed view for ${school.name}`,
+      title: "Principal Assigned",
+      description: `${principal.name} has been assigned as principal`,
     });
+  };
+
+  const handleRemovePrincipal = (schoolUnitId: string) => {
+    setSchoolUnits(prev => prev.map(unit => 
+      unit.id === schoolUnitId
+        ? {
+            ...unit,
+            principalId: undefined,
+            principalName: undefined
+          }
+        : unit
+    ));
+
+    toast({
+      title: "Principal Removed",
+      description: "Principal has been removed from the school unit",
+    });
+  };
+
+  const handleEditSchoolUnit = (schoolUnit: SchoolUnit) => {
+    setSelectedSchoolUnit(schoolUnit);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteSchoolUnit = (schoolUnitId: string) => {
+    const schoolUnit = schoolUnits.find(u => u.id === schoolUnitId);
+    if (!schoolUnit) return;
+
+    if (window.confirm(`Are you sure you want to delete "${schoolUnit.name}"? This action cannot be undone.`)) {
+      setSchoolUnits(prev => prev.filter(u => u.id !== schoolUnitId));
+      toast({
+        title: "School Unit Deleted",
+        description: `${schoolUnit.name} has been deleted successfully`,
+      });
+    }
+  };
+
+  const openLinkDialog = (schoolUnit: SchoolUnit) => {
+    setSelectedSchoolUnit(schoolUnit);
+    setIsLinkGroupDialogOpen(true);
+  };
+
+  const openAssignPrincipalDialog = (schoolUnit: SchoolUnit) => {
+    setSelectedSchoolUnit(schoolUnit);
+    setIsAssignPrincipalDialogOpen(true);
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ike-primary">Regional School Units</h1>
-          <p className="text-ike-neutral">Manage all school units in your region</p>
+          <h1 className="text-3xl font-bold text-ike-primary">School Units Management</h1>
+          <p className="text-ike-neutral mt-2">
+            Manage school units, their affiliations, and principal assignments
+          </p>
         </div>
-        <Dialog open={isAddSchoolOpen} onOpenChange={setIsAddSchoolOpen}>
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-ike-primary hover:bg-ike-primary/90">
-              <Plus className="w-4 h-4 mr-2" />
+            <Button className="bg-ike-primary hover:bg-ike-primary-dark">
+              <Building2 className="w-4 h-4 mr-2" />
               Add School Unit
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>Add New School Unit</DialogTitle>
-              <DialogDescription>
-                Enter the details for the new school unit
-              </DialogDescription>
             </DialogHeader>
-            <div className="grid grid-cols-2 gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="schoolName">School Name</Label>
-                <Input
-                  id="schoolName"
-                  value={newSchool.name}
-                  onChange={(e) => setNewSchool({...newSchool, name: e.target.value})}
-                  placeholder="Enter school name"
-                />
+                <Label htmlFor="name">School Name</Label>
+                <Input id="name" placeholder="Enter school name" />
               </div>
               <div>
-                <Label htmlFor="orgNumber">Organization Number</Label>
-                <Input
-                  id="orgNumber"
-                  value={newSchool.organizationNumber}
-                  onChange={(e) => setNewSchool({...newSchool, organizationNumber: e.target.value})}
-                  placeholder="556789-1234"
-                />
-              </div>
-              <div className="col-span-2">
-                <Label htmlFor="address">Address</Label>
-                <Input
-                  id="address"
-                  value={newSchool.address}
-                  onChange={(e) => setNewSchool({...newSchool, address: e.target.value})}
-                  placeholder="Street address, postal code, city"
-                />
+                <Label htmlFor="code">School Code</Label>
+                <Input id="code" placeholder="Enter school code" />
               </div>
               <div>
-                <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  value={newSchool.phone}
-                  onChange={(e) => setNewSchool({...newSchool, phone: e.target.value})}
-                  placeholder="040-123 45 67"
-                />
+                <Label htmlFor="type">School Type</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="elementary">Elementary</SelectItem>
+                    <SelectItem value="middle">Middle School</SelectItem>
+                    <SelectItem value="high">High School</SelectItem>
+                    <SelectItem value="special">Special Education</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="municipality">Municipality</Label>
+                <Input id="municipality" placeholder="Enter municipality" />
               </div>
               <div>
                 <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={newSchool.email}
-                  onChange={(e) => setNewSchool({...newSchool, email: e.target.value})}
-                  placeholder="info@school.se"
-                />
+                <Input id="email" type="email" placeholder="school@example.com" />
               </div>
               <div>
-                <Label htmlFor="principalName">Principal Name</Label>
-                <Input
-                  id="principalName"
-                  value={newSchool.principalName}
-                  onChange={(e) => setNewSchool({...newSchool, principalName: e.target.value})}
-                  placeholder="Enter principal name"
-                />
+                <Label htmlFor="phone">Phone</Label>
+                <Input id="phone" placeholder="+46 8 123 4567" />
+              </div>
+              <div className="col-span-2">
+                <Label htmlFor="address">Address</Label>
+                <Textarea id="address" placeholder="Street, Postal Code, City, Country" />
               </div>
               <div>
-                <Label htmlFor="principalEmail">Principal Email</Label>
-                <Input
-                  id="principalEmail"
-                  type="email"
-                  value={newSchool.principalEmail}
-                  onChange={(e) => setNewSchool({...newSchool, principalEmail: e.target.value})}
-                  placeholder="principal@school.se"
-                />
+                <Label htmlFor="capacity">Capacity</Label>
+                <Input id="capacity" type="number" placeholder="500" />
+              </div>
+              <div>
+                <Label htmlFor="established">Established Date</Label>
+                <Input id="established" type="date" />
               </div>
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsAddSchoolOpen(false)}>
+            <div className="flex justify-end space-x-2 mt-4">
+              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleAddSchool} className="bg-ike-primary hover:bg-ike-primary/90">
-                Add School
+              <Button 
+                className="bg-ike-primary hover:bg-ike-primary-dark"
+                onClick={() => {
+                  setIsAddDialogOpen(false);
+                  toast({
+                    title: "School Unit Added",
+                    description: "New school unit has been added successfully",
+                  });
+                }}
+              >
+                Add School Unit
               </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <School className="w-5 h-5 text-ike-primary" />
-            School Units Management
-          </CardTitle>
-          <CardDescription>
-            Overview and management of all school units in your region
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ike-neutral" />
-            <Input
-              placeholder="Search schools..."
-              className="pl-10"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+      <div className="flex items-center space-x-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ike-neutral w-4 h-4" />
+          <Input
+            placeholder="Search school units..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>School Name</TableHead>
-                <TableHead>Organization Number</TableHead>
-                <TableHead>Principal</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Students</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredSchools.map((school) => (
-                <TableRow key={school.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Building className="w-4 h-4 text-ike-neutral" />
-                      <div>
-                        <div className="font-medium">{school.name}</div>
-                        <div className="text-sm text-ike-neutral">{school.type}</div>
-                      </div>
+      <div className="grid gap-6">
+        {filteredSchoolUnits.map((schoolUnit) => (
+          <Card key={schoolUnit.id} className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-ike-primary/10 rounded-full flex items-center justify-center">
+                    <Building2 className="w-6 h-6 text-ike-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-ike-primary">{schoolUnit.name}</CardTitle>
+                    <p className="text-sm text-ike-neutral">Code: {schoolUnit.code}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Badge className={getTypeColor(schoolUnit.type)}>
+                    {schoolUnit.type}
+                  </Badge>
+                  <Badge variant={schoolUnit.status === 'active' ? 'default' : 'secondary'}>
+                    {schoolUnit.status}
+                  </Badge>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleEditSchoolUnit(schoolUnit)}
+                  >
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleDeleteSchoolUnit(schoolUnit.id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-ike-primary">Contact Information</h4>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Mail className="w-4 h-4 text-ike-primary" />
+                    <span>{schoolUnit.email}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Phone className="w-4 h-4 text-ike-primary" />
+                    <span>{schoolUnit.phone}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <MapPin className="w-4 h-4 text-ike-primary" />
+                    <span>{schoolUnit.address.street}, {schoolUnit.address.city}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Calendar className="w-4 h-4 text-ike-primary" />
+                    <span>Est. {schoolUnit.establishedDate}</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-ike-primary">Statistics</h4>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Users className="w-4 h-4 text-ike-primary" />
+                    <span>Students: {schoolUnit.currentStudents}/{schoolUnit.capacity}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-ike-primary h-2 rounded-full" 
+                      style={{ width: `${(schoolUnit.currentStudents / schoolUnit.capacity) * 100}%` }}
+                    ></div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <h5 className="font-medium text-ike-primary flex items-center">
+                      <GraduationCap className="w-4 h-4 mr-2" />
+                      Principal
+                    </h5>
+                    {schoolUnit.principalName ? (
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleRemovePrincipal(schoolUnit.id)}
+                      >
+                        <Unlink className="w-4 h-4 mr-1" />
+                        Remove
+                      </Button>
+                    ) : (
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => openAssignPrincipalDialog(schoolUnit)}
+                      >
+                        <Plus className="w-4 h-4 mr-1" />
+                        Assign
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {schoolUnit.principalName ? (
+                    <p className="text-sm font-medium">{schoolUnit.principalName}</p>
+                  ) : (
+                    <p className="text-sm text-ike-neutral italic">No principal assigned</p>
+                  )}
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-ike-primary flex items-center">
+                      <Users className="w-4 h-4 mr-2" />
+                      Group Affiliations ({schoolUnit.groups.length})
+                    </h4>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => openLinkDialog(schoolUnit)}
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Link Group
+                    </Button>
+                  </div>
+                  
+                  {schoolUnit.groups.length === 0 ? (
+                    <p className="text-sm text-ike-neutral italic">No groups assigned</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {schoolUnit.groups.map((group) => (
+                        <div key={group.id} className="flex items-center justify-between p-2 bg-ike-neutral-light rounded">
+                          <div>
+                            <p className="font-medium text-sm">{group.name}</p>
+                            <p className="text-xs text-ike-neutral">{group.municipality}</p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleUnlinkGroup(schoolUnit.id, group.id)}
+                          >
+                            <Unlink className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ))}
                     </div>
-                  </TableCell>
-                  <TableCell>{school.organizationNumber}</TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{school.principalName}</div>
-                      <div className="text-sm text-ike-neutral">{school.principalEmail}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-ike-neutral" />
-                      <span className="text-sm">{school.address}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Users className="w-3 h-3 text-ike-neutral" />
-                      <span>{school.students}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className="bg-green-100 text-green-800">
-                      {school.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-white border shadow-lg">
-                        <DropdownMenuItem onClick={() => handleViewSchool(school)} className="flex items-center gap-2">
-                          <Eye className="h-4 w-4" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleEditSchool(school)} className="flex items-center gap-2">
-                          <Edit className="h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => setDeleteSchoolId(school.id)} 
-                          className="flex items-center gap-2 text-red-600"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-      {/* Edit School Dialog */}
-      <Dialog open={isEditSchoolOpen} onOpenChange={setIsEditSchoolOpen}>
+      {/* Edit School Unit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Edit School Unit</DialogTitle>
-            <DialogDescription>
-              Update the school unit information
-            </DialogDescription>
+            <DialogTitle>Edit School Unit - {selectedSchoolUnit?.name}</DialogTitle>
           </DialogHeader>
-          {selectedSchool && (
-            <div className="grid grid-cols-2 gap-4 py-4">
-              <div>
-                <Label htmlFor="editSchoolName">School Name</Label>
-                <Input
-                  id="editSchoolName"
-                  value={selectedSchool.name}
-                  onChange={(e) => setSelectedSchool({...selectedSchool, name: e.target.value})}
-                />
-              </div>
-              <div>
-                <Label htmlFor="editOrgNumber">Organization Number</Label>
-                <Input
-                  id="editOrgNumber"
-                  value={selectedSchool.organizationNumber}
-                  onChange={(e) => setSelectedSchool({...selectedSchool, organizationNumber: e.target.value})}
-                />
-              </div>
-              <div className="col-span-2">
-                <Label htmlFor="editAddress">Address</Label>
-                <Input
-                  id="editAddress"
-                  value={selectedSchool.address}
-                  onChange={(e) => setSelectedSchool({...selectedSchool, address: e.target.value})}
-                />
-              </div>
-              <div>
-                <Label htmlFor="editPhone">Phone</Label>
-                <Input
-                  id="editPhone"
-                  value={selectedSchool.phone}
-                  onChange={(e) => setSelectedSchool({...selectedSchool, phone: e.target.value})}
-                />
-              </div>
-              <div>
-                <Label htmlFor="editEmail">Email</Label>
-                <Input
-                  id="editEmail"
-                  type="email"
-                  value={selectedSchool.email}
-                  onChange={(e) => setSelectedSchool({...selectedSchool, email: e.target.value})}
-                />
-              </div>
-              <div>
-                <Label htmlFor="editPrincipalName">Principal Name</Label>
-                <Input
-                  id="editPrincipalName"
-                  value={selectedSchool.principalName}
-                  onChange={(e) => setSelectedSchool({...selectedSchool, principalName: e.target.value})}
-                />
-              </div>
-              <div>
-                <Label htmlFor="editPrincipalEmail">Principal Email</Label>
-                <Input
-                  id="editPrincipalEmail"
-                  type="email"
-                  value={selectedSchool.principalEmail}
-                  onChange={(e) => setSelectedSchool({...selectedSchool, principalEmail: e.target.value})}
-                />
-              </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="editName">School Name</Label>
+              <Input id="editName" defaultValue={selectedSchoolUnit?.name} placeholder="Enter school name" />
             </div>
-          )}
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsEditSchoolOpen(false)}>
+            <div>
+              <Label htmlFor="editCode">School Code</Label>
+              <Input id="editCode" defaultValue={selectedSchoolUnit?.code} placeholder="Enter school code" />
+            </div>
+            <div>
+              <Label htmlFor="editType">School Type</Label>
+              <Select defaultValue={selectedSchoolUnit?.type}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="elementary">Elementary</SelectItem>
+                  <SelectItem value="middle">Middle School</SelectItem>
+                  <SelectItem value="high">High School</SelectItem>
+                  <SelectItem value="special">Special Education</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="editMunicipality">Municipality</Label>
+              <Input id="editMunicipality" defaultValue={selectedSchoolUnit?.municipality} placeholder="Enter municipality" />
+            </div>
+            <div>
+              <Label htmlFor="editEmail">Email</Label>
+              <Input id="editEmail" type="email" defaultValue={selectedSchoolUnit?.email} placeholder="school@example.com" />
+            </div>
+            <div>
+              <Label htmlFor="editPhone">Phone</Label>
+              <Input id="editPhone" defaultValue={selectedSchoolUnit?.phone} placeholder="+46 8 123 4567" />
+            </div>
+            <div className="col-span-2">
+              <Label htmlFor="editAddress">Address</Label>
+              <Textarea 
+                id="editAddress" 
+                defaultValue={`${selectedSchoolUnit?.address?.street}, ${selectedSchoolUnit?.address?.postalCode} ${selectedSchoolUnit?.address?.city}, ${selectedSchoolUnit?.address?.country}`}
+                placeholder="Street, Postal Code, City, Country" 
+              />
+            </div>
+            <div>
+              <Label htmlFor="editCapacity">Capacity</Label>
+              <Input id="editCapacity" type="number" defaultValue={selectedSchoolUnit?.capacity} />
+            </div>
+            <div>
+              <Label htmlFor="editEstablished">Established Date</Label>
+              <Input id="editEstablished" type="date" defaultValue={selectedSchoolUnit?.establishedDate} />
+            </div>
+          </div>
+          <div className="flex justify-end space-x-2 mt-4">
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleUpdateSchool} className="bg-ike-primary hover:bg-ike-primary/90">
-              Update School
+            <Button 
+              className="bg-ike-primary hover:bg-ike-primary-dark"
+              onClick={() => {
+                setIsEditDialogOpen(false);
+                toast({
+                  title: "School Unit Updated",
+                  description: "School unit information has been updated successfully",
+                });
+              }}
+            >
+              Update School Unit
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deleteSchoolId} onOpenChange={() => setDeleteSchoolId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the school unit and remove all associated data.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteSchool} className="bg-red-600 hover:bg-red-700">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Link Group Dialog */}
+      <Dialog open={isLinkGroupDialogOpen} onOpenChange={setIsLinkGroupDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Link Group to {selectedSchoolUnit?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Label>Select Group</Label>
+            <Select onValueChange={(groupId) => {
+              if (selectedSchoolUnit) {
+                handleLinkGroup(selectedSchoolUnit.id, groupId);
+                setIsLinkGroupDialogOpen(false);
+              }
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a group to link" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableGroups
+                  .filter(group => !selectedSchoolUnit?.groups.some(g => g.id === group.id))
+                  .map((group) => (
+                    <SelectItem key={group.id} value={group.id}>
+                      {group.name} ({group.municipality})
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assign Principal Dialog */}
+      <Dialog open={isAssignPrincipalDialogOpen} onOpenChange={setIsAssignPrincipalDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Assign Principal to {selectedSchoolUnit?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Label>Select Principal</Label>
+            <Select onValueChange={(principalId) => {
+              if (selectedSchoolUnit) {
+                handleAssignPrincipal(selectedSchoolUnit.id, principalId);
+                setIsAssignPrincipalDialogOpen(false);
+              }
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a principal to assign" />
+              </SelectTrigger>
+              <SelectContent>
+                {availablePrincipals
+                  .filter(principal => !schoolUnits.some(unit => unit.principalId === principal.id))
+                  .map((principal) => (
+                    <SelectItem key={principal.id} value={principal.id}>
+                      {principal.name} ({principal.email})
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
