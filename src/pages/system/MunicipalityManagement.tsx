@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,13 +22,17 @@ import {
   Plus,
   Unlink,
   Link,
-  GraduationCap
+  GraduationCap,
+  DollarSign,
+  FileText,
+  Calculator
 } from "lucide-react";
 
 interface Municipality {
   id: string;
   name: string;
   code: string;
+  organizationNumber: string;
   region: string;
   email: string;
   phone: string;
@@ -44,6 +47,25 @@ interface Municipality {
   status: 'active' | 'inactive';
   population: number;
   area: number; // in km²
+  // Financial fields
+  priceList: {
+    id: string;
+    name: string;
+    version: string;
+    effectiveDate: string;
+  };
+  accounting: {
+    accountingSystem: string;
+    fiscalYearStart: string;
+    fiscalYearEnd: string;
+    currencyCode: string;
+  };
+  additionalAmount: {
+    amount: number;
+    description: string;
+    category: string;
+    effectiveDate: string;
+  };
   linkedGroups: Array<{
     id: string;
     name: string;
@@ -96,6 +118,7 @@ const MunicipalityManagement = () => {
       id: '1',
       name: 'Stockholm',
       code: 'STO001',
+      organizationNumber: '212000-1355',
       region: 'Stockholm County',
       email: 'info@stockholm.se',
       phone: '+46 8 508 290 00',
@@ -110,6 +133,24 @@ const MunicipalityManagement = () => {
       status: 'active',
       population: 975551,
       area: 188.0,
+      priceList: {
+        id: 'PL001',
+        name: 'Stockholm Standard Price List 2024',
+        version: '2.1',
+        effectiveDate: '2024-01-01'
+      },
+      accounting: {
+        accountingSystem: 'Raindance',
+        fiscalYearStart: '2024-01-01',
+        fiscalYearEnd: '2024-12-31',
+        currencyCode: 'SEK'
+      },
+      additionalAmount: {
+        amount: 15000,
+        description: 'Administrative fee for inter-municipal students',
+        category: 'Administrative',
+        effectiveDate: '2024-01-01'
+      },
       linkedGroups: [
         { id: '1', name: 'Stockholm Central Group' },
         { id: '2', name: 'Northern District Group' }
@@ -126,6 +167,7 @@ const MunicipalityManagement = () => {
       id: '2',
       name: 'Göteborg',
       code: 'GOT002',
+      organizationNumber: '212000-1447',
       region: 'Västra Götaland County',
       email: 'kontakt@goteborg.se',
       phone: '+46 31 365 00 00',
@@ -140,6 +182,24 @@ const MunicipalityManagement = () => {
       status: 'active',
       population: 583056,
       area: 203.7,
+      priceList: {
+        id: 'PL002',
+        name: 'Göteborg Standard Price List 2024',
+        version: '1.5',
+        effectiveDate: '2024-01-01'
+      },
+      accounting: {
+        accountingSystem: 'Agresso',
+        fiscalYearStart: '2024-01-01',
+        fiscalYearEnd: '2024-12-31',
+        currencyCode: 'SEK'
+      },
+      additionalAmount: {
+        amount: 12500,
+        description: 'Transportation supplement',
+        category: 'Transportation',
+        effectiveDate: '2024-01-01'
+      },
       linkedGroups: [
         { id: '3', name: 'Göteborg West Group' }
       ],
@@ -312,52 +372,176 @@ const MunicipalityManagement = () => {
               Add Municipality
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add New Municipality</DialogTitle>
             </DialogHeader>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">Municipality Name</Label>
-                <Input id="name" placeholder="Enter municipality name" />
-              </div>
-              <div>
-                <Label htmlFor="code">Municipality Code</Label>
-                <Input id="code" placeholder="Enter municipality code" />
-              </div>
-              <div>
-                <Label htmlFor="region">Region</Label>
-                <Input id="region" placeholder="Enter region" />
-              </div>
-              <div>
-                <Label htmlFor="website">Website</Label>
-                <Input id="website" placeholder="https://example.se" />
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="info@municipality.se" />
-              </div>
-              <div>
-                <Label htmlFor="phone">Phone</Label>
-                <Input id="phone" placeholder="+46 8 123 4567" />
-              </div>
-              <div className="col-span-2">
-                <Label htmlFor="address">Address</Label>
-                <Textarea id="address" placeholder="Street, Postal Code, City, Country" />
-              </div>
-              <div>
-                <Label htmlFor="population">Population</Label>
-                <Input id="population" type="number" placeholder="500000" />
-              </div>
-              <div>
-                <Label htmlFor="area">Area (km²)</Label>
-                <Input id="area" type="number" step="0.1" placeholder="188.0" />
-              </div>
-              <div>
-                <Label htmlFor="established">Established Date</Label>
-                <Input id="established" type="date" />
-              </div>
-            </div>
+            <Tabs defaultValue="basic" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="basic">Basic Information</TabsTrigger>
+                <TabsTrigger value="financial">Financial Details</TabsTrigger>
+                <TabsTrigger value="contact">Contact & Address</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="basic" className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="name">Municipality Name</Label>
+                    <Input id="name" placeholder="Enter municipality name" />
+                  </div>
+                  <div>
+                    <Label htmlFor="code">Municipality Code</Label>
+                    <Input id="code" placeholder="Enter municipality code" />
+                  </div>
+                  <div>
+                    <Label htmlFor="orgNumber">Organization Number</Label>
+                    <Input id="orgNumber" placeholder="XXXXXX-XXXX" />
+                  </div>
+                  <div>
+                    <Label htmlFor="region">Region</Label>
+                    <Input id="region" placeholder="Enter region" />
+                  </div>
+                  <div>
+                    <Label htmlFor="population">Population</Label>
+                    <Input id="population" type="number" placeholder="500000" />
+                  </div>
+                  <div>
+                    <Label htmlFor="area">Area (km²)</Label>
+                    <Input id="area" type="number" step="0.1" placeholder="188.0" />
+                  </div>
+                  <div>
+                    <Label htmlFor="established">Established Date</Label>
+                    <Input id="established" type="date" />
+                  </div>
+                  <div>
+                    <Label htmlFor="website">Website</Label>
+                    <Input id="website" placeholder="https://example.se" />
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="financial" className="space-y-4">
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold flex items-center">
+                      <FileText className="w-5 h-5 mr-2 text-ike-primary" />
+                      Price List
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="priceListName">Price List Name</Label>
+                        <Input id="priceListName" placeholder="Standard Price List 2024" />
+                      </div>
+                      <div>
+                        <Label htmlFor="priceListVersion">Version</Label>
+                        <Input id="priceListVersion" placeholder="1.0" />
+                      </div>
+                      <div>
+                        <Label htmlFor="priceListEffective">Effective Date</Label>
+                        <Input id="priceListEffective" type="date" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold flex items-center">
+                      <Calculator className="w-5 h-5 mr-2 text-ike-primary" />
+                      Accounting
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="accountingSystem">Accounting System</Label>
+                        <Select>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select accounting system" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="raindance">Raindance</SelectItem>
+                            <SelectItem value="agresso">Agresso</SelectItem>
+                            <SelectItem value="visma">Visma</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="currencyCode">Currency</Label>
+                        <Select>
+                          <SelectTrigger>
+                            <SelectValue placeholder="SEK" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="SEK">SEK</SelectItem>
+                            <SelectItem value="EUR">EUR</SelectItem>
+                            <SelectItem value="USD">USD</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="fiscalYearStart">Fiscal Year Start</Label>
+                        <Input id="fiscalYearStart" type="date" />
+                      </div>
+                      <div>
+                        <Label htmlFor="fiscalYearEnd">Fiscal Year End</Label>
+                        <Input id="fiscalYearEnd" type="date" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold flex items-center">
+                      <DollarSign className="w-5 h-5 mr-2 text-ike-primary" />
+                      Additional Amount
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="additionalAmount">Amount (SEK)</Label>
+                        <Input id="additionalAmount" type="number" placeholder="15000" />
+                      </div>
+                      <div>
+                        <Label htmlFor="additionalCategory">Category</Label>
+                        <Select>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="administrative">Administrative</SelectItem>
+                            <SelectItem value="transportation">Transportation</SelectItem>
+                            <SelectItem value="equipment">Equipment</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="additionalDescription">Description</Label>
+                        <Textarea id="additionalDescription" placeholder="Description of the additional amount" />
+                      </div>
+                      <div>
+                        <Label htmlFor="additionalEffective">Effective Date</Label>
+                        <Input id="additionalEffective" type="date" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="contact" className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" placeholder="info@municipality.se" />
+                  </div>
+                  <div>
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input id="phone" placeholder="+46 8 123 4567" />
+                  </div>
+                  <div className="col-span-2">
+                    <Label htmlFor="address">Address</Label>
+                    <Textarea id="address" placeholder="Street, Postal Code, City, Country" />
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+            
             <div className="flex justify-end space-x-2 mt-4">
               <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                 Cancel
@@ -406,7 +590,9 @@ const MunicipalityManagement = () => {
                   </div>
                   <div>
                     <CardTitle className="text-ike-primary">{municipality.name}</CardTitle>
-                    <p className="text-sm text-ike-neutral">Code: {municipality.code} • {municipality.region}</p>
+                    <p className="text-sm text-ike-neutral">
+                      Code: {municipality.code} • Org: {municipality.organizationNumber} • {municipality.region}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -431,7 +617,7 @@ const MunicipalityManagement = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div className="space-y-3">
                   <h4 className="font-semibold text-ike-primary">Contact Information</h4>
                   <div className="flex items-center space-x-2 text-sm">
@@ -470,6 +656,23 @@ const MunicipalityManagement = () => {
                     <Calendar className="w-4 h-4 text-ike-primary" />
                     <span>Est. {municipality.establishedDate}</span>
                   </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-ike-primary">Financial Information</h4>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <FileText className="w-4 h-4 text-ike-primary" />
+                    <span>{municipality.priceList.name} v{municipality.priceList.version}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Calculator className="w-4 h-4 text-ike-primary" />
+                    <span>{municipality.accounting.accountingSystem}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <DollarSign className="w-4 h-4 text-ike-primary" />
+                    <span>{municipality.additionalAmount.amount.toLocaleString()} SEK</span>
+                  </div>
+                  <p className="text-xs text-ike-neutral">{municipality.additionalAmount.description}</p>
                 </div>
               </div>
 
@@ -595,56 +798,150 @@ const MunicipalityManagement = () => {
 
       {/* Edit Municipality Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Municipality - {selectedMunicipality?.name}</DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="editName">Municipality Name</Label>
-              <Input id="editName" defaultValue={selectedMunicipality?.name} placeholder="Enter municipality name" />
-            </div>
-            <div>
-              <Label htmlFor="editCode">Municipality Code</Label>
-              <Input id="editCode" defaultValue={selectedMunicipality?.code} placeholder="Enter municipality code" />
-            </div>
-            <div>
-              <Label htmlFor="editRegion">Region</Label>
-              <Input id="editRegion" defaultValue={selectedMunicipality?.region} placeholder="Enter region" />
-            </div>
-            <div>
-              <Label htmlFor="editWebsite">Website</Label>
-              <Input id="editWebsite" defaultValue={selectedMunicipality?.website} placeholder="https://example.se" />
-            </div>
-            <div>
-              <Label htmlFor="editEmail">Email</Label>
-              <Input id="editEmail" type="email" defaultValue={selectedMunicipality?.email} placeholder="info@municipality.se" />
-            </div>
-            <div>
-              <Label htmlFor="editPhone">Phone</Label>
-              <Input id="editPhone" defaultValue={selectedMunicipality?.phone} placeholder="+46 8 123 4567" />
-            </div>
-            <div className="col-span-2">
-              <Label htmlFor="editAddress">Address</Label>
-              <Textarea 
-                id="editAddress" 
-                defaultValue={`${selectedMunicipality?.address?.street}, ${selectedMunicipality?.address?.postalCode} ${selectedMunicipality?.address?.city}, ${selectedMunicipality?.address?.country}`}
-                placeholder="Street, Postal Code, City, Country" 
-              />
-            </div>
-            <div>
-              <Label htmlFor="editPopulation">Population</Label>
-              <Input id="editPopulation" type="number" defaultValue={selectedMunicipality?.population} />
-            </div>
-            <div>
-              <Label htmlFor="editArea">Area (km²)</Label>
-              <Input id="editArea" type="number" step="0.1" defaultValue={selectedMunicipality?.area} />
-            </div>
-            <div>
-              <Label htmlFor="editEstablished">Established Date</Label>
-              <Input id="editEstablished" type="date" defaultValue={selectedMunicipality?.establishedDate} />
-            </div>
-          </div>
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="basic">Basic Information</TabsTrigger>
+              <TabsTrigger value="financial">Financial Details</TabsTrigger>
+              <TabsTrigger value="contact">Contact & Address</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="basic" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="editName">Municipality Name</Label>
+                  <Input id="editName" defaultValue={selectedMunicipality?.name} placeholder="Enter municipality name" />
+                </div>
+                <div>
+                  <Label htmlFor="editCode">Municipality Code</Label>
+                  <Input id="editCode" defaultValue={selectedMunicipality?.code} placeholder="Enter municipality code" />
+                </div>
+                <div>
+                  <Label htmlFor="editOrgNumber">Organization Number</Label>
+                  <Input id="editOrgNumber" defaultValue={selectedMunicipality?.organizationNumber} placeholder="XXXXXX-XXXX" />
+                </div>
+                <div>
+                  <Label htmlFor="editRegion">Region</Label>
+                  <Input id="editRegion" defaultValue={selectedMunicipality?.region} placeholder="Enter region" />
+                </div>
+                <div>
+                  <Label htmlFor="editPopulation">Population</Label>
+                  <Input id="editPopulation" type="number" defaultValue={selectedMunicipality?.population} />
+                </div>
+                <div>
+                  <Label htmlFor="editArea">Area (km²)</Label>
+                  <Input id="editArea" type="number" step="0.1" defaultValue={selectedMunicipality?.area} />
+                </div>
+                <div>
+                  <Label htmlFor="editEstablished">Established Date</Label>
+                  <Input id="editEstablished" type="date" defaultValue={selectedMunicipality?.establishedDate} />
+                </div>
+                <div>
+                  <Label htmlFor="editWebsite">Website</Label>
+                  <Input id="editWebsite" defaultValue={selectedMunicipality?.website} placeholder="https://example.se" />
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="financial" className="space-y-4">
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold flex items-center">
+                    <FileText className="w-5 h-5 mr-2 text-ike-primary" />
+                    Price List
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="editPriceListName">Price List Name</Label>
+                      <Input id="editPriceListName" defaultValue={selectedMunicipality?.priceList.name} />
+                    </div>
+                    <div>
+                      <Label htmlFor="editPriceListVersion">Version</Label>
+                      <Input id="editPriceListVersion" defaultValue={selectedMunicipality?.priceList.version} />
+                    </div>
+                    <div>
+                      <Label htmlFor="editPriceListEffective">Effective Date</Label>
+                      <Input id="editPriceListEffective" type="date" defaultValue={selectedMunicipality?.priceList.effectiveDate} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold flex items-center">
+                    <Calculator className="w-5 h-5 mr-2 text-ike-primary" />
+                    Accounting
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="editAccountingSystem">Accounting System</Label>
+                      <Input id="editAccountingSystem" defaultValue={selectedMunicipality?.accounting.accountingSystem} />
+                    </div>
+                    <div>
+                      <Label htmlFor="editCurrencyCode">Currency</Label>
+                      <Input id="editCurrencyCode" defaultValue={selectedMunicipality?.accounting.currencyCode} />
+                    </div>
+                    <div>
+                      <Label htmlFor="editFiscalYearStart">Fiscal Year Start</Label>
+                      <Input id="editFiscalYearStart" type="date" defaultValue={selectedMunicipality?.accounting.fiscalYearStart} />
+                    </div>
+                    <div>
+                      <Label htmlFor="editFiscalYearEnd">Fiscal Year End</Label>
+                      <Input id="editFiscalYearEnd" type="date" defaultValue={selectedMunicipality?.accounting.fiscalYearEnd} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold flex items-center">
+                    <DollarSign className="w-5 h-5 mr-2 text-ike-primary" />
+                    Additional Amount
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="editAdditionalAmount">Amount (SEK)</Label>
+                      <Input id="editAdditionalAmount" type="number" defaultValue={selectedMunicipality?.additionalAmount.amount} />
+                    </div>
+                    <div>
+                      <Label htmlFor="editAdditionalCategory">Category</Label>
+                      <Input id="editAdditionalCategory" defaultValue={selectedMunicipality?.additionalAmount.category} />
+                    </div>
+                    <div className="col-span-2">
+                      <Label htmlFor="editAdditionalDescription">Description</Label>
+                      <Textarea id="editAdditionalDescription" defaultValue={selectedMunicipality?.additionalAmount.description} />
+                    </div>
+                    <div>
+                      <Label htmlFor="editAdditionalEffective">Effective Date</Label>
+                      <Input id="editAdditionalEffective" type="date" defaultValue={selectedMunicipality?.additionalAmount.effectiveDate} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="contact" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="editEmail">Email</Label>
+                  <Input id="editEmail" type="email" defaultValue={selectedMunicipality?.email} />
+                </div>
+                <div>
+                  <Label htmlFor="editPhone">Phone</Label>
+                  <Input id="editPhone" defaultValue={selectedMunicipality?.phone} />
+                </div>
+                <div className="col-span-2">
+                  <Label htmlFor="editAddress">Address</Label>
+                  <Textarea 
+                    id="editAddress" 
+                    defaultValue={`${selectedMunicipality?.address?.street}, ${selectedMunicipality?.address?.postalCode} ${selectedMunicipality?.address?.city}, ${selectedMunicipality?.address?.country}`}
+                  />
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+          
           <div className="flex justify-end space-x-2 mt-4">
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
               Cancel
