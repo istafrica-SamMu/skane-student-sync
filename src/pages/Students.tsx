@@ -77,6 +77,7 @@ interface Student {
   principalPhone?: string;
   principalStartDate?: string;
   principalEndDate?: string;
+  personalSupplement?: string;
 }
 
 interface HistoryEntry {
@@ -365,6 +366,25 @@ const StudentForm = ({
         </div>
       </div>
 
+      {/* Personal Supplement */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-ike-neutral-dark border-b pb-2">Personal Supplement</h3>
+        <div>
+          <Label htmlFor="personalSupplement" className="text-ike-neutral">Additional Information</Label>
+          <textarea
+            id="personalSupplement"
+            value={formData.personalSupplement || ""}
+            onChange={(e) => setFormData({...formData, personalSupplement: e.target.value})}
+            className="w-full min-h-[100px] px-3 py-2 border border-ike-primary/20 rounded-md focus:outline-none focus:ring-2 focus:ring-ike-primary focus:border-transparent resize-vertical"
+            placeholder="Enter any additional information, notes, or special circumstances..."
+            rows={4}
+          />
+          <p className="text-sm text-ike-neutral mt-1">
+            This field can contain special circumstances, additional notes, or any supplementary information about the student.
+          </p>
+        </div>
+      </div>
+
       <DialogFooter>
         <Button type="button" variant="outline" onClick={resetForm}>
           Cancel
@@ -588,6 +608,19 @@ const StudentDetailsModal = ({
                 </div>
               </div>
             </div>
+
+            {/* Personal Supplement */}
+            {selectedStudent.personalSupplement && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-ike-neutral-dark border-b pb-2">Personal Supplement</h3>
+                <div className="bg-ike-neutral-light/30 p-4 rounded-lg">
+                  <label className="text-sm font-medium text-ike-neutral">Additional Information</label>
+                  <p className="text-ike-neutral-dark mt-2 whitespace-pre-wrap">
+                    {selectedStudent.personalSupplement}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         )}
         <DialogFooter>
@@ -626,7 +659,8 @@ const Students = () => {
       principalEmail: "erik.johansson@malmo.se",
       principalPhone: "040-123456",
       principalStartDate: "2023-01-01",
-      principalEndDate: "2025-12-31"
+      principalEndDate: "2025-12-31",
+      personalSupplement: "Additional information about Anna Svensson"
     },
     {
       id: 2,
@@ -646,7 +680,8 @@ const Students = () => {
       principalName: "Maria Lindberg",
       principalEmail: "maria.lindberg@jensen.se",
       principalPhone: "040-234567",
-      principalStartDate: "2022-08-01"
+      principalStartDate: "2022-08-01",
+      personalSupplement: "Additional information about Johan Andersson"
     },
     {
       id: 3,
@@ -666,7 +701,8 @@ const Students = () => {
       principalEmail: "peter.karlsson@borgarskola.se",
       principalPhone: "040-345678",
       principalStartDate: "2024-01-01",
-      principalEndDate: "2026-12-31"
+      principalEndDate: "2026-12-31",
+      personalSupplement: "Additional information about Lisa Nilsson"
     }
   ]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -697,7 +733,8 @@ const Students = () => {
     principalEmail: "",
     principalPhone: "",
     principalStartDate: "",
-    principalEndDate: ""
+    principalEndDate: "",
+    personalSupplement: ""
   });
   const [showStudentHistory, setShowStudentHistory] = useState(false);
   const [selectedStudentForHistory, setSelectedStudentForHistory] = useState<Student | null>(null);
@@ -744,7 +781,8 @@ const Students = () => {
       principalEmail: student.principalEmail || "",
       principalPhone: student.principalPhone || "",
       principalStartDate: student.principalStartDate || "",
-      principalEndDate: student.principalEndDate || ""
+      principalEndDate: student.principalEndDate || "",
+      personalSupplement: student.personalSupplement || ""
     });
     setEditingStudent(student);
     setShowStudentForm(true);
@@ -821,7 +859,8 @@ const Students = () => {
       principalEmail: formData.principalEmail || "",
       principalPhone: formData.principalPhone || "",
       principalStartDate: formData.principalStartDate || "",
-      principalEndDate: formData.principalEndDate || ""
+      principalEndDate: formData.principalEndDate || "",
+      personalSupplement: formData.personalSupplement || ""
     };
 
     if (editingStudent) {
@@ -882,7 +921,8 @@ const Students = () => {
       principalEmail: "",
       principalPhone: "",
       principalStartDate: "",
-      principalEndDate: ""
+      principalEndDate: "",
+      personalSupplement: ""
     });
     setEditingStudent(null);
     setShowStudentForm(false);
