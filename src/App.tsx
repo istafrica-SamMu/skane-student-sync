@@ -40,7 +40,7 @@ import MunicipalUserAdmin from "./pages/operations/MunicipalUserAdmin";
 import RegionalStatistics from "./pages/reports/RegionalStatistics";
 import MonthlyCompilation from "./pages/reports/MonthlyCompilation";
 import FinancialAnalysis from "./pages/reports/FinancialAnalysis";
-import ChangeTracking from "./pages/ChangeTracking";
+import ChangeTracking from "./pages/reports/ChangeTracking";
 import StudentLists from "./pages/reports/StudentLists";
 import SchoolFinancialReports from "./pages/reports/SchoolFinancialReports";
 import SchoolStatistics from "./pages/reports/SchoolStatistics";
