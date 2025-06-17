@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { ContactInfoCard } from "@/components/ContactInfoCard";
 import { ContactForm } from "@/components/ContactForm";
+import { CollaborationAreaCard } from "@/components/CollaborationAreaCard";
+import { CollaborationAreaForm } from "@/components/CollaborationAreaForm";
 import { 
   Building2, 
   Edit, 
@@ -195,6 +197,8 @@ const GroupManagement = () => {
     { id: '6', name: 'Malmö', code: '1280' },
     { id: '7', name: 'Lund', code: '1281' }
   ]);
+
+  const [collaborationAreas, setCollaborationAreas] = useState<CollaborationArea[]>([]);
 
   const filteredGroups = groups.filter(group =>
     group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
