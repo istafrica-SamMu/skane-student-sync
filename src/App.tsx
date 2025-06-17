@@ -29,6 +29,7 @@ import MunicipalityManagement from "./pages/system/MunicipalityManagement";
 import GroupManagement from "./pages/system/GroupManagement";
 import SchoolUnits from "./pages/system/SchoolUnits";
 import SchoolYears from "./pages/system/SchoolYears";
+import Support from "./pages/system/Support";
 import StudyPaths from "./pages/study-paths/StudyPaths";
 import PriceCodes from "./pages/study-paths/PriceCodes";
 import NationalPrograms from "./pages/study-paths/NationalPrograms";
@@ -39,7 +40,7 @@ import MunicipalUserAdmin from "./pages/operations/MunicipalUserAdmin";
 import RegionalStatistics from "./pages/reports/RegionalStatistics";
 import MonthlyCompilation from "./pages/reports/MonthlyCompilation";
 import FinancialAnalysis from "./pages/reports/FinancialAnalysis";
-import ChangeTracking from "./pages/reports/ChangeTracking";
+import ChangeTracking from "./pages/ChangeTracking";
 import StudentLists from "./pages/reports/StudentLists";
 import SchoolFinancialReports from "./pages/reports/SchoolFinancialReports";
 import SchoolStatistics from "./pages/reports/SchoolStatistics";
@@ -146,7 +147,7 @@ const AppContent = () => {
                 </ProtectedRoute>
               } />
               
-              {/* ... keep existing code (all other routes) */}
+              {/* System Management Routes */}
               <Route path="/system/users" element={
                 <ProtectedRoute>
                   <UserManagement />
@@ -175,6 +176,11 @@ const AppContent = () => {
               <Route path="/system/school-years" element={
                 <ProtectedRoute>
                   <SchoolYears />
+                </ProtectedRoute>
+              } />
+              <Route path="/system/support" element={
+                <ProtectedRoute>
+                  <Support />
                 </ProtectedRoute>
               } />
               <Route path="/study-paths" element={
