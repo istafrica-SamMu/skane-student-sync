@@ -66,6 +66,7 @@ import OrgAdminDashboard from "./pages/OrgAdminDashboard";
 import DevAdminDashboard from "./pages/DevAdminDashboard";
 import PrincipalManagement from "./pages/system/PrincipalManagement";
 import ContactOccasions from "./pages/kaa/ContactOccasions";
+import KAARegistry from "./pages/KAARegistry";
 
 const queryClient = new QueryClient();
 
@@ -118,6 +119,20 @@ const AppContent = () => {
                   {getDashboardComponent()}
                 </ProtectedRoute>
               } />
+              
+              {/* KAA Management Routes */}
+              <Route path="/kaa/registry" element={
+                <ProtectedRoute>
+                  <KAARegistry />
+                </ProtectedRoute>
+              } />
+              <Route path="/kaa/contacts" element={
+                <ProtectedRoute>
+                  <ContactOccasions />
+                </ProtectedRoute>
+              } />
+              
+              {/* ... keep existing code (all other routes) */}
               <Route path="/system/users" element={
                 <ProtectedRoute>
                   <UserManagement />
