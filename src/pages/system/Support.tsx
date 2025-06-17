@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
   HelpCircle, 
   FileText, 
@@ -34,16 +35,23 @@ import {
   Download,
   Play,
   Eye,
-  EyeOff
+  EyeOff,
+  MessageSquare,
+  Send
 } from "lucide-react";
 import { SupportDocument, SupportVideo, FAQ } from "@/types/support";
 
 const Support = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddDocument, setShowAddDocument] = useState(false);
   const [showAddVideo, setShowAddVideo] = useState(false);
   const [showAddFAQ, setShowAddFAQ] = useState(false);
+  const [showAskQuestion, setShowAskQuestion] = useState(false);
+
+  // Check if user has admin privileges
+  const isAdmin = user?.role === 'regional-admin' || user?.role === 'orgadmin' || user?.role === 'devadmin';
 
   // Mock data - in real implementation this would come from backend
   const [documents, setDocuments] = useState<SupportDocument[]>([
@@ -139,6 +147,12 @@ const Support = () => {
     isPublished: true
   });
 
+  const [newQuestion, setNewQuestion] = useState({
+    subject: "",
+    message: "",
+    category: "general" as const
+  });
+
   const handleAddDocument = () => {
     if (!newDocument.title || !newDocument.description) {
       toast({
@@ -157,7 +171,7 @@ const Support = () => {
       fileUrl: "/documents/" + (newDocument.file?.name || "document.pdf"),
       category: newDocument.category,
       uploadDate: new Date().toISOString().split('T')[0],
-      uploadedBy: "Current User",
+      uploadedBy: user?.name || "Current User",
       fileSize: newDocument.file ? `${(newDocument.file.size / 1024 / 1024).toFixed(1)} MB` : "Unknown"
     };
 
@@ -189,7 +203,7 @@ const Support = () => {
       category: newVideo.category,
       duration: newVideo.duration,
       uploadDate: new Date().toISOString().split('T')[0],
-      uploadedBy: "Current User"
+      uploadedBy: user?.name || "Current User"
     };
 
     setVideos([...videos, video]);
@@ -220,7 +234,7 @@ const Support = () => {
       isPublished: newFAQ.isPublished,
       createdDate: new Date().toISOString().split('T')[0],
       updatedDate: new Date().toISOString().split('T')[0],
-      createdBy: "Current User"
+      createdBy: user?.name || "Current User"
     };
 
     setFaqs([...faqs, faq]);
@@ -233,7 +247,28 @@ const Support = () => {
     });
   };
 
+  const handleAskQuestion = () => {
+    if (!newQuestion.subject || !newQuestion.message) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // In real implementation, this would send the question to support team
+    toast({
+      title: "Question Submitted",
+      description: "Your question has been sent to the support team. You will receive a response via email.",
+    });
+
+    setNewQuestion({ subject: "", message: "", category: "general" });
+    setShowAskQuestion(false);
+  };
+
   const toggleFAQPublished = (id: string) => {
+    if (!isAdmin) return;
     setFaqs(faqs.map(faq => 
       faq.id === id ? { ...faq, isPublished: !faq.isPublished } : faq
     ));
@@ -257,13 +292,24 @@ const Support = () => {
     return colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
+  // Filter FAQs for non-admin users (only show published)
+  const visibleFaqs = isAdmin ? faqs : faqs.filter(faq => faq.isPublished);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ike-primary">Support System</h1>
-          <p className="text-ike-neutral">Manage support documents, videos, and FAQs</p>
+          <h1 className="text-3xl font-bold text-ike-primary">Support Center</h1>
+          <p className="text-ike-neutral">
+            {isAdmin ? "Manage support documents, videos, and FAQs" : "Find help and resources for using the IKE system"}
+          </p>
         </div>
+        {!isAdmin && (
+          <Button onClick={() => setShowAskQuestion(true)}>
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Ask a Question
+          </Button>
+        )}
       </div>
 
       <div className="flex gap-4 mb-6">
@@ -301,13 +347,15 @@ const Support = () => {
                 <div>
                   <CardTitle>Support Documents</CardTitle>
                   <CardDescription>
-                    Manage user guides, policies, and technical documentation
+                    {isAdmin ? "Manage user guides, policies, and technical documentation" : "Download helpful documents and guides"}
                   </CardDescription>
                 </div>
-                <Button onClick={() => setShowAddDocument(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Document
-                </Button>
+                {isAdmin && (
+                  <Button onClick={() => setShowAddDocument(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Document
+                  </Button>
+                )}
               </div>
             </CardHeader>
             <CardContent>
@@ -336,12 +384,16 @@ const Support = () => {
                       <Button variant="outline" size="sm">
                         <Download className="w-4 h-4" />
                       </Button>
-                      <Button variant="outline" size="sm">
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      {isAdmin && (
+                        <>
+                          <Button variant="outline" size="sm">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -357,13 +409,15 @@ const Support = () => {
                 <div>
                   <CardTitle>Instructional Videos</CardTitle>
                   <CardDescription>
-                    Manage tutorial and training videos for users
+                    {isAdmin ? "Manage tutorial and training videos for users" : "Watch helpful video tutorials and guides"}
                   </CardDescription>
                 </div>
-                <Button onClick={() => setShowAddVideo(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Video
-                </Button>
+                {isAdmin && (
+                  <Button onClick={() => setShowAddVideo(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Video
+                  </Button>
+                )}
               </div>
             </CardHeader>
             <CardContent>
@@ -392,12 +446,16 @@ const Support = () => {
                       <Button variant="outline" size="sm">
                         <Play className="w-4 h-4" />
                       </Button>
-                      <Button variant="outline" size="sm">
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      {isAdmin && (
+                        <>
+                          <Button variant="outline" size="sm">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -413,18 +471,20 @@ const Support = () => {
                 <div>
                   <CardTitle>Frequently Asked Questions</CardTitle>
                   <CardDescription>
-                    Manage common questions and answers for users
+                    {isAdmin ? "Manage common questions and answers for users" : "Find answers to common questions"}
                   </CardDescription>
                 </div>
-                <Button onClick={() => setShowAddFAQ(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add FAQ
-                </Button>
+                {isAdmin && (
+                  <Button onClick={() => setShowAddFAQ(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add FAQ
+                  </Button>
+                )}
               </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {faqs.filter(faq => 
+                {visibleFaqs.filter(faq => 
                   faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
                   faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
                 ).map((faq) => (
@@ -435,34 +495,38 @@ const Support = () => {
                         <Badge className={getCategoryColor(faq.category)}>
                           {faq.category}
                         </Badge>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleFAQPublished(faq.id)}
-                          className="p-1"
-                        >
-                          {faq.isPublished ? (
-                            <Eye className="w-4 h-4 text-green-600" />
-                          ) : (
-                            <EyeOff className="w-4 h-4 text-gray-400" />
-                          )}
-                        </Button>
+                        {isAdmin && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleFAQPublished(faq.id)}
+                            className="p-1"
+                          >
+                            {faq.isPublished ? (
+                              <Eye className="w-4 h-4 text-green-600" />
+                            ) : (
+                              <EyeOff className="w-4 h-4 text-gray-400" />
+                            )}
+                          </Button>
+                        )}
                       </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
+                      {isAdmin && (
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
                     <h3 className="font-medium mb-2">{faq.question}</h3>
                     <p className="text-sm text-ike-neutral mb-3">{faq.answer}</p>
                     <div className="flex items-center gap-4 text-xs text-ike-neutral">
                       <span>Created: {faq.createdDate}</span>
                       <span>By: {faq.createdBy}</span>
-                      <span>Status: {faq.isPublished ? 'Published' : 'Draft'}</span>
+                      {isAdmin && <span>Status: {faq.isPublished ? 'Published' : 'Draft'}</span>}
                     </div>
                   </div>
                 ))}
@@ -472,183 +536,244 @@ const Support = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Add Document Dialog */}
-      <Dialog open={showAddDocument} onOpenChange={setShowAddDocument}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Add Support Document</DialogTitle>
-            <DialogDescription>
-              Upload a new document to help users with the system.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="docTitle" className="text-right">Title</Label>
-              <Input
-                id="docTitle"
-                className="col-span-3"
-                value={newDocument.title}
-                onChange={(e) => setNewDocument({...newDocument, title: e.target.value})}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="docDescription" className="text-right">Description</Label>
-              <Textarea
-                id="docDescription"
-                className="col-span-3"
-                value={newDocument.description}
-                onChange={(e) => setNewDocument({...newDocument, description: e.target.value})}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="docCategory" className="text-right">Category</Label>
-              <Select value={newDocument.category} onValueChange={(value: any) => setNewDocument({...newDocument, category: value})}>
-                <SelectTrigger className="col-span-3">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="user-guide">User Guide</SelectItem>
-                  <SelectItem value="technical">Technical</SelectItem>
-                  <SelectItem value="policy">Policy</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="docFile" className="text-right">File</Label>
-              <Input
-                id="docFile"
-                type="file"
-                className="col-span-3"
-                onChange={(e) => setNewDocument({...newDocument, file: e.target.files?.[0] || null})}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddDocument(false)}>Cancel</Button>
-            <Button onClick={handleAddDocument}>Add Document</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Admin Dialogs */}
+      {isAdmin && (
+        <>
+          {/* Add Document Dialog */}
+          <Dialog open={showAddDocument} onOpenChange={setShowAddDocument}>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>Add Support Document</DialogTitle>
+                <DialogDescription>
+                  Upload a new document to help users with the system.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="docTitle" className="text-right">Title</Label>
+                  <Input
+                    id="docTitle"
+                    className="col-span-3"
+                    value={newDocument.title}
+                    onChange={(e) => setNewDocument({...newDocument, title: e.target.value})}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="docDescription" className="text-right">Description</Label>
+                  <Textarea
+                    id="docDescription"
+                    className="col-span-3"
+                    value={newDocument.description}
+                    onChange={(e) => setNewDocument({...newDocument, description: e.target.value})}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="docCategory" className="text-right">Category</Label>
+                  <Select value={newDocument.category} onValueChange={(value: any) => setNewDocument({...newDocument, category: value})}>
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="user-guide">User Guide</SelectItem>
+                      <SelectItem value="technical">Technical</SelectItem>
+                      <SelectItem value="policy">Policy</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="docFile" className="text-right">File</Label>
+                  <Input
+                    id="docFile"
+                    type="file"
+                    className="col-span-3"
+                    onChange={(e) => setNewDocument({...newDocument, file: e.target.files?.[0] || null})}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowAddDocument(false)}>Cancel</Button>
+                <Button onClick={handleAddDocument}>Add Document</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
-      {/* Add Video Dialog */}
-      <Dialog open={showAddVideo} onOpenChange={setShowAddVideo}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Add Instructional Video</DialogTitle>
-            <DialogDescription>
-              Add a new video to help users learn the system.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="videoTitle" className="text-right">Title</Label>
-              <Input
-                id="videoTitle"
-                className="col-span-3"
-                value={newVideo.title}
-                onChange={(e) => setNewVideo({...newVideo, title: e.target.value})}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="videoDescription" className="text-right">Description</Label>
-              <Textarea
-                id="videoDescription"
-                className="col-span-3"
-                value={newVideo.description}
-                onChange={(e) => setNewVideo({...newVideo, description: e.target.value})}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="videoUrl" className="text-right">Video URL</Label>
-              <Input
-                id="videoUrl"
-                className="col-span-3"
-                placeholder="https://..."
-                value={newVideo.videoUrl}
-                onChange={(e) => setNewVideo({...newVideo, videoUrl: e.target.value})}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="videoCategory" className="text-right">Category</Label>
-              <Select value={newVideo.category} onValueChange={(value: any) => setNewVideo({...newVideo, category: value})}>
-                <SelectTrigger className="col-span-3">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="tutorial">Tutorial</SelectItem>
-                  <SelectItem value="overview">Overview</SelectItem>
-                  <SelectItem value="feature-demo">Feature Demo</SelectItem>
-                  <SelectItem value="troubleshooting">Troubleshooting</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="videoDuration" className="text-right">Duration</Label>
-              <Input
-                id="videoDuration"
-                className="col-span-3"
-                placeholder="e.g., 5:32"
-                value={newVideo.duration}
-                onChange={(e) => setNewVideo({...newVideo, duration: e.target.value})}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddVideo(false)}>Cancel</Button>
-            <Button onClick={handleAddVideo}>Add Video</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          {/* Add Video Dialog */}
+          <Dialog open={showAddVideo} onOpenChange={setShowAddVideo}>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>Add Instructional Video</DialogTitle>
+                <DialogDescription>
+                  Add a new video to help users learn the system.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="videoTitle" className="text-right">Title</Label>
+                  <Input
+                    id="videoTitle"
+                    className="col-span-3"
+                    value={newVideo.title}
+                    onChange={(e) => setNewVideo({...newVideo, title: e.target.value})}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="videoDescription" className="text-right">Description</Label>
+                  <Textarea
+                    id="videoDescription"
+                    className="col-span-3"
+                    value={newVideo.description}
+                    onChange={(e) => setNewVideo({...newVideo, description: e.target.value})}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="videoUrl" className="text-right">Video URL</Label>
+                  <Input
+                    id="videoUrl"
+                    className="col-span-3"
+                    placeholder="https://..."
+                    value={newVideo.videoUrl}
+                    onChange={(e) => setNewVideo({...newVideo, videoUrl: e.target.value})}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="videoCategory" className="text-right">Category</Label>
+                  <Select value={newVideo.category} onValueChange={(value: any) => setNewVideo({...newVideo, category: value})}>
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="tutorial">Tutorial</SelectItem>
+                      <SelectItem value="overview">Overview</SelectItem>
+                      <SelectItem value="feature-demo">Feature Demo</SelectItem>
+                      <SelectItem value="troubleshooting">Troubleshooting</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="videoDuration" className="text-right">Duration</Label>
+                  <Input
+                    id="videoDuration"
+                    className="col-span-3"
+                    placeholder="e.g., 5:32"
+                    value={newVideo.duration}
+                    onChange={(e) => setNewVideo({...newVideo, duration: e.target.value})}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowAddVideo(false)}>Cancel</Button>
+                <Button onClick={handleAddVideo}>Add Video</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
-      {/* Add FAQ Dialog */}
-      <Dialog open={showAddFAQ} onOpenChange={setShowAddFAQ}>
+          {/* Add FAQ Dialog */}
+          <Dialog open={showAddFAQ} onOpenChange={setShowAddFAQ}>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>Add FAQ</DialogTitle>
+                <DialogDescription>
+                  Create a new frequently asked question and answer.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="faqQuestion" className="text-right">Question</Label>
+                  <Textarea
+                    id="faqQuestion"
+                    className="col-span-3"
+                    value={newFAQ.question}
+                    onChange={(e) => setNewFAQ({...newFAQ, question: e.target.value})}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="faqAnswer" className="text-right">Answer</Label>
+                  <Textarea
+                    id="faqAnswer"
+                    className="col-span-3"
+                    rows={4}
+                    value={newFAQ.answer}
+                    onChange={(e) => setNewFAQ({...newFAQ, answer: e.target.value})}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="faqCategory" className="text-right">Category</Label>
+                  <Select value={newFAQ.category} onValueChange={(value: any) => setNewFAQ({...newFAQ, category: value})}>
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="general">General</SelectItem>
+                      <SelectItem value="technical">Technical</SelectItem>
+                      <SelectItem value="account">Account</SelectItem>
+                      <SelectItem value="permissions">Permissions</SelectItem>
+                      <SelectItem value="data">Data</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowAddFAQ(false)}>Cancel</Button>
+                <Button onClick={handleAddFAQ}>Add FAQ</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
+
+      {/* Ask Question Dialog for regular users */}
+      <Dialog open={showAskQuestion} onOpenChange={setShowAskQuestion}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Add FAQ</DialogTitle>
+            <DialogTitle>Ask a Question</DialogTitle>
             <DialogDescription>
-              Create a new frequently asked question and answer.
+              Submit a question to our support team. We'll respond via email.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="faqQuestion" className="text-right">Question</Label>
-              <Textarea
-                id="faqQuestion"
+              <Label htmlFor="questionSubject" className="text-right">Subject</Label>
+              <Input
+                id="questionSubject"
                 className="col-span-3"
-                value={newFAQ.question}
-                onChange={(e) => setNewFAQ({...newFAQ, question: e.target.value})}
+                value={newQuestion.subject}
+                onChange={(e) => setNewQuestion({...newQuestion, subject: e.target.value})}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="faqAnswer" className="text-right">Answer</Label>
-              <Textarea
-                id="faqAnswer"
-                className="col-span-3"
-                rows={4}
-                value={newFAQ.answer}
-                onChange={(e) => setNewFAQ({...newFAQ, answer: e.target.value})}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="faqCategory" className="text-right">Category</Label>
-              <Select value={newFAQ.category} onValueChange={(value: any) => setNewFAQ({...newFAQ, category: value})}>
+              <Label htmlFor="questionCategory" className="text-right">Category</Label>
+              <Select value={newQuestion.category} onValueChange={(value: any) => setNewQuestion({...newQuestion, category: value})}>
                 <SelectTrigger className="col-span-3">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="general">General</SelectItem>
-                  <SelectItem value="technical">Technical</SelectItem>
-                  <SelectItem value="account">Account</SelectItem>
-                  <SelectItem value="permissions">Permissions</SelectItem>
-                  <SelectItem value="data">Data</SelectItem>
+                  <SelectItem value="technical">Technical Issue</SelectItem>
+                  <SelectItem value="account">Account Issue</SelectItem>
+                  <SelectItem value="permissions">Access/Permissions</SelectItem>
+                  <SelectItem value="data">Data Question</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="questionMessage" className="text-right pt-2">Message</Label>
+              <Textarea
+                id="questionMessage"
+                className="col-span-3"
+                rows={5}
+                placeholder="Please describe your question or issue in detail..."
+                value={newQuestion.message}
+                onChange={(e) => setNewQuestion({...newQuestion, message: e.target.value})}
+              />
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddFAQ(false)}>Cancel</Button>
-            <Button onClick={handleAddFAQ}>Add FAQ</Button>
+            <Button variant="outline" onClick={() => setShowAskQuestion(false)}>Cancel</Button>
+            <Button onClick={handleAskQuestion}>
+              <Send className="w-4 h-4 mr-2" />
+              Send Question
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
