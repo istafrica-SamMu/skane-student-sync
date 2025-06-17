@@ -109,7 +109,9 @@ const GroupManagement = () => {
   const [isLinkPrincipalDialogOpen, setIsLinkPrincipalDialogOpen] = useState(false);
   const [isLinkSchoolDialogOpen, setIsLinkSchoolDialogOpen] = useState(false);
   const [isCollaborationAreaDialogOpen, setIsCollaborationAreaDialogOpen] = useState(false);
+  const [isEditCollaborationAreaDialogOpen, setIsEditCollaborationAreaDialogOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const [selectedCollaborationArea, setSelectedCollaborationArea] = useState<CollaborationArea | null>(null);
 
   // Enhanced mock data with new fields
   const [groups, setGroups] = useState<Group[]>([
@@ -363,6 +365,37 @@ const GroupManagement = () => {
     toast({
       title: "Collaboration Area Created",
       description: `${newArea.name} has been created successfully`,
+    });
+  };
+
+  const handleEditCollaborationArea = (area: CollaborationArea) => {
+    setSelectedCollaborationArea(area);
+    setIsEditCollaborationAreaDialogOpen(true);
+  };
+
+  const handleUpdateCollaborationArea = (areaData: any) => {
+    if (!selectedCollaborationArea) return;
+
+    const updatedArea: CollaborationArea = {
+      ...selectedCollaborationArea,
+      name: areaData.name,
+      region: areaData.region,
+      description: areaData.description,
+      municipalities: availableMunicipalities.filter(m => areaData.municipalityIds.includes(m.id)),
+      status: areaData.status,
+      coordinatorName: areaData.coordinatorName,
+      coordinatorEmail: areaData.coordinatorEmail
+    };
+
+    setCollaborationAreas(prev => prev.map(area => 
+      area.id === selectedCollaborationArea.id ? updatedArea : area
+    ));
+
+    setIsEditCollaborationAreaDialogOpen(false);
+    setSelectedCollaborationArea(null);
+    toast({
+      title: "Collaboration Area Updated",
+      description: `${updatedArea.name} has been updated successfully`,
     });
   };
 
@@ -907,6 +940,7 @@ const GroupManagement = () => {
                 <CollaborationAreaCard
                   key={area.id}
                   area={area}
+                  onEdit={() => handleEditCollaborationArea(area)}
                   onRemoveMunicipality={(municipalityId) => handleRemoveMunicipalityFromArea(area.id, municipalityId)}
                 />
               ))
@@ -1182,6 +1216,35 @@ const GroupManagement = () => {
               </SelectContent>
             </Select>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Collaboration Area Dialog */}
+      <Dialog open={isEditCollaborationAreaDialogOpen} onOpenChange={setIsEditCollaborationAreaDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-ike-primary">Edit Collaboration Area - {selectedCollaborationArea?.name}</DialogTitle>
+          </DialogHeader>
+          {selectedCollaborationArea && (
+            <CollaborationAreaForm
+              initialData={{
+                name: selectedCollaborationArea.name,
+                region: selectedCollaborationArea.region,
+                description: selectedCollaborationArea.description || '',
+                coordinatorName: selectedCollaborationArea.coordinatorName,
+                coordinatorEmail: selectedCollaborationArea.coordinatorEmail,
+                status: selectedCollaborationArea.status,
+                municipalityIds: selectedCollaborationArea.municipalities.map(m => m.id),
+              }}
+              onSubmit={handleUpdateCollaborationArea}
+              onCancel={() => {
+                setIsEditCollaborationAreaDialogOpen(false);
+                setSelectedCollaborationArea(null);
+              }}
+              availableMunicipalities={availableMunicipalities}
+              isEditing={true}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>

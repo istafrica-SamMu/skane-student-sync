@@ -29,13 +29,15 @@ interface CollaborationAreaFormProps {
   onSubmit: (data: CollaborationAreaFormData) => void;
   onCancel: () => void;
   availableMunicipalities: Municipality[];
+  isEditing?: boolean;
 }
 
 export const CollaborationAreaForm = ({ 
   initialData, 
   onSubmit, 
   onCancel, 
-  availableMunicipalities 
+  availableMunicipalities,
+  isEditing = false
 }: CollaborationAreaFormProps) => {
   const [formData, setFormData] = useState<CollaborationAreaFormData>({
     name: initialData?.name || '',
@@ -241,7 +243,7 @@ export const CollaborationAreaForm = ({
           Cancel
         </Button>
         <Button onClick={handleSubmit} className="bg-ike-primary hover:bg-ike-primary-dark">
-          Save Collaboration Area
+          {isEditing ? 'Update Collaboration Area' : 'Save Collaboration Area'}
         </Button>
       </div>
     </div>
