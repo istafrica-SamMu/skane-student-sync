@@ -338,11 +338,6 @@ export const schoolAdminMenu: MenuItem[] = [
         url: "/reports/financial",
         icon: DollarSign,
       },
-      {
-        title: "School Statistics",
-        url: "/reports/statistics",
-        icon: BarChart3,
-      },
     ],
   },
   {
