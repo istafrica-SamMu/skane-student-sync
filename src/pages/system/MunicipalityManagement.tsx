@@ -1,155 +1,299 @@
 
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Building, Plus, Users, School, Edit, Trash2, MoreVertical, MapPin, Phone, Mail, Euro, Calculator } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { 
+  MapPin, 
+  Edit, 
+  Trash2, 
+  Mail, 
+  Phone, 
+  Users,
+  Building2,
+  Calendar,
+  Search,
+  Plus,
+  Unlink,
+  Link,
+  GraduationCap
+} from "lucide-react";
+
+interface Municipality {
+  id: string;
+  name: string;
+  code: string;
+  region: string;
+  email: string;
+  phone: string;
+  address: {
+    street: string;
+    postalCode: string;
+    city: string;
+    country: string;
+  };
+  website?: string;
+  establishedDate: string;
+  status: 'active' | 'inactive';
+  population: number;
+  area: number; // in km²
+  linkedGroups: Array<{
+    id: string;
+    name: string;
+  }>;
+  linkedSchools: Array<{
+    id: string;
+    name: string;
+    type: string;
+  }>;
+  linkedPrincipals: Array<{
+    id: string;
+    name: string;
+  }>;
+}
+
+interface Group {
+  id: string;
+  name: string;
+  municipality: string;
+  status: 'active' | 'inactive';
+}
+
+interface SchoolUnit {
+  id: string;
+  name: string;
+  type: string;
+  municipality: string;
+  status: 'active' | 'inactive';
+}
+
+interface Principal {
+  id: string;
+  name: string;
+  email: string;
+}
 
 const MunicipalityManagement = () => {
   const { toast } = useToast();
-  const [isAddMunicipalityOpen, setIsAddMunicipalityOpen] = useState(false);
-  const [isEditMunicipalityOpen, setIsEditMunicipalityOpen] = useState(false);
-  const [selectedMunicipality, setSelectedMunicipality] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRegion, setSelectedRegion] = useState<string>('all');
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+  const [selectedMunicipality, setSelectedMunicipality] = useState<Municipality | null>(null);
+  const [linkType, setLinkType] = useState<'groups' | 'schools' | 'principals'>('groups');
 
-  const [municipalities, setMunicipalities] = useState([
+  // Mock data
+  const [municipalities, setMunicipalities] = useState<Municipality[]>([
     {
-      id: 1,
-      name: "Malmö Municipality",
-      code: "MAL",
-      organizationNumber: "212000-1124",
-      schools: 45,
-      students: 12500,
-      administrators: 8,
-      status: "Active",
-      contactPersons: [
-        { name: "Anna Svensson", role: "Administrator", email: "anna.svensson@malmo.se", phone: "+46 40 123 456" }
-      ],
-      postalAddress: {
-        street: "Stortorget 1",
-        postalCode: "211 34",
-        city: "Malmö",
-        country: "Sweden"
+      id: '1',
+      name: 'Stockholm',
+      code: 'STO001',
+      region: 'Stockholm County',
+      email: 'info@stockholm.se',
+      phone: '+46 8 508 290 00',
+      address: {
+        street: 'Stadshuset',
+        postalCode: '10520',
+        city: 'Stockholm',
+        country: 'Sweden'
       },
-      priceList: "Standard 2024",
-      accounting: "Account Group A",
-      additionalAmount: 0
+      website: 'https://stockholm.se',
+      establishedDate: '1252-01-01',
+      status: 'active',
+      population: 975551,
+      area: 188.0,
+      linkedGroups: [
+        { id: '1', name: 'Stockholm Central Group' },
+        { id: '2', name: 'Northern District Group' }
+      ],
+      linkedSchools: [
+        { id: '1', name: 'Stockholm Elementary School', type: 'elementary' },
+        { id: '3', name: 'Stockholm High School', type: 'high' }
+      ],
+      linkedPrincipals: [
+        { id: '1', name: 'Anna Andersson' }
+      ]
     },
     {
-      id: 2,
-      name: "Lund Municipality",
-      code: "LUN",
-      organizationNumber: "212000-1231",
-      schools: 28,
-      students: 8200,
-      administrators: 5,
-      status: "Active",
-      contactPersons: [
-        { name: "Erik Lindqvist", role: "Administrator", email: "erik.lindqvist@lund.se", phone: "+46 46 789 123" }
-      ],
-      postalAddress: {
-        street: "Stora Södergatan 17",
-        postalCode: "222 23",
-        city: "Lund",
-        country: "Sweden"
+      id: '2',
+      name: 'Göteborg',
+      code: 'GOT002',
+      region: 'Västra Götaland County',
+      email: 'kontakt@goteborg.se',
+      phone: '+46 31 365 00 00',
+      address: {
+        street: 'Stadshuset',
+        postalCode: '40420',
+        city: 'Göteborg',
+        country: 'Sweden'
       },
-      priceList: "Standard 2024",
-      accounting: "Account Group B",
-      additionalAmount: 5000
-    },
-    {
-      id: 3,
-      name: "Helsingborg Municipality",
-      code: "HEL",
-      organizationNumber: "212000-1347",
-      schools: 38,
-      students: 11000,
-      administrators: 7,
-      status: "Active",
-      contactPersons: [
-        { name: "Maria Johansson", role: "Administrator", email: "maria.johansson@helsingborg.se", phone: "+46 42 456 789" }
+      website: 'https://goteborg.se',
+      establishedDate: '1621-01-01',
+      status: 'active',
+      population: 583056,
+      area: 203.7,
+      linkedGroups: [
+        { id: '3', name: 'Göteborg West Group' }
       ],
-      postalAddress: {
-        street: "Drottninggatan 1",
-        postalCode: "251 89",
-        city: "Helsingborg",
-        country: "Sweden"
-      },
-      priceList: "Enhanced 2024",
-      accounting: "Account Group C",
-      additionalAmount: 2500
+      linkedSchools: [
+        { id: '2', name: 'Göteborg High School', type: 'high' }
+      ],
+      linkedPrincipals: []
     }
   ]);
 
-  const handleAddMunicipality = () => {
+  const [availableGroups] = useState<Group[]>([
+    { id: '1', name: 'Stockholm Central Group', municipality: 'Stockholm', status: 'active' },
+    { id: '2', name: 'Northern District Group', municipality: 'Stockholm', status: 'active' },
+    { id: '3', name: 'Göteborg West Group', municipality: 'Göteborg', status: 'active' },
+    { id: '4', name: 'Malmö South Group', municipality: 'Malmö', status: 'active' }
+  ]);
+
+  const [availableSchools] = useState<SchoolUnit[]>([
+    { id: '1', name: 'Stockholm Elementary School', type: 'elementary', municipality: 'Stockholm', status: 'active' },
+    { id: '2', name: 'Göteborg High School', type: 'high', municipality: 'Göteborg', status: 'active' },
+    { id: '3', name: 'Stockholm High School', type: 'high', municipality: 'Stockholm', status: 'active' }
+  ]);
+
+  const [availablePrincipals] = useState<Principal[]>([
+    { id: '1', name: 'Anna Andersson', email: 'anna.andersson@example.com' },
+    { id: '2', name: 'Erik Eriksson', email: 'erik.eriksson@example.com' },
+    { id: '3', name: 'Maria Johansson', email: 'maria.johansson@example.com' }
+  ]);
+
+  const regions = [...new Set(municipalities.map(m => m.region))];
+
+  const filteredMunicipalities = municipalities.filter(municipality => {
+    const matchesSearch = municipality.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         municipality.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         municipality.region.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRegion = selectedRegion === 'all' || municipality.region === selectedRegion;
+    return matchesSearch && matchesRegion;
+  });
+
+  const handleLink = (municipalityId: string, entityId: string, type: 'groups' | 'schools' | 'principals') => {
+    let entity;
+    if (type === 'groups') {
+      entity = availableGroups.find(g => g.id === entityId);
+    } else if (type === 'schools') {
+      entity = availableSchools.find(s => s.id === entityId);
+    } else {
+      entity = availablePrincipals.find(p => p.id === entityId);
+    }
+    
+    if (!entity) return;
+
+    setMunicipalities(prev => prev.map(municipality => {
+      if (municipality.id === municipalityId) {
+        const updated = { ...municipality };
+        if (type === 'groups') {
+          updated.linkedGroups = [...updated.linkedGroups, { id: entity.id, name: entity.name }];
+        } else if (type === 'schools') {
+          updated.linkedSchools = [...updated.linkedSchools, { 
+            id: entity.id, 
+            name: entity.name, 
+            type: (entity as SchoolUnit).type 
+          }];
+        } else {
+          updated.linkedPrincipals = [...updated.linkedPrincipals, { id: entity.id, name: entity.name }];
+        }
+        return updated;
+      }
+      return municipality;
+    }));
+
     toast({
-      title: "Municipality Added",
-      description: "New municipality has been successfully added to the system.",
+      title: `${type.charAt(0).toUpperCase() + type.slice(1, -1)} Linked`,
+      description: `${entity.name} has been linked to the municipality`,
     });
-    setIsAddMunicipalityOpen(false);
   };
 
-  const handleEditMunicipality = (municipality) => {
+  const handleUnlink = (municipalityId: string, entityId: string, type: 'groups' | 'schools' | 'principals') => {
+    setMunicipalities(prev => prev.map(municipality => {
+      if (municipality.id === municipalityId) {
+        const updated = { ...municipality };
+        if (type === 'groups') {
+          updated.linkedGroups = updated.linkedGroups.filter(g => g.id !== entityId);
+        } else if (type === 'schools') {
+          updated.linkedSchools = updated.linkedSchools.filter(s => s.id !== entityId);
+        } else {
+          updated.linkedPrincipals = updated.linkedPrincipals.filter(p => p.id !== entityId);
+        }
+        return updated;
+      }
+      return municipality;
+    }));
+
+    toast({
+      title: `${type.charAt(0).toUpperCase() + type.slice(1, -1)} Unlinked`,
+      description: `${type.charAt(0).toUpperCase() + type.slice(1, -1)} has been unlinked from the municipality`,
+    });
+  };
+
+  const handleEdit = (municipality: Municipality) => {
     setSelectedMunicipality(municipality);
-    setIsEditMunicipalityOpen(true);
+    setIsEditDialogOpen(true);
   };
 
-  const handleUpdateMunicipality = () => {
+  const handleDelete = (municipalityId: string) => {
+    const municipality = municipalities.find(m => m.id === municipalityId);
+    if (!municipality) return;
+
+    if (window.confirm(`Are you sure you want to delete "${municipality.name}"? This action cannot be undone.`)) {
+      setMunicipalities(prev => prev.filter(m => m.id !== municipalityId));
+      toast({
+        title: "Municipality Deleted",
+        description: `${municipality.name} has been deleted successfully`,
+      });
+    }
+  };
+
+  const handleSave = () => {
+    setIsEditDialogOpen(false);
     toast({
       title: "Municipality Updated",
-      description: "Municipality information has been successfully updated.",
+      description: "Municipality information has been updated successfully",
     });
-    setIsEditMunicipalityOpen(false);
-    setSelectedMunicipality(null);
   };
 
-  const handleDeleteMunicipality = (municipalityId) => {
-    setMunicipalities(municipalities.filter(municipality => municipality.id !== municipalityId));
+  const handleAdd = () => {
+    setIsAddDialogOpen(false);
     toast({
-      title: "Municipality Deleted",
-      description: "Municipality has been successfully removed from the system.",
-      variant: "destructive",
+      title: "Municipality Added",
+      description: "New municipality has been added successfully",
     });
   };
 
-  const handleManageMunicipality = (municipality) => {
+  const openLinkDialog = (municipality: Municipality, type: 'groups' | 'schools' | 'principals') => {
     setSelectedMunicipality(municipality);
-    setIsEditMunicipalityOpen(true);
+    setLinkType(type);
+    setIsLinkDialogOpen(true);
+  };
+
+  const getAvailableEntities = () => {
+    if (!selectedMunicipality) return [];
+    
+    if (linkType === 'groups') {
+      return availableGroups.filter(group => 
+        !selectedMunicipality.linkedGroups.some(g => g.id === group.id)
+      );
+    } else if (linkType === 'schools') {
+      return availableSchools.filter(school => 
+        !selectedMunicipality.linkedSchools.some(s => s.id === school.id)
+      );
+    } else {
+      return availablePrincipals.filter(principal => 
+        !selectedMunicipality.linkedPrincipals.some(p => p.id === principal.id)
+      );
+    }
   };
 
   return (
@@ -157,382 +301,395 @@ const MunicipalityManagement = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-ike-primary">Municipality Management</h1>
-          <p className="text-ike-neutral">Manage home municipalities in the regional system</p>
+          <p className="text-ike-neutral mt-2">
+            Manage municipalities and their relationships with groups, schools, and principals
+          </p>
         </div>
-        
-        <Dialog open={isAddMunicipalityOpen} onOpenChange={setIsAddMunicipalityOpen}>
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-ike-primary hover:bg-ike-primary/90">
-              <Plus className="w-4 h-4 mr-2" />
+            <Button className="bg-ike-primary hover:bg-ike-primary-dark">
+              <MapPin className="w-4 h-4 mr-2" />
               Add Municipality
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>Add New Municipality</DialogTitle>
-              <DialogDescription>
-                Add a new home municipality to the regional system. Fill in all the required information.
-              </DialogDescription>
             </DialogHeader>
-            <Tabs defaultValue="basic" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                <TabsTrigger value="contact">Contact</TabsTrigger>
-                <TabsTrigger value="financial">Financial</TabsTrigger>
-                <TabsTrigger value="additional">Additional</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="basic" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Municipality Name *</Label>
-                    <Input id="name" placeholder="Enter municipality name" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="code">Municipality Code *</Label>
-                    <Input id="code" placeholder="Enter municipality code" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="orgNumber">Organization Number *</Label>
-                    <Input id="orgNumber" placeholder="XXXXXX-XXXX" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="status">Status</Label>
-                    <Input id="status" placeholder="Active" defaultValue="Active" />
-                  </div>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="contact" className="space-y-4">
-                <div className="space-y-4">
-                  <h4 className="font-medium">Postal Address</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="street">Street Address</Label>
-                      <Input id="street" placeholder="Street address" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="postalCode">Postal Code</Label>
-                      <Input id="postalCode" placeholder="XXX XX" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="city">City</Label>
-                      <Input id="city" placeholder="City" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="country">Country</Label>
-                      <Input id="country" placeholder="Sweden" defaultValue="Sweden" />
-                    </div>
-                  </div>
-                  
-                  <h4 className="font-medium mt-6">Contact Persons</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="contactName">Contact Name</Label>
-                      <Input id="contactName" placeholder="Full name" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="contactRole">Role</Label>
-                      <Input id="contactRole" placeholder="Administrator" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="contactEmail">Email</Label>
-                      <Input id="contactEmail" type="email" placeholder="email@municipality.se" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="contactPhone">Phone</Label>
-                      <Input id="contactPhone" placeholder="+46 XX XXX XXXX" />
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="financial" className="space-y-4">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="priceList">Price List</Label>
-                    <Input id="priceList" placeholder="Standard 2024" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="accounting">Accounting Group</Label>
-                    <Input id="accounting" placeholder="Account Group A" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="additionalAmount">Additional Amount (SEK)</Label>
-                    <Input id="additionalAmount" type="number" placeholder="0" defaultValue="0" />
-                  </div>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="additional" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="schools">Number of Schools</Label>
-                    <Input id="schools" type="number" placeholder="0" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="students">Number of Students</Label>
-                    <Input id="students" type="number" placeholder="0" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="administrators">Number of Administrators</Label>
-                    <Input id="administrators" type="number" placeholder="0" />
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-            <DialogFooter>
-              <Button type="submit" onClick={handleAddMunicipality}>Add Municipality</Button>
-            </DialogFooter>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="name">Municipality Name</Label>
+                <Input id="name" placeholder="Enter municipality name" />
+              </div>
+              <div>
+                <Label htmlFor="code">Municipality Code</Label>
+                <Input id="code" placeholder="Enter municipality code" />
+              </div>
+              <div>
+                <Label htmlFor="region">Region</Label>
+                <Input id="region" placeholder="Enter region" />
+              </div>
+              <div>
+                <Label htmlFor="website">Website</Label>
+                <Input id="website" placeholder="https://example.se" />
+              </div>
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" placeholder="info@municipality.se" />
+              </div>
+              <div>
+                <Label htmlFor="phone">Phone</Label>
+                <Input id="phone" placeholder="+46 8 123 4567" />
+              </div>
+              <div className="col-span-2">
+                <Label htmlFor="address">Address</Label>
+                <Textarea id="address" placeholder="Street, Postal Code, City, Country" />
+              </div>
+              <div>
+                <Label htmlFor="population">Population</Label>
+                <Input id="population" type="number" placeholder="500000" />
+              </div>
+              <div>
+                <Label htmlFor="area">Area (km²)</Label>
+                <Input id="area" type="number" step="0.1" placeholder="188.0" />
+              </div>
+              <div>
+                <Label htmlFor="established">Established Date</Label>
+                <Input id="established" type="date" />
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2 mt-4">
+              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button className="bg-ike-primary hover:bg-ike-primary-dark" onClick={handleAdd}>
+                Add Municipality
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {municipalities.map((municipality) => (
+      <div className="flex items-center space-x-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ike-neutral w-4 h-4" />
+          <Input
+            placeholder="Search municipalities..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="Filter by region" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Regions</SelectItem>
+            {regions.map((region) => (
+              <SelectItem key={region} value={region}>
+                {region}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid gap-6">
+        {filteredMunicipalities.map((municipality) => (
           <Card key={municipality.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Building className="w-5 h-5 text-ike-primary" />
-                  {municipality.name}
-                </CardTitle>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <MoreVertical className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-white" align="end">
-                    <DropdownMenuItem onClick={() => handleEditMunicipality(municipality)}>
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleManageMunicipality(municipality)}>
-                      <Building className="w-4 h-4 mr-2" />
-                      Manage
-                    </DropdownMenuItem>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the municipality
-                            "{municipality.name}" and remove all associated data.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDeleteMunicipality(municipality.id)}>
-                            Delete Municipality
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-              <CardDescription>
-                <div className="space-y-1">
-                  <div>Code: {municipality.code}</div>
-                  <div>Org. Nr: {municipality.organizationNumber}</div>
-                </div>
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-ike-neutral">Status</span>
-                  <Badge className="bg-green-100 text-green-800">{municipality.status}</Badge>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <School className="w-4 h-4 text-ike-neutral" />
-                      <span className="text-sm">Schools</span>
-                    </div>
-                    <span className="font-medium">{municipality.schools}</span>
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-ike-primary/10 rounded-full flex items-center justify-center">
+                    <MapPin className="w-6 h-6 text-ike-primary" />
                   </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-ike-neutral" />
-                      <span className="text-sm">Students</span>
-                    </div>
-                    <span className="font-medium">{municipality.students.toLocaleString()}</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-ike-neutral" />
-                      <span className="text-sm">Administrators</span>
-                    </div>
-                    <span className="font-medium">{municipality.administrators}</span>
+                  <div>
+                    <CardTitle className="text-ike-primary">{municipality.name}</CardTitle>
+                    <p className="text-sm text-ike-neutral">Code: {municipality.code} • {municipality.region}</p>
                   </div>
                 </div>
-
-                <div className="space-y-2 pt-2 border-t">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-ike-neutral" />
-                    <span className="text-sm">{municipality.postalAddress.city}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Euro className="w-4 h-4 text-ike-neutral" />
-                    <span className="text-sm">{municipality.priceList}</span>
-                  </div>
-                  {municipality.additionalAmount > 0 && (
-                    <div className="flex items-center gap-2">
-                      <Calculator className="w-4 h-4 text-ike-neutral" />
-                      <span className="text-sm">+{municipality.additionalAmount.toLocaleString()} SEK</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="pt-4 border-t">
+                <div className="flex items-center space-x-2">
+                  <Badge variant={municipality.status === 'active' ? 'default' : 'secondary'}>
+                    {municipality.status}
+                  </Badge>
                   <Button 
                     variant="outline" 
-                    className="w-full"
-                    onClick={() => handleManageMunicipality(municipality)}
+                    size="sm"
+                    onClick={() => handleEdit(municipality)}
                   >
-                    Manage Municipality
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleDelete(municipality.id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-ike-primary">Contact Information</h4>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Mail className="w-4 h-4 text-ike-primary" />
+                    <span>{municipality.email}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Phone className="w-4 h-4 text-ike-primary" />
+                    <span>{municipality.phone}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <MapPin className="w-4 h-4 text-ike-primary" />
+                    <span>{municipality.address.street}, {municipality.address.city}</span>
+                  </div>
+                  {municipality.website && (
+                    <div className="flex items-center space-x-2 text-sm">
+                      <Link className="w-4 h-4 text-ike-primary" />
+                      <a href={municipality.website} target="_blank" rel="noopener noreferrer" className="text-ike-primary hover:underline">
+                        {municipality.website}
+                      </a>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-ike-primary">Statistics</h4>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Users className="w-4 h-4 text-ike-primary" />
+                    <span>Population: {municipality.population.toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <MapPin className="w-4 h-4 text-ike-primary" />
+                    <span>Area: {municipality.area} km²</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Calendar className="w-4 h-4 text-ike-primary" />
+                    <span>Est. {municipality.establishedDate}</span>
+                  </div>
+                </div>
+              </div>
+
+              <Tabs defaultValue="groups" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="groups" className="flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    Groups ({municipality.linkedGroups.length})
+                  </TabsTrigger>
+                  <TabsTrigger value="schools" className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4" />
+                    Schools ({municipality.linkedSchools.length})
+                  </TabsTrigger>
+                  <TabsTrigger value="principals" className="flex items-center gap-2">
+                    <GraduationCap className="w-4 h-4" />
+                    Principals ({municipality.linkedPrincipals.length})
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="groups" className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <h5 className="font-medium text-ike-primary">Linked Groups</h5>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => openLinkDialog(municipality, 'groups')}
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Link Group
+                    </Button>
+                  </div>
+                  {municipality.linkedGroups.length === 0 ? (
+                    <p className="text-sm text-ike-neutral italic">No groups linked</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {municipality.linkedGroups.map((group) => (
+                        <div key={group.id} className="flex items-center justify-between p-2 bg-ike-neutral-light rounded">
+                          <span className="font-medium text-sm">{group.name}</span>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleUnlink(municipality.id, group.id, 'groups')}
+                          >
+                            <Unlink className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="schools" className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <h5 className="font-medium text-ike-primary">Linked Schools</h5>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => openLinkDialog(municipality, 'schools')}
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Link School
+                    </Button>
+                  </div>
+                  {municipality.linkedSchools.length === 0 ? (
+                    <p className="text-sm text-ike-neutral italic">No schools linked</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {municipality.linkedSchools.map((school) => (
+                        <div key={school.id} className="flex items-center justify-between p-2 bg-ike-neutral-light rounded">
+                          <div>
+                            <span className="font-medium text-sm">{school.name}</span>
+                            <Badge className="ml-2 text-xs">{school.type}</Badge>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleUnlink(municipality.id, school.id, 'schools')}
+                          >
+                            <Unlink className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="principals" className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <h5 className="font-medium text-ike-primary">Linked Principals</h5>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => openLinkDialog(municipality, 'principals')}
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Link Principal
+                    </Button>
+                  </div>
+                  {municipality.linkedPrincipals.length === 0 ? (
+                    <p className="text-sm text-ike-neutral italic">No principals linked</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {municipality.linkedPrincipals.map((principal) => (
+                        <div key={principal.id} className="flex items-center justify-between p-2 bg-ike-neutral-light rounded">
+                          <span className="font-medium text-sm">{principal.name}</span>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleUnlink(municipality.id, principal.id, 'principals')}
+                          >
+                            <Unlink className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
         ))}
       </div>
 
       {/* Edit Municipality Dialog */}
-      <Dialog open={isEditMunicipalityOpen} onOpenChange={setIsEditMunicipalityOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Edit Municipality</DialogTitle>
-            <DialogDescription>
-              Update municipality information and details.
-            </DialogDescription>
+            <DialogTitle>Edit Municipality - {selectedMunicipality?.name}</DialogTitle>
           </DialogHeader>
-          {selectedMunicipality && (
-            <Tabs defaultValue="basic" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                <TabsTrigger value="contact">Contact</TabsTrigger>
-                <TabsTrigger value="financial">Financial</TabsTrigger>
-                <TabsTrigger value="additional">Additional</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="basic" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-name">Municipality Name</Label>
-                    <Input id="edit-name" defaultValue={selectedMunicipality.name} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-code">Municipality Code</Label>
-                    <Input id="edit-code" defaultValue={selectedMunicipality.code} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-orgNumber">Organization Number</Label>
-                    <Input id="edit-orgNumber" defaultValue={selectedMunicipality.organizationNumber} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-status">Status</Label>
-                    <Input id="edit-status" defaultValue={selectedMunicipality.status} />
-                  </div>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="contact" className="space-y-4">
-                <div className="space-y-4">
-                  <h4 className="font-medium">Postal Address</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-street">Street Address</Label>
-                      <Input id="edit-street" defaultValue={selectedMunicipality.postalAddress.street} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-postalCode">Postal Code</Label>
-                      <Input id="edit-postalCode" defaultValue={selectedMunicipality.postalAddress.postalCode} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-city">City</Label>
-                      <Input id="edit-city" defaultValue={selectedMunicipality.postalAddress.city} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-country">Country</Label>
-                      <Input id="edit-country" defaultValue={selectedMunicipality.postalAddress.country} />
-                    </div>
-                  </div>
-                  
-                  <h4 className="font-medium mt-6">Contact Persons</h4>
-                  {selectedMunicipality.contactPersons.map((contact, index) => (
-                    <div key={index} className="grid grid-cols-2 gap-4 p-4 border rounded">
-                      <div className="space-y-2">
-                        <Label htmlFor={`edit-contactName-${index}`}>Contact Name</Label>
-                        <Input id={`edit-contactName-${index}`} defaultValue={contact.name} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor={`edit-contactRole-${index}`}>Role</Label>
-                        <Input id={`edit-contactRole-${index}`} defaultValue={contact.role} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor={`edit-contactEmail-${index}`}>Email</Label>
-                        <Input id={`edit-contactEmail-${index}`} defaultValue={contact.email} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor={`edit-contactPhone-${index}`}>Phone</Label>
-                        <Input id={`edit-contactPhone-${index}`} defaultValue={contact.phone} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="financial" className="space-y-4">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-priceList">Price List</Label>
-                    <Input id="edit-priceList" defaultValue={selectedMunicipality.priceList} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-accounting">Accounting Group</Label>
-                    <Input id="edit-accounting" defaultValue={selectedMunicipality.accounting} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-additionalAmount">Additional Amount (SEK)</Label>
-                    <Input id="edit-additionalAmount" type="number" defaultValue={selectedMunicipality.additionalAmount} />
-                  </div>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="additional" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-schools">Number of Schools</Label>
-                    <Input id="edit-schools" type="number" defaultValue={selectedMunicipality.schools} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-students">Number of Students</Label>
-                    <Input id="edit-students" type="number" defaultValue={selectedMunicipality.students} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-administrators">Number of Administrators</Label>
-                    <Input id="edit-administrators" type="number" defaultValue={selectedMunicipality.administrators} />
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          )}
-          <DialogFooter>
-            <Button type="submit" onClick={handleUpdateMunicipality}>Update Municipality</Button>
-          </DialogFooter>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="editName">Municipality Name</Label>
+              <Input id="editName" defaultValue={selectedMunicipality?.name} placeholder="Enter municipality name" />
+            </div>
+            <div>
+              <Label htmlFor="editCode">Municipality Code</Label>
+              <Input id="editCode" defaultValue={selectedMunicipality?.code} placeholder="Enter municipality code" />
+            </div>
+            <div>
+              <Label htmlFor="editRegion">Region</Label>
+              <Input id="editRegion" defaultValue={selectedMunicipality?.region} placeholder="Enter region" />
+            </div>
+            <div>
+              <Label htmlFor="editWebsite">Website</Label>
+              <Input id="editWebsite" defaultValue={selectedMunicipality?.website} placeholder="https://example.se" />
+            </div>
+            <div>
+              <Label htmlFor="editEmail">Email</Label>
+              <Input id="editEmail" type="email" defaultValue={selectedMunicipality?.email} placeholder="info@municipality.se" />
+            </div>
+            <div>
+              <Label htmlFor="editPhone">Phone</Label>
+              <Input id="editPhone" defaultValue={selectedMunicipality?.phone} placeholder="+46 8 123 4567" />
+            </div>
+            <div className="col-span-2">
+              <Label htmlFor="editAddress">Address</Label>
+              <Textarea 
+                id="editAddress" 
+                defaultValue={`${selectedMunicipality?.address?.street}, ${selectedMunicipality?.address?.postalCode} ${selectedMunicipality?.address?.city}, ${selectedMunicipality?.address?.country}`}
+                placeholder="Street, Postal Code, City, Country" 
+              />
+            </div>
+            <div>
+              <Label htmlFor="editPopulation">Population</Label>
+              <Input id="editPopulation" type="number" defaultValue={selectedMunicipality?.population} />
+            </div>
+            <div>
+              <Label htmlFor="editArea">Area (km²)</Label>
+              <Input id="editArea" type="number" step="0.1" defaultValue={selectedMunicipality?.area} />
+            </div>
+            <div>
+              <Label htmlFor="editEstablished">Established Date</Label>
+              <Input id="editEstablished" type="date" defaultValue={selectedMunicipality?.establishedDate} />
+            </div>
+          </div>
+          <div className="flex justify-end space-x-2 mt-4">
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              className="bg-ike-primary hover:bg-ike-primary-dark"
+              onClick={handleSave}
+            >
+              Update Municipality
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Link Entity Dialog */}
+      <Dialog open={isLinkDialogOpen} onOpenChange={setIsLinkDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Link {linkType.charAt(0).toUpperCase() + linkType.slice(1, -1)} to {selectedMunicipality?.name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Label>Select {linkType.charAt(0).toUpperCase() + linkType.slice(1, -1)}</Label>
+            <Select onValueChange={(entityId) => {
+              if (selectedMunicipality) {
+                handleLink(selectedMunicipality.id, entityId, linkType);
+                setIsLinkDialogOpen(false);
+              }
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder={`Select a ${linkType.slice(0, -1)} to link`} />
+              </SelectTrigger>
+              <SelectContent>
+                {getAvailableEntities().map((entity) => (
+                  <SelectItem key={entity.id} value={entity.id}>
+                    {entity.name}
+                    {'municipality' in entity && ` (${entity.municipality})`}
+                    {'email' in entity && ` (${entity.email})`}
+                    {'type' in entity && ` - ${entity.type}`}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
