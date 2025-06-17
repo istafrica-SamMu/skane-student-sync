@@ -355,11 +355,6 @@ export const schoolAdminMenu: MenuItem[] = [
         icon: MessageSquare,
       },
       {
-        title: "Enrollment Info",
-        url: "/my-page/enrollment",
-        icon: Settings,
-      },
-      {
         title: "Activity Logs",
         url: "/my-page/logs",
         icon: Activity,
