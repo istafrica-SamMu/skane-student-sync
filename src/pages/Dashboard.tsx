@@ -58,13 +58,17 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="flex space-x-3">
-            <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
-              <Download className="w-4 h-4 mr-2" />
-              Export Student Lists
+            <Button asChild className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+              <Link to="/reports/students">
+                <Download className="w-4 h-4 mr-2" />
+                Export Student Lists
+              </Link>
             </Button>
-            <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-              <FileText className="w-4 h-4 mr-2" />
-              School Reports
+            <Button asChild variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+              <Link to="/reports/financial">
+                <FileText className="w-4 h-4 mr-2" />
+                School Reports
+              </Link>
             </Button>
           </div>
         </div>
@@ -197,31 +201,43 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent className="space-y-3">
               <Button 
+                asChild
                 className="w-full justify-start bg-ike-primary hover:bg-ike-primary-dark text-white"
               >
-                <Users className="w-4 h-4 mr-2" />
-                Student Roster
+                <Link to="/students">
+                  <Users className="w-4 h-4 mr-2" />
+                  Student Roster
+                </Link>
               </Button>
               <Button 
+                asChild
                 variant="outline" 
                 className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
               >
-                <ArrowUpDown className="w-4 h-4 mr-2" />
-                Manage Placements
+                <Link to="/students/placements">
+                  <ArrowUpDown className="w-4 h-4 mr-2" />
+                  Manage Placements
+                </Link>
               </Button>
               <Button 
+                asChild
                 variant="outline" 
                 className="w-full justify-start"
               >
-                <GraduationCap className="w-4 h-4 mr-2" />
-                Class Management
+                <Link to="/students/classes">
+                  <GraduationCap className="w-4 h-4 mr-2" />
+                  Class Management
+                </Link>
               </Button>
               <Button 
+                asChild
                 variant="outline" 
                 className="w-full justify-start"
               >
-                <FileText className="w-4 h-4 mr-2" />
-                Generate Reports
+                <Link to="/reports/financial">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Generate Reports
+                </Link>
               </Button>
             </CardContent>
           </Card>
@@ -388,9 +404,11 @@ const Dashboard = () => {
                   <span className="font-bold text-ike-primary">79.2%</span>
                 </div>
               </div>
-              <Button className="w-full mt-4" variant="outline">
-                <BarChart3 className="w-4 h-4 mr-2" />
-                View Detailed Statistics
+              <Button asChild className="w-full mt-4" variant="outline">
+                <Link to="/reports/statistics">
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  View Detailed Statistics
+                </Link>
               </Button>
             </CardContent>
           </Card>
@@ -414,13 +432,17 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="flex space-x-3">
-            <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
-              <Download className="w-4 h-4 mr-2" />
-              Export Municipal Report
+            <Button asChild className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+              <Link to="/reports/municipal-statistics">
+                <Download className="w-4 h-4 mr-2" />
+                Export Municipal Report
+              </Link>
             </Button>
-            <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-              <FileText className="w-4 h-4 mr-2" />
-              Financial Export
+            <Button asChild variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+              <Link to="/reports/financial-export">
+                <FileText className="w-4 h-4 mr-2" />
+                Financial Export
+              </Link>
             </Button>
           </div>
         </div>
@@ -555,31 +577,43 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent className="space-y-3">
               <Button 
+                asChild
                 className="w-full justify-start bg-ike-primary hover:bg-ike-primary-dark text-white"
               >
-                <Users className="w-4 h-4 mr-2" />
-                Student Management
+                <Link to="/students">
+                  <Users className="w-4 h-4 mr-2" />
+                  Student Management
+                </Link>
               </Button>
               <Button 
+                asChild
                 variant="outline" 
                 className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
               >
-                <Euro className="w-4 h-4 mr-2" />
-                Financial Reports
+                <Link to="/financial/reports">
+                  <Euro className="w-4 h-4 mr-2" />
+                  Financial Reports
+                </Link>
               </Button>
               <Button 
+                asChild
                 variant="outline" 
                 className="w-full justify-start"
               >
-                <School className="w-4 h-4 mr-2" />
-                Municipal Schools
+                <Link to="/operations/municipal-schools">
+                  <School className="w-4 h-4 mr-2" />
+                  Municipal Schools
+                </Link>
               </Button>
               <Button 
+                asChild
                 variant="outline" 
                 className="w-full justify-start"
               >
-                <Calendar className="w-4 h-4 mr-2" />
-                Enrollment Control
+                <Link to="/integration/import">
+                  <Database className="w-4 h-4 mr-2" />
+                  Import Student Data
+                </Link>
               </Button>
             </CardContent>
           </Card>
@@ -659,7 +693,7 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Financial Summary */}
+        {/* Financial Summary & Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
@@ -683,32 +717,60 @@ const Dashboard = () => {
                   <span className="font-bold text-ike-warning">-1.4M SEK</span>
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-2 mt-4">
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/reports/money-to-receive">
+                    <TrendingUp className="w-4 h-4 mr-1" />
+                    To Receive
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/reports/money-to-pay">
+                    <DollarSign className="w-4 h-4 mr-1" />
+                    To Pay
+                  </Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-ike-neutral-dark">Enrollment Periods</CardTitle>
+              <CardTitle className="text-ike-neutral-dark">Municipal Quick Actions</CardTitle>
               <CardDescription>
-                Municipal enrollment management
+                Essential municipal management functions
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-ike-neutral">Current period:</span>
-                <Badge className="bg-ike-success text-white">Open</Badge>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-ike-neutral">Applications received:</span>
-                <span className="font-medium">156</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-ike-neutral">Deadline:</span>
-                <span className="font-medium">15 mars 2025</span>
-              </div>
-              <Button className="w-full mt-4" variant="outline">
-                <Settings className="w-4 h-4 mr-2" />
-                Manage Enrollment Settings
+            <CardContent className="space-y-3">
+              <Button asChild className="w-full justify-start" variant="outline">
+                <Link to="/students/classes">
+                  <GraduationCap className="w-4 h-4 mr-2" />
+                  Students by Class & Study Path
+                </Link>
+              </Button>
+              <Button asChild className="w-full justify-start" variant="outline">
+                <Link to="/students/municipal">
+                  <School className="w-4 h-4 mr-2" />
+                  Municipal School Students
+                </Link>
+              </Button>
+              <Button asChild className="w-full justify-start" variant="outline">
+                <Link to="/students/external">
+                  <ArrowUpDown className="w-4 h-4 mr-2" />
+                  External School Students
+                </Link>
+              </Button>
+              <Button asChild className="w-full justify-start" variant="outline">
+                <Link to="/financial/pricelists">
+                  <Euro className="w-4 h-4 mr-2" />
+                  Municipal Price Lists
+                </Link>
+              </Button>
+              <Button asChild className="w-full justify-start" variant="outline">
+                <Link to="/operations/municipal-users">
+                  <Users className="w-4 h-4 mr-2" />
+                  Municipal User Admin
+                </Link>
               </Button>
             </CardContent>
           </Card>
