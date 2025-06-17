@@ -62,7 +62,8 @@ import {
   Eye,
   GraduationCap,
   Trash2,
-  FileText
+  FileText,
+  Upload
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -71,10 +72,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useForm } from "react-hook-form";
 
 const Students = () => {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [programFilter, setProgramFilter] = useState("all");
@@ -86,6 +89,8 @@ const Students = () => {
   const [isNewStudentDialogOpen, setIsNewStudentDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const form = useForm({
     defaultValues: {
@@ -305,6 +310,24 @@ const Students = () => {
     setIsNewStudentDialogOpen(true);
   };
 
+  const handleImportStudents = () => {
+    setIsImportDialogOpen(true);
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+  };
+
+  const handleImportConfirm = () => {
+    if (selectedFile) {
+      console.log('Importing students from file:', selectedFile.name);
+      // Add actual import logic here
+      setIsImportDialogOpen(false);
+      setSelectedFile(null);
+    }
+  };
+
   const onSubmit = (data) => {
     console.log('Submitting student data:', data);
     setIsNewStudentDialogOpen(false);
@@ -325,6 +348,72 @@ const Students = () => {
           </p>
         </div>
         <div className="flex space-x-3">
+          <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="border-ike-primary text-ike-primary hover:bg-ike-primary hover:text-white"
+                onClick={handleImportStudents}
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Import Students
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>Import Students from File</DialogTitle>
+                <DialogDescription>
+                  Upload a CSV or Excel file containing student information to import multiple students at once.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="py-4">
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-ike-neutral-dark mb-2 block">
+                      Select File
+                    </label>
+                    <Input
+                      type="file"
+                      accept=".csv,.xlsx,.xls"
+                      onChange={handleFileChange}
+                      className="border-ike-primary/20 focus:border-ike-primary"
+                    />
+                    <p className="text-xs text-ike-neutral mt-1">
+                      Supported formats: CSV, Excel (.xlsx, .xls)
+                    </p>
+                  </div>
+                  {selectedFile && (
+                    <div className="bg-ike-primary/5 border border-ike-primary/20 rounded-lg p-3">
+                      <div className="flex items-center space-x-2">
+                        <FileText className="w-4 h-4 text-ike-primary" />
+                        <span className="text-sm text-ike-neutral-dark">{selectedFile.name}</span>
+                        <Badge variant="outline" className="text-ike-primary border-ike-primary/20">
+                          {(selectedFile.size / 1024).toFixed(1)} KB
+                        </Badge>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => {
+                  setIsImportDialogOpen(false);
+                  setSelectedFile(null);
+                }}>
+                  Cancel
+                </Button>
+                <Button 
+                  className="bg-ike-primary hover:bg-ike-primary/90"
+                  onClick={handleImportConfirm}
+                  disabled={!selectedFile}
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Import Students
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          
           <Dialog open={isNewStudentDialogOpen} onOpenChange={setIsNewStudentDialogOpen}>
             <DialogTrigger asChild>
               <Button 
