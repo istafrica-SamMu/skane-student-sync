@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { ContactInfoCard } from "@/components/ContactInfoCard";
+import { ContactForm } from "@/components/ContactForm";
 import { 
   Building2, 
   Edit, 
@@ -86,6 +88,7 @@ const GroupManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isContactEditDialogOpen, setIsContactEditDialogOpen] = useState(false);
   const [isLinkPrincipalDialogOpen, setIsLinkPrincipalDialogOpen] = useState(false);
   const [isLinkSchoolDialogOpen, setIsLinkSchoolDialogOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
@@ -266,6 +269,41 @@ const GroupManagement = () => {
         description: `${group.name} has been deleted successfully`,
       });
     }
+  };
+
+  const handleEditContact = (group: Group) => {
+    setSelectedGroup(group);
+    setIsContactEditDialogOpen(true);
+  };
+
+  const handleUpdateContact = (contactData: any) => {
+    if (!selectedGroup) return;
+
+    setGroups(prev => prev.map(group => 
+      group.id === selectedGroup.id
+        ? {
+            ...group,
+            contactPerson: {
+              name: contactData.name,
+              role: contactData.role,
+              email: contactData.email,
+              phone: contactData.phone
+            },
+            address: {
+              street: contactData.street,
+              postalCode: contactData.postalCode,
+              city: contactData.city,
+              country: contactData.country
+            }
+          }
+        : group
+    ));
+
+    setIsContactEditDialogOpen(false);
+    toast({
+      title: "Contact Updated",
+      description: "Contact information has been updated successfully",
+    });
   };
 
   const openLinkPrincipalDialog = (group: Group) => {
@@ -539,10 +577,10 @@ const GroupManagement = () => {
               <Tabs defaultValue="overview" className="w-full">
                 <TabsList className="grid w-full grid-cols-5">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="contact">Contact</TabsTrigger>
                   <TabsTrigger value="financial">Financial</TabsTrigger>
                   <TabsTrigger value="principals">Principals ({group.linkedPrincipals.length})</TabsTrigger>
                   <TabsTrigger value="schools">Schools ({group.linkedSchoolUnits.length})</TabsTrigger>
-                  <TabsTrigger value="details">Details</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="overview" className="space-y-4">
@@ -599,6 +637,14 @@ const GroupManagement = () => {
                       <p className="text-sm text-ike-neutral">{group.description}</p>
                     </div>
                   )}
+                </TabsContent>
+                
+                <TabsContent value="contact" className="space-y-4">
+                  <ContactInfoCard
+                    contactPerson={group.contactPerson}
+                    address={group.address}
+                    onEdit={() => handleEditContact(group)}
+                  />
                 </TabsContent>
                 
                 <TabsContent value="financial" className="space-y-4">
@@ -927,6 +973,33 @@ const GroupManagement = () => {
               Update Group
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Contact Edit Dialog */}
+      <Dialog open={isContactEditDialogOpen} onOpenChange={setIsContactEditDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-ike-primary">
+              Edit Contact Information - {selectedGroup?.name}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedGroup && (
+            <ContactForm
+              initialData={{
+                name: selectedGroup.contactPerson.name,
+                role: selectedGroup.contactPerson.role,
+                email: selectedGroup.contactPerson.email,
+                phone: selectedGroup.contactPerson.phone,
+                street: selectedGroup.address.street,
+                postalCode: selectedGroup.address.postalCode,
+                city: selectedGroup.address.city,
+                country: selectedGroup.address.country.toLowerCase(),
+              }}
+              onSubmit={handleUpdateContact}
+              onCancel={() => setIsContactEditDialogOpen(false)}
+            />
+          )}
         </DialogContent>
       </Dialog>
 
