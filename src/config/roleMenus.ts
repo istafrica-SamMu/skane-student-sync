@@ -1,34 +1,46 @@
-
 import {
-  LayoutDashboard,
+  Home,
   Users,
-  School,
-  GraduationCap,
   Calculator,
   FileText,
   BarChart3,
-  MessageSquare,
   Settings,
-  Building,
-  UserCheck,
-  MapPin,
-  Calendar,
   Database,
-  CreditCard,
-  Building2,
-  Globe,
-  Code,
-  Wrench,
-  UserCog,
-  Zap,
-  Server,
-  DollarSign,
-  Activity,
-  User,
+  ArrowUpDown,
+  AlertTriangle,
+  Package,
   Euro,
   TrendingUp,
+  UserCheck,
+  Link,
+  User,
+  Shield,
+  Building,
+  GraduationCap,
+  MessageSquare,
+  Activity,
   FileSpreadsheet,
-  Info
+  Calendar,
+  School,
+  UserPlus,
+  DollarSign,
+  MapPin,
+  Book,
+  Briefcase,
+  Clock,
+  Bell,
+  Mail,
+  Info,
+  Globe,
+  Code,
+  Key,
+  Languages,
+  Workflow,
+  GitBranch,
+  Server,
+  Monitor,
+  HardDrive,
+  Terminal
 } from "lucide-react";
 
 export interface MenuItem {
@@ -41,8 +53,8 @@ export interface MenuItem {
 export const regionalAdminMenu: MenuItem[] = [
   {
     title: "Dashboard",
-    icon: LayoutDashboard,
     url: "/dashboard",
+    icon: Home,
   },
   {
     title: "System Management",
@@ -50,85 +62,50 @@ export const regionalAdminMenu: MenuItem[] = [
     items: [
       {
         title: "User Management",
-        icon: Users,
         url: "/system/users",
+        icon: Users,
       },
       {
         title: "Municipality Management",
-        icon: Building,
         url: "/system/municipalities",
-      },
-      {
-        title: "Group Management", 
-        icon: Building2,
-        url: "/system/groups",
-      },
-      {
-        title: "Principal Management",
-        icon: UserCog,
-        url: "/system/principals",
+        icon: Building,
       },
       {
         title: "School Units",
-        icon: School,
         url: "/system/schools",
+        icon: School,
       },
       {
         title: "School Years",
-        icon: Calendar,
         url: "/system/school-years",
+        icon: Calendar,
       },
     ],
   },
   {
-    title: "Study Paths",
-    icon: GraduationCap,
+    title: "Study Path Management",
+    icon: Book,
     items: [
       {
         title: "Study Paths",
-        icon: GraduationCap,
         url: "/study-paths",
+        icon: Book,
       },
       {
         title: "Price Codes",
-        icon: CreditCard,
         url: "/study-paths/price-codes",
-      },
-      {
-        title: "National Programs",
-        icon: Globe,
-        url: "/study-paths/programs",
+        icon: Euro,
       },
     ],
   },
   {
-    title: "Operations",
+    title: "Regional Operations",
     icon: Database,
     items: [
       {
-        title: "KAA Management",
-        icon: UserCheck,
-        url: "/operations/kaa",
-      },
-      {
         title: "Population Data",
-        icon: Users,
         url: "/operations/population",
-      },
-      {
-        title: "Address Updates",
-        icon: MapPin,
-        url: "/operations/addresses",
-      },
-      {
-        title: "Municipal School Units",
-        icon: School,
-        url: "/operations/municipal-schools",
-      },
-      {
-        title: "Municipal User Admin",
         icon: Users,
-        url: "/operations/municipal-users",
       },
     ],
   },
@@ -194,54 +171,34 @@ export const regionalAdminMenu: MenuItem[] = [
 export const municipalityAdminMenu: MenuItem[] = [
   {
     title: "Dashboard",
-    icon: LayoutDashboard,
     url: "/dashboard",
+    icon: Home,
   },
   {
-    title: "Students",
+    title: "Student Management",
     icon: Users,
     items: [
       {
-        title: "All Students",
-        icon: Users,
+        title: "Students Overview",
         url: "/students",
+        icon: Users,
       },
       {
-        title: "Students by Class",
-        icon: Users,
+        title: "Students by Class & Study Path",
         url: "/students/classes",
+        icon: GraduationCap,
       },
       {
-        title: "Municipal Students",
-        icon: Users,
+        title: "Municipal School Students",
         url: "/students/municipal",
-      },
-      {
-        title: "External Students",
-        icon: Users,
-        url: "/students/external",
-      },
-      {
-        title: "Student Placements",
         icon: School,
-        url: "/students/placements",
       },
       {
-        title: "Student Conflicts",
-        icon: FileText,
-        url: "/students/conflicts",
-      },
-      {
-        title: "Bulk Operations",
-        icon: Database,
-        url: "/students/bulk",
+        title: "External School Students",
+        url: "/students/external",
+        icon: ArrowUpDown,
       },
     ],
-  },
-  {
-    title: "KAA Management",
-    icon: UserCheck,
-    url: "/operations/kaa",
   },
   {
     title: "Import Student Data",
@@ -347,32 +304,17 @@ export const municipalityAdminMenu: MenuItem[] = [
 export const schoolAdminMenu: MenuItem[] = [
   {
     title: "Dashboard",
-    icon: LayoutDashboard,
     url: "/dashboard",
+    icon: Home,
   },
   {
-    title: "Students",
+    title: "Student Management",
     icon: Users,
     items: [
       {
-        title: "All Students",
-        icon: Users,
+        title: "Student Roster & Classes",
         url: "/students",
-      },
-      {
-        title: "Students by Class",
         icon: Users,
-        url: "/students/classes",
-      },
-      {
-        title: "Student Placements",
-        icon: School,
-        url: "/students/placements",
-      },
-      {
-        title: "Bulk Operations",
-        icon: Database,
-        url: "/students/bulk",
       },
     ],
   },
@@ -434,124 +376,223 @@ export const schoolAdminMenu: MenuItem[] = [
 export const orgAdminMenu: MenuItem[] = [
   {
     title: "Dashboard",
-    icon: LayoutDashboard,
     url: "/dashboard",
+    icon: Home,
   },
   {
-    title: "Customer Management",
+    title: "Organization Management",
     icon: Building,
     items: [
       {
-        title: "Organizations",
-        icon: Building2,
-        url: "/system/municipalities",
-      },
-      {
-        title: "User Accounts",
+        title: "Customer Accounts",
+        url: "/org/customers",
         icon: Users,
-        url: "/system/users",
       },
       {
-        title: "Groups & Principals",
-        icon: UserCog,
-        url: "/system/groups",
+        title: "Account Hierarchy",
+        url: "/org/hierarchy",
+        icon: GitBranch,
+      },
+      {
+        title: "Billing & Subscriptions",
+        url: "/org/billing",
+        icon: DollarSign,
+      },
+      {
+        title: "Organization Settings",
+        url: "/org/settings",
+        icon: Settings,
       },
     ],
   },
   {
-    title: "System Operations",
-    icon: Server,
+    title: "User Administration",
+    icon: Shield,
+    items: [
+      {
+        title: "Global User Management",
+        url: "/org/users",
+        icon: Users,
+      },
+      {
+        title: "Role & Permissions",
+        url: "/org/permissions",
+        icon: Key,
+      },
+      {
+        title: "Access Control",
+        url: "/org/access",
+        icon: Shield,
+      },
+    ],
+  },
+  {
+    title: "System Oversight",
+    icon: Monitor,
     items: [
       {
         title: "System Health",
-        icon: Zap,
-        url: "/reports/statistics",
+        url: "/org/health",
+        icon: Activity,
       },
       {
         title: "Usage Analytics",
+        url: "/org/analytics",
         icon: BarChart3,
-        url: "/reports/regional",
       },
       {
-        title: "Support Tickets",
-        icon: MessageSquare,
-        url: "/my-page/messages",
+        title: "Audit Logs",
+        url: "/org/audit",
+        icon: FileText,
       },
     ],
   },
   {
-    title: "Settings",
-    icon: Settings,
-    url: "/settings",
+    title: "Support & Communication",
+    icon: MessageSquare,
+    items: [
+      {
+        title: "Customer Support",
+        url: "/org/support",
+        icon: MessageSquare,
+      },
+      {
+        title: "Announcements",
+        url: "/org/announcements",
+        icon: Bell,
+      },
+      {
+        title: "Knowledge Base",
+        url: "/org/knowledge",
+        icon: Book,
+      },
+    ],
   },
 ];
 
 export const devAdminMenu: MenuItem[] = [
   {
     title: "Dashboard",
-    icon: LayoutDashboard,
     url: "/dashboard",
+    icon: Home,
+  },
+  {
+    title: "Integration Management",
+    icon: Workflow,
+    items: [
+      {
+        title: "API Configurations",
+        url: "/dev/integrations",
+        icon: Code,
+      },
+      {
+        title: "Customer Integrations",
+        url: "/dev/customer-integrations",
+        icon: Link,
+      },
+      {
+        title: "Integration Testing",
+        url: "/dev/testing",
+        icon: Activity,
+      },
+      {
+        title: "API Documentation",
+        url: "/dev/api-docs",
+        icon: FileText,
+      },
+    ],
+  },
+  {
+    title: "Localization & Translations",
+    icon: Languages,
+    items: [
+      {
+        title: "Translation Management",
+        url: "/dev/translations",
+        icon: Languages,
+      },
+      {
+        title: "Language Settings",
+        url: "/dev/languages",
+        icon: Globe,
+      },
+      {
+        title: "Translation Tools",
+        url: "/dev/translation-tools",
+        icon: Settings,
+      },
+    ],
   },
   {
     title: "Development Tools",
-    icon: Code,
+    icon: Terminal,
     items: [
       {
-        title: "Integration Management",
-        icon: Zap,
-        url: "/integration",
+        title: "Environment Management",
+        url: "/dev/environments",
+        icon: Server,
       },
       {
-        title: "Translation Management",
-        icon: Globe,
-        url: "/settings",
+        title: "Database Management",
+        url: "/dev/database",
+        icon: HardDrive,
       },
       {
         title: "System Configuration",
-        icon: Wrench,
-        url: "/system/schools",
+        url: "/dev/config",
+        icon: Settings,
+      },
+      {
+        title: "Feature Flags",
+        url: "/dev/features",
+        icon: GitBranch,
       },
     ],
   },
   {
-    title: "Customer Setup",
-    icon: Building,
-    items: [
-      {
-        title: "Customer Integrations",
-        icon: Server,
-        url: "/integration/testing",
-      },
-      {
-        title: "Data Migration",
-        icon: Database,
-        url: "/operations/population",
-      },
-      {
-        title: "System Deployment",
-        icon: Zap,
-        url: "/integration/status",
-      },
-    ],
-  },
-  {
-    title: "Analytics & Monitoring",
-    icon: BarChart3,
+    title: "Monitoring & Debugging",
+    icon: Monitor,
     items: [
       {
         title: "System Logs",
+        url: "/dev/logs",
         icon: FileText,
-        url: "/my-page/logs",
       },
       {
-        title: "Performance Metrics",
+        title: "Performance Monitoring",
+        url: "/dev/performance",
         icon: BarChart3,
-        url: "/reports/statistics",
       },
       {
         title: "Error Tracking",
-        icon: FileText,
-        url: "/reports/changes",
+        url: "/dev/errors",
+        icon: AlertTriangle,
+      },
+      {
+        title: "Debug Tools",
+        url: "/dev/debug",
+        icon: Terminal,
+      },
+    ],
+  },
+  {
+    title: "Development Resources",
+    icon: Code,
+    items: [
+      {
+        title: "Code Repository",
+        url: "/dev/repository",
+        icon: GitBranch,
+      },
+      {
+        title: "Development Docs",
+        url: "/dev/docs",
+        icon: Book,
+      },
+      {
+        title: "Testing Suite",
+        url: "/dev/test-suite",
+        icon: Activity,
       },
     ],
   },

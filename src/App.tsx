@@ -25,8 +25,6 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import UserManagement from "./pages/system/UserManagement";
 import MunicipalityManagement from "./pages/system/MunicipalityManagement";
-import GroupManagement from "./pages/system/GroupManagement";
-import PrincipalManagement from "./pages/system/PrincipalManagement";
 import SchoolUnits from "./pages/system/SchoolUnits";
 import SchoolYears from "./pages/system/SchoolYears";
 import StudyPaths from "./pages/study-paths/StudyPaths";
@@ -36,7 +34,6 @@ import PopulationData from "./pages/operations/PopulationData";
 import AddressUpdates from "./pages/operations/AddressUpdates";
 import MunicipalSchoolUnits from "./pages/operations/MunicipalSchoolUnits";
 import MunicipalUserAdmin from "./pages/operations/MunicipalUserAdmin";
-import KAAManagement from "./pages/operations/KAAManagement";
 import RegionalStatistics from "./pages/reports/RegionalStatistics";
 import MonthlyCompilation from "./pages/reports/MonthlyCompilation";
 import FinancialAnalysis from "./pages/reports/FinancialAnalysis";
@@ -171,11 +168,6 @@ const AppContent = () => {
               <Route path="/operations/municipal-users" element={
                 <ProtectedRoute>
                   <MunicipalUserAdmin />
-                </ProtectedRoute>
-              } />
-              <Route path="/operations/kaa" element={
-                <ProtectedRoute>
-                  <KAAManagement />
                 </ProtectedRoute>
               } />
               <Route path="/students" element={
