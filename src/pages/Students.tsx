@@ -3,6 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { 
   Table,
   TableBody,
@@ -63,7 +66,8 @@ import {
   GraduationCap,
   Trash2,
   FileText,
-  Upload
+  Upload,
+  CalendarIcon
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -74,23 +78,44 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useForm } from "react-hook-form";
+import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+
+interface Student {
+  id: number;
+  name: string;
+  personalNumber: string;
+  municipality: string;
+  school: string;
+  schoolUnit: string;
+  program: string;
+  class: string;
+  year: string;
+  status: "active" | "conflict" | "pending";
+  startDate: string;
+  endDate?: string;
+  amount: number;
+  teacher: string;
+}
 
 const Students = () => {
   const { t } = useLanguage();
   const { user } = useAuth();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [programFilter, setProgramFilter] = useState("all");
   const [classFilter, setClassFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState("all");
   const [schoolUnitFilter, setSchoolUnitFilter] = useState("all");
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [isStudentDialogOpen, setIsStudentDialogOpen] = useState(false);
   const [isNewStudentDialogOpen, setIsNewStudentDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [studentToDelete, setStudentToDelete] = useState(null);
+  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const form = useForm({
     defaultValues: {
@@ -102,12 +127,14 @@ const Students = () => {
       class: "",
       year: "",
       teacher: "",
-      status: "active"
+      status: "active" as Student["status"],
+      startDate: undefined as Date | undefined,
+      endDate: undefined as Date | undefined
     }
   });
 
-  // Mock student data with enhanced school unit information
-  const students = [
+  // Mock student data with enhanced school unit information and end dates
+  const students: Student[] = [
     {
       id: 1,
       name: "Erik Andersson",
@@ -120,6 +147,7 @@ const Students = () => {
       year: "År 3",
       status: "active",
       startDate: "2024-08-15",
+      endDate: "2027-06-15",
       amount: 125000,
       teacher: "Anna Andersson"
     },
@@ -135,6 +163,7 @@ const Students = () => {
       year: "År 2",
       status: "conflict",
       startDate: "2023-08-15",
+      endDate: "2026-06-15",
       amount: 128000,
       teacher: "Erik Johansson"
     },
@@ -150,6 +179,7 @@ const Students = () => {
       year: "År 3",
       status: "active",
       startDate: "2024-08-15",
+      endDate: "2027-06-15",
       amount: 135000,
       teacher: "Maria Lindström"
     },
@@ -180,6 +210,7 @@ const Students = () => {
       year: "År 3",
       status: "active",
       startDate: "2024-08-15",
+      endDate: "2027-06-15",
       amount: 130000,
       teacher: "Lena Svensson"
     }
@@ -272,18 +303,30 @@ const Students = () => {
     return matchesProgram && matchesYear && matchesSchoolUnit;
   });
 
-  const handleViewStudent = (student) => {
+  const validateDates = (startDate?: Date, endDate?: Date): string | null => {
+    if (!startDate || !endDate) return null;
+    if (endDate <= startDate) {
+      return "End date must be after start date";
+    }
+    return null;
+  };
+
+  const handleViewStudent = (student: Student) => {
     setSelectedStudent(student);
     setIsStudentDialogOpen(true);
   };
 
-  const handleEditStudent = (student) => {
+  const handleEditStudent = (student: Student) => {
     setSelectedStudent(student);
-    form.reset(student);
+    form.reset({
+      ...student,
+      startDate: student.startDate ? new Date(student.startDate) : undefined,
+      endDate: student.endDate ? new Date(student.endDate) : undefined
+    });
     setIsNewStudentDialogOpen(true);
   };
 
-  const handleDeleteStudent = (student) => {
+  const handleDeleteStudent = (student: Student) => {
     setStudentToDelete(student);
     setIsDeleteDialogOpen(true);
   };
@@ -305,7 +348,9 @@ const Students = () => {
       class: "",
       year: "",
       teacher: "",
-      status: "active"
+      status: "active",
+      startDate: undefined,
+      endDate: undefined
     });
     setIsNewStudentDialogOpen(true);
   };
@@ -314,9 +359,9 @@ const Students = () => {
     setIsImportDialogOpen(true);
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setSelectedFile(file);
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    setSelectedFile(file || null);
   };
 
   const handleImportConfirm = () => {
@@ -328,14 +373,59 @@ const Students = () => {
     }
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: any) => {
+    const dateError = validateDates(data.startDate, data.endDate);
+    if (dateError) {
+      toast({
+        title: "Error",
+        description: dateError,
+        variant: "destructive",
+      });
+      return;
+    }
+
     console.log('Submitting student data:', data);
     setIsNewStudentDialogOpen(false);
+    
+    toast({
+      title: "Success",
+      description: selectedStudent ? "Student updated successfully." : "Student added successfully.",
+    });
   };
 
   const handleExportData = () => {
     console.log('Exporting student data...');
   };
+
+  const DatePicker = ({ date, onDateChange, placeholder }: { 
+    date?: Date; 
+    onDateChange: (date: Date | undefined) => void; 
+    placeholder: string;
+  }) => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className={cn(
+            "w-full justify-start text-left font-normal",
+            !date && "text-muted-foreground"
+          )}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {date ? format(date, "PPP") : <span>{placeholder}</span>}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={onDateChange}
+          initialFocus
+          className={cn("p-3 pointer-events-auto")}
+        />
+      </PopoverContent>
+    </Popover>
+  );
 
   return (
     <div className="space-y-6">
@@ -424,7 +514,7 @@ const Students = () => {
                 New Student
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[600px]">
               <DialogHeader>
                 <DialogTitle>
                   {selectedStudent ? 'Edit Student' : 'Add New Student'}
@@ -555,6 +645,42 @@ const Students = () => {
                           <FormLabel>Teacher</FormLabel>
                           <FormControl>
                             <Input placeholder="Teacher name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="startDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Start Date</FormLabel>
+                          <FormControl>
+                            <DatePicker
+                              date={field.value}
+                              onDateChange={field.onChange}
+                              placeholder="Select start date"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="endDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>End Date</FormLabel>
+                          <FormControl>
+                            <DatePicker
+                              date={field.value}
+                              onDateChange={field.onChange}
+                              placeholder="Select end date"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -742,7 +868,7 @@ const Students = () => {
                     <TableHead className="font-medium">{t('students.program')}</TableHead>
                     <TableHead className="font-medium">{t('students.class')}</TableHead>
                     <TableHead className="font-medium">Year</TableHead>
-                    <TableHead className="font-medium">Teacher</TableHead>
+                    <TableHead className="font-medium">Duration</TableHead>
                     <TableHead className="font-medium">{t('students.status')}</TableHead>
                     <TableHead className="font-medium text-center">{t('students.actions')}</TableHead>
                   </TableRow>
@@ -764,7 +890,16 @@ const Students = () => {
                       <TableCell>{student.program}</TableCell>
                       <TableCell>{student.class}</TableCell>
                       <TableCell>{student.year}</TableCell>
-                      <TableCell>{student.teacher}</TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          <div>{format(new Date(student.startDate), "MMM dd, yyyy")}</div>
+                          {student.endDate && (
+                            <div className="text-ike-neutral">
+                              to {format(new Date(student.endDate), "MMM dd, yyyy")}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell>{getStatusBadge(student.status)}</TableCell>
                       <TableCell className="text-center">
                         <DropdownMenu>
@@ -907,8 +1042,14 @@ const Students = () => {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-ike-neutral">Start Date</label>
-                <p className="text-ike-neutral-dark">{selectedStudent.startDate}</p>
+                <p className="text-ike-neutral-dark">{format(new Date(selectedStudent.startDate), "PPP")}</p>
               </div>
+              {selectedStudent.endDate && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-ike-neutral">End Date</label>
+                  <p className="text-ike-neutral-dark">{format(new Date(selectedStudent.endDate), "PPP")}</p>
+                </div>
+              )}
             </div>
           )}
           <DialogFooter>
@@ -919,7 +1060,7 @@ const Students = () => {
               className="bg-ike-primary hover:bg-ike-primary/90"
               onClick={() => {
                 setIsStudentDialogOpen(false);
-                handleEditStudent(selectedStudent);
+                if (selectedStudent) handleEditStudent(selectedStudent);
               }}
             >
               <Edit className="w-4 h-4 mr-2" />
