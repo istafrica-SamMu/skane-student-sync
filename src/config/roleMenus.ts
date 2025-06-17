@@ -40,7 +40,8 @@ import {
   Server,
   Monitor,
   HardDrive,
-  Terminal
+  Terminal,
+  Building2
 } from "lucide-react";
 
 export interface MenuItem {
@@ -69,6 +70,11 @@ export const regionalAdminMenu: MenuItem[] = [
         title: "Municipality Management",
         url: "/system/municipalities",
         icon: Building,
+      },
+      {
+        title: "Group Management",
+        url: "/system/groups",
+        icon: Building2,
       },
       {
         title: "School Units",
@@ -387,6 +393,11 @@ export const orgAdminMenu: MenuItem[] = [
         title: "Customer Accounts",
         url: "/org/customers",
         icon: Users,
+      },
+      {
+        title: "Group Management",
+        url: "/system/groups",
+        icon: Building2,
       },
       {
         title: "Account Hierarchy",
