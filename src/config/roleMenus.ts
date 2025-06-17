@@ -77,6 +77,11 @@ export const regionalAdminMenu: MenuItem[] = [
         icon: Building2,
       },
       {
+        title: "Principal Management",
+        url: "/system/principals",
+        icon: UserCheck,
+      },
+      {
         title: "School Units",
         url: "/system/schools",
         icon: School,

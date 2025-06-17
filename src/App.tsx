@@ -64,6 +64,7 @@ import FinancialExport from "./pages/reports/FinancialExport";
 import SchoolInfo from "./pages/my-school/SchoolInfo";
 import OrgAdminDashboard from "./pages/OrgAdminDashboard";
 import DevAdminDashboard from "./pages/DevAdminDashboard";
+import PrincipalManagement from "./pages/system/PrincipalManagement";
 
 const queryClient = new QueryClient();
 
@@ -374,6 +375,11 @@ const AppContent = () => {
               <Route path="/integration/*" element={
                 <ProtectedRoute>
                   <Integration />
+                </ProtectedRoute>
+              } />
+              <Route path="/system/principals" element={
+                <ProtectedRoute>
+                  <PrincipalManagement />
                 </ProtectedRoute>
               } />
               <Route path="/settings" element={
