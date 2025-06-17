@@ -67,6 +67,8 @@ import DevAdminDashboard from "./pages/DevAdminDashboard";
 import PrincipalManagement from "./pages/system/PrincipalManagement";
 import ContactOccasions from "./pages/kaa/ContactOccasions";
 import KAARegistry from "./pages/KAARegistry";
+import StatisticsSwedenReports from "./pages/kaa/StatisticsSwedenReports";
+import MeasuresAndActions from "./pages/kaa/MeasuresAndActions";
 
 const queryClient = new QueryClient();
 
@@ -129,6 +131,16 @@ const AppContent = () => {
               <Route path="/kaa/contacts" element={
                 <ProtectedRoute>
                   <ContactOccasions />
+                </ProtectedRoute>
+              } />
+              <Route path="/kaa/measures" element={
+                <ProtectedRoute>
+                  <MeasuresAndActions />
+                </ProtectedRoute>
+              } />
+              <Route path="/kaa/scb-reports" element={
+                <ProtectedRoute>
+                  <StatisticsSwedenReports />
                 </ProtectedRoute>
               } />
               
