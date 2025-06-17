@@ -67,7 +67,8 @@ import {
   Trash2,
   FileText,
   Upload,
-  CalendarIcon
+  CalendarIcon,
+  MapPin
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -86,6 +87,8 @@ interface Student {
   id: number;
   name: string;
   personalNumber: string;
+  populationMunicipalityCode: string;
+  populationMunicipalityName: string;
   municipality: string;
   school: string;
   schoolUnit: string;
@@ -121,6 +124,8 @@ const Students = () => {
     defaultValues: {
       name: "",
       personalNumber: "",
+      populationMunicipalityCode: "",
+      populationMunicipalityName: "",
       municipality: "",
       school: "",
       program: "",
@@ -133,12 +138,26 @@ const Students = () => {
     }
   });
 
-  // Mock student data with enhanced school unit information and end dates
+  // Mock municipality data for population registration
+  const municipalities = [
+    { code: "1280", name: "Malmö" },
+    { code: "1281", name: "Lund" },
+    { code: "1283", name: "Helsingborg" },
+    { code: "1290", name: "Kristianstad" },
+    { code: "1291", name: "Hässleholm" },
+    { code: "1293", name: "Höör" },
+    { code: "1214", name: "Svedala" },
+    { code: "1230", name: "Staffanstorp" }
+  ];
+
+  // Mock student data with population registration information
   const students: Student[] = [
     {
       id: 1,
       name: "Erik Andersson",
       personalNumber: "200501-1234",
+      populationMunicipalityCode: "1280",
+      populationMunicipalityName: "Malmö",
       municipality: "Malmö",
       school: "Malmö Gymnasium",
       schoolUnit: "Huvudenhet",
@@ -155,6 +174,8 @@ const Students = () => {
       id: 2,
       name: "Maria Johansson",
       personalNumber: "200403-5678",
+      populationMunicipalityCode: "1281",
+      populationMunicipalityName: "Lund",
       municipality: "Lund",
       school: "Katedralskolan",
       schoolUnit: "Estetisk enhet",
@@ -171,6 +192,8 @@ const Students = () => {
       id: 3,
       name: "Carl Lindström",
       personalNumber: "200502-9012",
+      populationMunicipalityCode: "1283",
+      populationMunicipalityName: "Helsingborg",
       municipality: "Helsingborg",
       school: "Nicolai Gymnasium",
       schoolUnit: "Teknikcentrum",
@@ -187,6 +210,8 @@ const Students = () => {
       id: 4,
       name: "Anna Petersson",
       personalNumber: "200406-3456",
+      populationMunicipalityCode: "1290",
+      populationMunicipalityName: "Kristianstad",
       municipality: "Kristianstad",
       school: "Kristianstad Gymnasium",
       schoolUnit: "Ekonomicentrum",
@@ -202,6 +227,8 @@ const Students = () => {
       id: 5,
       name: "Johan Nilsson",
       personalNumber: "200501-7890",
+      populationMunicipalityCode: "1280",
+      populationMunicipalityName: "Malmö",
       municipality: "Malmö",
       school: "Jensen Gymnasium",
       schoolUnit: "Kreativ enhet",
@@ -286,7 +313,8 @@ const Students = () => {
 
   const filteredStudents = students.filter(student => {
     const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         student.personalNumber.includes(searchTerm);
+                         student.personalNumber.includes(searchTerm) ||
+                         student.populationMunicipalityName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "all" || student.status === statusFilter;
     const matchesProgram = programFilter === "all" || student.program === programFilter;
     const matchesClass = classFilter === "all" || student.class === classFilter;
@@ -342,6 +370,8 @@ const Students = () => {
     form.reset({
       name: "",
       personalNumber: "",
+      populationMunicipalityCode: "",
+      populationMunicipalityName: "",
       municipality: "",
       school: "",
       program: "",
@@ -395,6 +425,14 @@ const Students = () => {
 
   const handleExportData = () => {
     console.log('Exporting student data...');
+  };
+
+  const handleMunicipalityChange = (municipalityCode: string) => {
+    const municipality = municipalities.find(m => m.code === municipalityCode);
+    if (municipality) {
+      form.setValue("populationMunicipalityCode", municipality.code);
+      form.setValue("populationMunicipalityName", municipality.name);
+    }
   };
 
   const DatePicker = ({ date, onDateChange, placeholder }: { 
@@ -514,7 +552,7 @@ const Students = () => {
                 New Student
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
+            <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
                   {selectedStudent ? 'Edit Student' : 'Add New Student'}
@@ -553,6 +591,54 @@ const Students = () => {
                       )}
                     />
                   </div>
+
+                  {/* Population Registration Section */}
+                  <div className="border-t pt-4">
+                    <h4 className="text-sm font-medium text-ike-neutral-dark mb-3 flex items-center">
+                      <MapPin className="w-4 h-4 mr-2 text-ike-primary" />
+                      Population Registration
+                    </h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="populationMunicipalityCode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Municipality</FormLabel>
+                            <FormControl>
+                              <Select onValueChange={handleMunicipalityChange} value={field.value}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select municipality" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {municipalities.map((municipality) => (
+                                    <SelectItem key={municipality.code} value={municipality.code}>
+                                      {municipality.code} - {municipality.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="populationMunicipalityName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Municipality Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Auto-filled" {...field} readOnly className="bg-gray-50" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
                   <FormField
                     control={form.control}
                     name="school"
@@ -759,7 +845,7 @@ const Students = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ike-neutral" />
               <Input
-                placeholder={t('students.search.placeholder')}
+                placeholder="Search by name, personal number, or municipality..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 border-ike-primary/20 focus:border-ike-primary"
@@ -864,6 +950,7 @@ const Students = () => {
                       </Button>
                     </TableHead>
                     <TableHead className="font-medium">{t('students.personal.number')}</TableHead>
+                    <TableHead className="font-medium">Population Municipality</TableHead>
                     <TableHead className="font-medium">School Unit</TableHead>
                     <TableHead className="font-medium">{t('students.program')}</TableHead>
                     <TableHead className="font-medium">{t('students.class')}</TableHead>
@@ -881,6 +968,12 @@ const Students = () => {
                       </TableCell>
                       <TableCell className="font-mono text-sm">
                         {student.personalNumber}
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          <div className="font-medium">{student.populationMunicipalityName}</div>
+                          <div className="text-ike-neutral font-mono text-xs">{student.populationMunicipalityCode}</div>
+                        </div>
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className="text-ike-primary border-ike-primary/20">
@@ -990,7 +1083,7 @@ const Students = () => {
 
       {/* Student Details Modal */}
       <Dialog open={isStudentDialogOpen} onOpenChange={setIsStudentDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[700px]">
           <DialogHeader>
             <DialogTitle className="flex items-center">
               <FileText className="w-5 h-5 mr-2 text-ike-primary" />
@@ -1010,6 +1103,24 @@ const Students = () => {
                 <label className="text-sm font-medium text-ike-neutral">Personal Number</label>
                 <p className="font-mono text-ike-neutral-dark">{selectedStudent.personalNumber}</p>
               </div>
+              
+              <div className="col-span-2 border-t pt-4">
+                <h4 className="text-sm font-medium text-ike-neutral-dark mb-3 flex items-center">
+                  <MapPin className="w-4 h-4 mr-2 text-ike-primary" />
+                  Population Registration
+                </h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-ike-neutral">Municipality</label>
+                    <p className="text-ike-neutral-dark">{selectedStudent.populationMunicipalityName}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-ike-neutral">Municipality Code</label>
+                    <p className="font-mono text-ike-neutral-dark">{selectedStudent.populationMunicipalityCode}</p>
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <label className="text-sm font-medium text-ike-neutral">School</label>
                 <p className="text-ike-neutral-dark">{selectedStudent.school}</p>
