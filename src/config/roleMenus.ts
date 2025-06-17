@@ -30,7 +30,17 @@ import {
   Clock,
   Bell,
   Mail,
-  Info
+  Info,
+  Globe,
+  Code,
+  Key,
+  Languages,
+  Workflow,
+  GitBranch,
+  Server,
+  Monitor,
+  HardDrive,
+  Terminal
 } from "lucide-react";
 
 export interface MenuItem {
@@ -358,6 +368,231 @@ export const schoolAdminMenu: MenuItem[] = [
         title: "Settings",
         url: "/my-page/settings",
         icon: Settings,
+      },
+    ],
+  },
+];
+
+export const orgAdminMenu: MenuItem[] = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: Home,
+  },
+  {
+    title: "Organization Management",
+    icon: Building,
+    items: [
+      {
+        title: "Customer Accounts",
+        url: "/org/customers",
+        icon: Users,
+      },
+      {
+        title: "Account Hierarchy",
+        url: "/org/hierarchy",
+        icon: GitBranch,
+      },
+      {
+        title: "Billing & Subscriptions",
+        url: "/org/billing",
+        icon: DollarSign,
+      },
+      {
+        title: "Organization Settings",
+        url: "/org/settings",
+        icon: Settings,
+      },
+    ],
+  },
+  {
+    title: "User Administration",
+    icon: Shield,
+    items: [
+      {
+        title: "Global User Management",
+        url: "/org/users",
+        icon: Users,
+      },
+      {
+        title: "Role & Permissions",
+        url: "/org/permissions",
+        icon: Key,
+      },
+      {
+        title: "Access Control",
+        url: "/org/access",
+        icon: Shield,
+      },
+    ],
+  },
+  {
+    title: "System Oversight",
+    icon: Monitor,
+    items: [
+      {
+        title: "System Health",
+        url: "/org/health",
+        icon: Activity,
+      },
+      {
+        title: "Usage Analytics",
+        url: "/org/analytics",
+        icon: BarChart3,
+      },
+      {
+        title: "Audit Logs",
+        url: "/org/audit",
+        icon: FileText,
+      },
+    ],
+  },
+  {
+    title: "Support & Communication",
+    icon: MessageSquare,
+    items: [
+      {
+        title: "Customer Support",
+        url: "/org/support",
+        icon: MessageSquare,
+      },
+      {
+        title: "Announcements",
+        url: "/org/announcements",
+        icon: Bell,
+      },
+      {
+        title: "Knowledge Base",
+        url: "/org/knowledge",
+        icon: Book,
+      },
+    ],
+  },
+];
+
+export const devAdminMenu: MenuItem[] = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: Home,
+  },
+  {
+    title: "Integration Management",
+    icon: Workflow,
+    items: [
+      {
+        title: "API Configurations",
+        url: "/dev/integrations",
+        icon: Code,
+      },
+      {
+        title: "Customer Integrations",
+        url: "/dev/customer-integrations",
+        icon: Link,
+      },
+      {
+        title: "Integration Testing",
+        url: "/dev/testing",
+        icon: Activity,
+      },
+      {
+        title: "API Documentation",
+        url: "/dev/api-docs",
+        icon: FileText,
+      },
+    ],
+  },
+  {
+    title: "Localization & Translations",
+    icon: Languages,
+    items: [
+      {
+        title: "Translation Management",
+        url: "/dev/translations",
+        icon: Languages,
+      },
+      {
+        title: "Language Settings",
+        url: "/dev/languages",
+        icon: Globe,
+      },
+      {
+        title: "Translation Tools",
+        url: "/dev/translation-tools",
+        icon: Settings,
+      },
+    ],
+  },
+  {
+    title: "Development Tools",
+    icon: Terminal,
+    items: [
+      {
+        title: "Environment Management",
+        url: "/dev/environments",
+        icon: Server,
+      },
+      {
+        title: "Database Management",
+        url: "/dev/database",
+        icon: HardDrive,
+      },
+      {
+        title: "System Configuration",
+        url: "/dev/config",
+        icon: Settings,
+      },
+      {
+        title: "Feature Flags",
+        url: "/dev/features",
+        icon: GitBranch,
+      },
+    ],
+  },
+  {
+    title: "Monitoring & Debugging",
+    icon: Monitor,
+    items: [
+      {
+        title: "System Logs",
+        url: "/dev/logs",
+        icon: FileText,
+      },
+      {
+        title: "Performance Monitoring",
+        url: "/dev/performance",
+        icon: BarChart3,
+      },
+      {
+        title: "Error Tracking",
+        url: "/dev/errors",
+        icon: AlertTriangle,
+      },
+      {
+        title: "Debug Tools",
+        url: "/dev/debug",
+        icon: Terminal,
+      },
+    ],
+  },
+  {
+    title: "Development Resources",
+    icon: Code,
+    items: [
+      {
+        title: "Code Repository",
+        url: "/dev/repository",
+        icon: GitBranch,
+      },
+      {
+        title: "Development Docs",
+        url: "/dev/docs",
+        icon: Book,
+      },
+      {
+        title: "Testing Suite",
+        url: "/dev/test-suite",
+        icon: Activity,
       },
     ],
   },

@@ -61,11 +61,13 @@ import MoneyToPay from "./pages/reports/MoneyToPay";
 import MunicipalStatistics from "./pages/reports/MunicipalStatistics";
 import FinancialExport from "./pages/reports/FinancialExport";
 import SchoolInfo from "./pages/my-school/SchoolInfo";
+import OrgAdminDashboard from "./pages/OrgAdminDashboard";
+import DevAdminDashboard from "./pages/DevAdminDashboard";
 
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -75,7 +77,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const AppContent = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   if (!isAuthenticated) {
     return (
@@ -85,6 +87,18 @@ const AppContent = () => {
       </Routes>
     );
   }
+
+  // Custom dashboard routing based on role
+  const getDashboardComponent = () => {
+    switch (user?.role) {
+      case 'orgadmin':
+        return <OrgAdminDashboard />;
+      case 'devadmin':
+        return <DevAdminDashboard />;
+      default:
+        return <Dashboard />;
+    }
+  };
 
   return (
     <SidebarProvider>
@@ -98,7 +112,7 @@ const AppContent = () => {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  {getDashboardComponent()}
                 </ProtectedRoute>
               } />
               <Route path="/system/users" element={

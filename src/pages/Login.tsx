@@ -43,6 +43,10 @@ const Login = () => {
         return 'Municipal level access - manages municipal schools and students';
       case 'school-admin':
         return 'School level access - manages individual school or school group';
+      case 'orgadmin':
+        return 'Organization administrator - manages customer accounts at organizational level';
+      case 'devadmin':
+        return 'Development administrator - configures integrations, translations, and development tools';
       default:
         return '';
     }
@@ -73,6 +77,8 @@ const Login = () => {
                 <SelectItem value="regional-admin">Regional Central Administrator</SelectItem>
                 <SelectItem value="municipality-admin">Municipality Administrator</SelectItem>
                 <SelectItem value="school-admin">Independent School Administrator</SelectItem>
+                <SelectItem value="orgadmin">Organization Administrator</SelectItem>
+                <SelectItem value="devadmin">Development Administrator</SelectItem>
               </SelectContent>
             </Select>
             {selectedRole && (

@@ -1,4 +1,3 @@
-
 import {
   Sidebar,
   SidebarContent,
@@ -17,7 +16,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChevronDown, BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { regionalAdminMenu, municipalityAdminMenu, schoolAdminMenu } from "@/config/roleMenus";
+import { regionalAdminMenu, municipalityAdminMenu, schoolAdminMenu, orgAdminMenu, devAdminMenu } from "@/config/roleMenus";
 
 export function RoleBasedSidebar() {
   const { user } = useAuth();
@@ -30,6 +29,10 @@ export function RoleBasedSidebar() {
         return municipalityAdminMenu;
       case 'school-admin':
         return schoolAdminMenu;
+      case 'orgadmin':
+        return orgAdminMenu;
+      case 'devadmin':
+        return devAdminMenu;
       default:
         return [];
     }
@@ -43,6 +46,10 @@ export function RoleBasedSidebar() {
         return 'Municipality Administrator';
       case 'school-admin':
         return 'School Administrator';
+      case 'orgadmin':
+        return 'Organization Administrator';
+      case 'devadmin':
+        return 'Development Administrator';
       default:
         return 'IKE 2.0';
     }
