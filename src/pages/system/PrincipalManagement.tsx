@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -57,6 +56,7 @@ const PrincipalManagement = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isLinkGroupDialogOpen, setIsLinkGroupDialogOpen] = useState(false);
   const [selectedPrincipal, setSelectedPrincipal] = useState<Principal | null>(null);
 
@@ -144,6 +144,24 @@ const PrincipalManagement = () => {
       title: "Group Unlinked",
       description: "Principal has been unlinked from the group",
     });
+  };
+
+  const handleEditPrincipal = (principal: Principal) => {
+    setSelectedPrincipal(principal);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeletePrincipal = (principalId: string) => {
+    const principal = principals.find(p => p.id === principalId);
+    if (!principal) return;
+
+    if (window.confirm(`Are you sure you want to delete "${principal.name}"? This action cannot be undone.`)) {
+      setPrincipals(prev => prev.filter(p => p.id !== principalId));
+      toast({
+        title: "Principal Deleted",
+        description: `${principal.name} has been deleted successfully`,
+      });
+    }
   };
 
   const openLinkDialog = (principal: Principal) => {
@@ -243,10 +261,18 @@ const PrincipalManagement = () => {
                   <Badge variant={principal.status === 'active' ? 'default' : 'secondary'}>
                     {principal.status}
                   </Badge>
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleEditPrincipal(principal)}
+                  >
                     <Edit className="w-4 h-4" />
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleDeletePrincipal(principal.id)}
+                  >
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
@@ -317,6 +343,66 @@ const PrincipalManagement = () => {
           </Card>
         ))}
       </div>
+
+      {/* Edit Principal Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Principal - {selectedPrincipal?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="editName">Full Name</Label>
+              <Input id="editName" defaultValue={selectedPrincipal?.name} placeholder="Enter full name" />
+            </div>
+            <div>
+              <Label htmlFor="editPersonalNumber">Personal Number</Label>
+              <Input id="editPersonalNumber" defaultValue={selectedPrincipal?.personalNumber} placeholder="YYYYMMDD-XXXX" />
+            </div>
+            <div>
+              <Label htmlFor="editEmail">Email</Label>
+              <Input id="editEmail" type="email" defaultValue={selectedPrincipal?.email} placeholder="email@example.com" />
+            </div>
+            <div>
+              <Label htmlFor="editPhone">Phone</Label>
+              <Input id="editPhone" defaultValue={selectedPrincipal?.phone} placeholder="+46 70 123 4567" />
+            </div>
+            <div className="col-span-2">
+              <Label htmlFor="editAddress">Address</Label>
+              <Textarea 
+                id="editAddress" 
+                defaultValue={`${selectedPrincipal?.address?.street}, ${selectedPrincipal?.address?.postalCode} ${selectedPrincipal?.address?.city}, ${selectedPrincipal?.address?.country}`}
+                placeholder="Street, Postal Code, City, Country" 
+              />
+            </div>
+            <div>
+              <Label htmlFor="editStartDate">Start Date</Label>
+              <Input id="editStartDate" type="date" defaultValue={selectedPrincipal?.startDate} />
+            </div>
+            <div>
+              <Label htmlFor="editEndDate">End Date (Optional)</Label>
+              <Input id="editEndDate" type="date" defaultValue={selectedPrincipal?.endDate} />
+            </div>
+          </div>
+          <div className="flex justify-end space-x-2 mt-4">
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              className="bg-ike-primary hover:bg-ike-primary-dark"
+              onClick={() => {
+                setIsEditDialogOpen(false);
+                toast({
+                  title: "Principal Updated",
+                  description: "Principal information has been updated successfully",
+                });
+              }}
+            >
+              Update Principal
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Link Group Dialog */}
       <Dialog open={isLinkGroupDialogOpen} onOpenChange={setIsLinkGroupDialogOpen}>

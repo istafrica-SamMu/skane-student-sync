@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -79,6 +78,7 @@ const GroupManagement = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isLinkPrincipalDialogOpen, setIsLinkPrincipalDialogOpen] = useState(false);
   const [isLinkSchoolDialogOpen, setIsLinkSchoolDialogOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
@@ -232,6 +232,24 @@ const GroupManagement = () => {
       title: "School Unit Unlinked",
       description: "School unit has been unlinked from the group",
     });
+  };
+
+  const handleEditGroup = (group: Group) => {
+    setSelectedGroup(group);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteGroup = (groupId: string) => {
+    const group = groups.find(g => g.id === groupId);
+    if (!group) return;
+
+    if (window.confirm(`Are you sure you want to delete "${group.name}"? This action cannot be undone.`)) {
+      setGroups(prev => prev.filter(g => g.id !== groupId));
+      toast({
+        title: "Group Deleted",
+        description: `${group.name} has been deleted successfully`,
+      });
+    }
   };
 
   const openLinkPrincipalDialog = (group: Group) => {
@@ -423,10 +441,18 @@ const GroupManagement = () => {
                   <Badge variant={group.status === 'active' ? 'default' : 'secondary'}>
                     {group.status}
                   </Badge>
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleEditGroup(group)}
+                  >
                     <Edit className="w-4 h-4" />
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleDeleteGroup(group.id)}
+                  >
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
@@ -594,6 +620,149 @@ const GroupManagement = () => {
           </Card>
         ))}
       </div>
+
+      {/* Edit Group Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Group - {selectedGroup?.name}</DialogTitle>
+          </DialogHeader>
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="basic">Basic Info</TabsTrigger>
+              <TabsTrigger value="contact">Contact</TabsTrigger>
+              <TabsTrigger value="address">Address</TabsTrigger>
+              <TabsTrigger value="financial">Financial</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="basic" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="editGroupName">Group Name</Label>
+                  <Input id="editGroupName" defaultValue={selectedGroup?.name} placeholder="Enter group name" />
+                </div>
+                <div>
+                  <Label htmlFor="editMunicipality">Municipality</Label>
+                  <Select defaultValue={selectedGroup?.municipality?.toLowerCase()}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select municipality" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="stockholm">Stockholm</SelectItem>
+                      <SelectItem value="göteborg">Göteborg</SelectItem>
+                      <SelectItem value="malmö">Malmö</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="editOrgNumber">Organization Number</Label>
+                  <Input id="editOrgNumber" defaultValue={selectedGroup?.organizationNumber} placeholder="212000-XXXX" />
+                </div>
+                <div>
+                  <Label htmlFor="editStatus">Status</Label>
+                  <Select defaultValue={selectedGroup?.status}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="editStartDate">Start Date</Label>
+                  <Input id="editStartDate" type="date" defaultValue={selectedGroup?.startDate} />
+                </div>
+                <div>
+                  <Label htmlFor="editEndDate">End Date (Optional)</Label>
+                  <Input id="editEndDate" type="date" defaultValue={selectedGroup?.endDate} />
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="contact" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="editContactName">Contact Person Name</Label>
+                  <Input id="editContactName" defaultValue={selectedGroup?.contactPerson?.name} placeholder="Full name" />
+                </div>
+                <div>
+                  <Label htmlFor="editContactRole">Role</Label>
+                  <Input id="editContactRole" defaultValue={selectedGroup?.contactPerson?.role} placeholder="Position/Title" />
+                </div>
+                <div>
+                  <Label htmlFor="editContactEmail">Email</Label>
+                  <Input id="editContactEmail" type="email" defaultValue={selectedGroup?.contactPerson?.email} placeholder="email@example.com" />
+                </div>
+                <div>
+                  <Label htmlFor="editContactPhone">Phone</Label>
+                  <Input id="editContactPhone" defaultValue={selectedGroup?.contactPerson?.phone} placeholder="+46 XX XXX XX XX" />
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="address" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <Label htmlFor="editStreet">Street Address</Label>
+                  <Input id="editStreet" defaultValue={selectedGroup?.address?.street} placeholder="Street name and number" />
+                </div>
+                <div>
+                  <Label htmlFor="editPostalCode">Postal Code</Label>
+                  <Input id="editPostalCode" defaultValue={selectedGroup?.address?.postalCode} placeholder="XXX XX" />
+                </div>
+                <div>
+                  <Label htmlFor="editCity">City</Label>
+                  <Input id="editCity" defaultValue={selectedGroup?.address?.city} placeholder="City name" />
+                </div>
+                <div>
+                  <Label htmlFor="editCountry">Country</Label>
+                  <Select defaultValue={selectedGroup?.address?.country?.toLowerCase()}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sweden">Sweden</SelectItem>
+                      <SelectItem value="norway">Norway</SelectItem>
+                      <SelectItem value="denmark">Denmark</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="financial" className="space-y-4">
+              <div>
+                <Label htmlFor="editAdditionalAmount">Additional Amount (SEK)</Label>
+                <Input id="editAdditionalAmount" type="number" defaultValue={selectedGroup?.additionalAmount} placeholder="0" />
+              </div>
+              <div>
+                <Label htmlFor="editDescription">Description</Label>
+                <Textarea id="editDescription" placeholder="Additional details about financial arrangements..." />
+              </div>
+            </TabsContent>
+          </Tabs>
+          
+          <div className="flex justify-end space-x-2 mt-6">
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              className="bg-ike-primary hover:bg-ike-primary-dark"
+              onClick={() => {
+                setIsEditDialogOpen(false);
+                toast({
+                  title: "Group Updated",
+                  description: "Group information has been updated successfully",
+                });
+              }}
+            >
+              Update Group
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Link Principal Dialog */}
       <Dialog open={isLinkPrincipalDialogOpen} onOpenChange={setIsLinkPrincipalDialogOpen}>
