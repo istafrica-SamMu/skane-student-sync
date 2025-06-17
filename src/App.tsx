@@ -67,7 +67,7 @@ import DevAdminDashboard from "./pages/DevAdminDashboard";
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
