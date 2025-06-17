@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -6,25 +5,13 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   Settings, 
   Calendar, 
-  Users, 
-  Shield, 
-  Clock, 
-  GraduationCap,
+  Building,
   AlertTriangle,
   Check,
-  Building,
   FileText,
   Save
 } from "lucide-react";
@@ -39,10 +26,7 @@ const EnrollmentSettings = () => {
     enrollmentEnd: "2024-03-31",
     priorityDeadline: "2024-02-15",
     allowLateApplications: true,
-    lateApplicationDeadline: "2024-04-15",
-    requireResidencyProof: true,
-    enableWaitingLists: true,
-    autoProcessApplications: false
+    lateApplicationDeadline: "2024-04-15"
   });
 
   const [schoolSettings, setSchoolSettings] = useState([
@@ -263,59 +247,6 @@ const EnrollmentSettings = () => {
         </CardContent>
       </Card>
 
-      {/* Application Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Settings className="w-5 h-5 text-ike-primary" />
-            <span>Application Settings</span>
-          </CardTitle>
-          <CardDescription>
-            Configure application processing and requirements
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <Label>Require Residency Proof</Label>
-              <p className="text-sm text-ike-neutral">
-                Require proof of municipal residency for enrollment
-              </p>
-            </div>
-            <Switch
-              checked={municipalSettings.requireResidencyProof}
-              onCheckedChange={(checked) => handleMunicipalSettingChange('requireResidencyProof', checked)}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <Label>Enable Waiting Lists</Label>
-              <p className="text-sm text-ike-neutral">
-                Create waiting lists when schools reach capacity
-              </p>
-            </div>
-            <Switch
-              checked={municipalSettings.enableWaitingLists}
-              onCheckedChange={(checked) => handleMunicipalSettingChange('enableWaitingLists', checked)}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <Label>Auto-Process Applications</Label>
-              <p className="text-sm text-ike-neutral">
-                Automatically process applications when requirements are met
-              </p>
-            </div>
-            <Switch
-              checked={municipalSettings.autoProcessApplications}
-              onCheckedChange={(checked) => handleMunicipalSettingChange('autoProcessApplications', checked)}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Configuration Actions */}
       <Card>
         <CardHeader>
@@ -339,20 +270,6 @@ const EnrollmentSettings = () => {
               </div>
             </div>
           </div>
-
-          {!municipalSettings.enableWaitingLists && (
-            <div className="p-4 border border-yellow-200 bg-yellow-50 rounded-lg">
-              <div className="flex items-start space-x-2">
-                <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-yellow-800">Waiting Lists Disabled</p>
-                  <p className="text-sm text-yellow-700 mt-1">
-                    Applications may be rejected when schools reach capacity without waiting lists enabled.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
 
           <div className="flex justify-between space-x-4">
             <div className="flex space-x-3">
