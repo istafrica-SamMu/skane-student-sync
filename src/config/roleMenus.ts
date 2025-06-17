@@ -41,7 +41,8 @@ import {
   Monitor,
   HardDrive,
   Terminal,
-  Building2
+  Building2,
+  ClipboardList
 } from "lucide-react";
 
 export interface MenuItem {
@@ -208,6 +209,32 @@ export const municipalityAdminMenu: MenuItem[] = [
         title: "External School Students",
         url: "/students/external",
         icon: ArrowUpDown,
+      },
+    ],
+  },
+  {
+    title: "KAA Management",
+    icon: ClipboardList,
+    items: [
+      {
+        title: "KAA Registry",
+        url: "/kaa/registry",
+        icon: Users,
+      },
+      {
+        title: "Measures & Actions",
+        url: "/kaa/measures",
+        icon: Activity,
+      },
+      {
+        title: "Contact Occasions",
+        url: "/kaa/contacts",
+        icon: MessageSquare,
+      },
+      {
+        title: "Statistics Sweden Reports",
+        url: "/kaa/scb-reports",
+        icon: FileText,
       },
     ],
   },
