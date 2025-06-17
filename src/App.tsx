@@ -25,6 +25,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import UserManagement from "./pages/system/UserManagement";
 import MunicipalityManagement from "./pages/system/MunicipalityManagement";
+import GroupManagement from "./pages/system/GroupManagement";
 import SchoolUnits from "./pages/system/SchoolUnits";
 import SchoolYears from "./pages/system/SchoolYears";
 import StudyPaths from "./pages/study-paths/StudyPaths";
@@ -123,6 +124,11 @@ const AppContent = () => {
               <Route path="/system/municipalities" element={
                 <ProtectedRoute>
                   <MunicipalityManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/system/groups" element={
+                <ProtectedRoute>
+                  <GroupManagement />
                 </ProtectedRoute>
               } />
               <Route path="/system/schools" element={
