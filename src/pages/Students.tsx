@@ -410,12 +410,14 @@ const StudentTable = ({
   handleEdit,
   handleDelete,
   handleViewHistory,
+  handleViewEducationHistory,
 }: {
   filteredStudents: Student[];
   handleViewDetails: (student: Student) => void;
   handleEdit: (student: Student) => void;
   handleDelete: (id: number) => void;
   handleViewHistory: (student: Student) => void;
+  handleViewEducationHistory: (student: Student) => void;
 }) => {
   return (
     <Table>
@@ -979,6 +981,14 @@ const Students = () => {
     setShowStudentForm(false);
   };
 
+  const handleUpdateEducationHistory = (studentId: number, history: EducationHistory[]) => {
+    setStudents(students.map(s => 
+      s.id === studentId 
+        ? { ...s, educationHistory: history }
+        : s
+    ));
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -1115,6 +1125,7 @@ const Students = () => {
             handleEdit={handleEdit} 
             handleDelete={handleDelete}
             handleViewHistory={handleViewHistory}
+            handleViewEducationHistory={handleViewEducationHistory}
           />
         </CardContent>
       </Card>
