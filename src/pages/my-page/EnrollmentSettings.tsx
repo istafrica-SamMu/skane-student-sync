@@ -69,14 +69,6 @@ const EnrollmentSettings = () => {
     }
   ]);
 
-  const [documentRequirements, setDocumentRequirements] = useState({
-    residencyProof: true,
-    birthCertificate: true,
-    previousSchoolRecords: false,
-    specialNeedsDocumentation: true,
-    parentalConsent: true
-  });
-
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
@@ -91,10 +83,6 @@ const EnrollmentSettings = () => {
         i === index ? { ...school, [field]: value } : school
       )
     );
-  };
-
-  const handleDocumentRequirementChange = (requirement: string, value: boolean) => {
-    setDocumentRequirements(prev => ({ ...prev, [requirement]: value }));
   };
 
   const handleSaveConfiguration = () => {
@@ -275,81 +263,18 @@ const EnrollmentSettings = () => {
         </CardContent>
       </Card>
 
-      {/* Document Requirements */}
+      {/* Application Settings */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <FileText className="w-5 h-5 text-ike-primary" />
-            <span>Document Requirements</span>
+            <Settings className="w-5 h-5 text-ike-primary" />
+            <span>Application Settings</span>
           </CardTitle>
           <CardDescription>
-            Configure required documentation for enrollment applications
+            Configure application processing and requirements
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label>Residency Proof</Label>
-                  <p className="text-xs text-ike-neutral">Utility bill or lease agreement</p>
-                </div>
-                <Switch
-                  checked={documentRequirements.residencyProof}
-                  onCheckedChange={(checked) => handleDocumentRequirementChange('residencyProof', checked)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label>Birth Certificate</Label>
-                  <p className="text-xs text-ike-neutral">Official birth certificate copy</p>
-                </div>
-                <Switch
-                  checked={documentRequirements.birthCertificate}
-                  onCheckedChange={(checked) => handleDocumentRequirementChange('birthCertificate', checked)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label>Previous School Records</Label>
-                  <p className="text-xs text-ike-neutral">Transcripts from previous school</p>
-                </div>
-                <Switch
-                  checked={documentRequirements.previousSchoolRecords}
-                  onCheckedChange={(checked) => handleDocumentRequirementChange('previousSchoolRecords', checked)}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label>Special Needs Documentation</Label>
-                  <p className="text-xs text-ike-neutral">IEP or medical documentation</p>
-                </div>
-                <Switch
-                  checked={documentRequirements.specialNeedsDocumentation}
-                  onCheckedChange={(checked) => handleDocumentRequirementChange('specialNeedsDocumentation', checked)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label>Parental Consent</Label>
-                  <p className="text-xs text-ike-neutral">Signed consent forms</p>
-                </div>
-                <Switch
-                  checked={documentRequirements.parentalConsent}
-                  onCheckedChange={(checked) => handleDocumentRequirementChange('parentalConsent', checked)}
-                />
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <Label>Require Residency Proof</Label>
