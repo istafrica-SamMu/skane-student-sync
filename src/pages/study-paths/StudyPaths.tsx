@@ -6,9 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Book, Plus, Search, Filter, Edit, Trash2, Eye, Download } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Book, Plus, Search, Filter, Edit, Trash2, Eye, Download, CalendarIcon } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface StudyPath {
   id: string;
@@ -18,16 +22,67 @@ interface StudyPath {
   municipality: string;
   priceCode?: string;
   students: number;
+  startDate?: Date;
+  endDate?: Date;
 }
 
 export default function StudyPaths() {
   const { toast } = useToast();
   const [studyPaths, setStudyPaths] = useState<StudyPath[]>([
-    { id: "1", name: "Natural Science", code: "NA001", status: "Active", municipality: "Malmö", priceCode: "PC001", students: 120 },
-    { id: "2", name: "Social Science", code: "SA002", status: "Active", municipality: "Lund", priceCode: "PC002", students: 85 },
-    { id: "3", name: "Technology", code: "TE003", status: "Pending", municipality: "Helsingborg", priceCode: "PC003", students: 67 },
-    { id: "4", name: "Arts", code: "AR004", status: "Active", municipality: "Malmö", priceCode: "PC004", students: 45 },
-    { id: "5", name: "Business", code: "BU005", status: "Inactive", municipality: "Lund", students: 0 },
+    { 
+      id: "1", 
+      name: "Natural Science", 
+      code: "NA001", 
+      status: "Active", 
+      municipality: "Malmö", 
+      priceCode: "PC001", 
+      students: 120,
+      startDate: new Date("2024-08-15"),
+      endDate: new Date("2027-06-15")
+    },
+    { 
+      id: "2", 
+      name: "Social Science", 
+      code: "SA002", 
+      status: "Active", 
+      municipality: "Lund", 
+      priceCode: "PC002", 
+      students: 85,
+      startDate: new Date("2024-08-15"),
+      endDate: new Date("2027-06-15")
+    },
+    { 
+      id: "3", 
+      name: "Technology", 
+      code: "TE003", 
+      status: "Pending", 
+      municipality: "Helsingborg", 
+      priceCode: "PC003", 
+      students: 67,
+      startDate: new Date("2025-08-15"),
+      endDate: new Date("2028-06-15")
+    },
+    { 
+      id: "4", 
+      name: "Arts", 
+      code: "AR004", 
+      status: "Active", 
+      municipality: "Malmö", 
+      priceCode: "PC004", 
+      students: 45,
+      startDate: new Date("2024-08-15"),
+      endDate: new Date("2027-06-15")
+    },
+    { 
+      id: "5", 
+      name: "Business", 
+      code: "BU005", 
+      status: "Inactive", 
+      municipality: "Lund", 
+      students: 0,
+      startDate: new Date("2023-08-15"),
+      endDate: new Date("2024-06-15")
+    },
   ]);
 
   // Predefined options for dropdowns
@@ -44,7 +99,9 @@ export default function StudyPaths() {
     code: "",
     municipality: "",
     priceCode: "",
-    status: "Active" as StudyPath["status"]
+    status: "Active" as StudyPath["status"],
+    startDate: undefined as Date | undefined,
+    endDate: undefined as Date | undefined
   });
 
   const resetForm = () => {
@@ -53,8 +110,18 @@ export default function StudyPaths() {
       code: "",
       municipality: "",
       priceCode: "",
-      status: "Active"
+      status: "Active",
+      startDate: undefined,
+      endDate: undefined
     });
+  };
+
+  const validateDates = (startDate?: Date, endDate?: Date): string | null => {
+    if (!startDate || !endDate) return null;
+    if (endDate <= startDate) {
+      return "End date must be after start date";
+    }
+    return null;
   };
 
   const handleAdd = () => {
@@ -67,6 +134,16 @@ export default function StudyPaths() {
       return;
     }
 
+    const dateError = validateDates(formData.startDate, formData.endDate);
+    if (dateError) {
+      toast({
+        title: "Error",
+        description: dateError,
+        variant: "destructive",
+      });
+      return;
+    }
+
     const newPath: StudyPath = {
       id: Date.now().toString(),
       name: formData.name,
@@ -74,7 +151,9 @@ export default function StudyPaths() {
       status: formData.status,
       municipality: formData.municipality,
       priceCode: formData.priceCode || undefined,
-      students: 0
+      students: 0,
+      startDate: formData.startDate,
+      endDate: formData.endDate
     };
 
     setStudyPaths([...studyPaths, newPath]);
@@ -94,7 +173,9 @@ export default function StudyPaths() {
       code: path.code,
       municipality: path.municipality,
       priceCode: path.priceCode || "",
-      status: path.status
+      status: path.status,
+      startDate: path.startDate,
+      endDate: path.endDate
     });
     setIsEditDialogOpen(true);
   };
@@ -109,6 +190,16 @@ export default function StudyPaths() {
       return;
     }
 
+    const dateError = validateDates(formData.startDate, formData.endDate);
+    if (dateError) {
+      toast({
+        title: "Error",
+        description: dateError,
+        variant: "destructive",
+      });
+      return;
+    }
+
     const updatedPaths = studyPaths.map(path =>
       path.id === editingPath.id
         ? {
@@ -117,7 +208,9 @@ export default function StudyPaths() {
             code: formData.code,
             municipality: formData.municipality,
             priceCode: formData.priceCode || undefined,
-            status: formData.status
+            status: formData.status,
+            startDate: formData.startDate,
+            endDate: formData.endDate
           }
         : path
     );
@@ -153,6 +246,36 @@ export default function StudyPaths() {
     path.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     path.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
     path.municipality.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const DatePicker = ({ date, onDateChange, placeholder }: { 
+    date?: Date; 
+    onDateChange: (date: Date | undefined) => void; 
+    placeholder: string;
+  }) => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className={cn(
+            "w-full justify-start text-left font-normal",
+            !date && "text-muted-foreground"
+          )}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {date ? format(date, "PPP") : <span>{placeholder}</span>}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={onDateChange}
+          initialFocus
+          className={cn("p-3 pointer-events-auto")}
+        />
+      </PopoverContent>
+    </Popover>
   );
 
   return (
@@ -267,6 +390,24 @@ export default function StudyPaths() {
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label>Start Date</Label>
+                    <DatePicker
+                      date={formData.startDate}
+                      onDateChange={(date) => setFormData({ ...formData, startDate: date })}
+                      placeholder="Select start date"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>End Date</Label>
+                    <DatePicker
+                      date={formData.endDate}
+                      onDateChange={(date) => setFormData({ ...formData, endDate: date })}
+                      placeholder="Select end date"
+                    />
+                  </div>
+                </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
@@ -353,6 +494,13 @@ export default function StudyPaths() {
                     Code: {path.code} • {path.municipality} • {path.students} students
                     {path.priceCode && ` • Price Code: ${path.priceCode}`}
                   </p>
+                  {(path.startDate || path.endDate) && (
+                    <p className="text-sm text-ike-neutral mt-1">
+                      {path.startDate && `Start: ${format(path.startDate, "MMM dd, yyyy")}`}
+                      {path.startDate && path.endDate && " • "}
+                      {path.endDate && `End: ${format(path.endDate, "MMM dd, yyyy")}`}
+                    </p>
+                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   <Badge variant={
@@ -477,6 +625,24 @@ export default function StudyPaths() {
                   <SelectItem value="Inactive">Inactive</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label>Start Date</Label>
+                <DatePicker
+                  date={formData.startDate}
+                  onDateChange={(date) => setFormData({ ...formData, startDate: date })}
+                  placeholder="Select start date"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>End Date</Label>
+                <DatePicker
+                  date={formData.endDate}
+                  onDateChange={(date) => setFormData({ ...formData, endDate: date })}
+                  placeholder="Select end date"
+                />
+              </div>
             </div>
           </div>
           <DialogFooter>
