@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,6 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   Users,
   Check,
@@ -47,7 +47,13 @@ import {
   Shield,
   Trash2,
   Edit,
-  Plus
+  Plus,
+  GraduationCap,
+  Building,
+  FileText,
+  BarChart3,
+  Settings as SettingsIcon,
+  DollarSign
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
@@ -60,6 +66,14 @@ interface User {
   organization?: string;
   status: 'active' | 'inactive';
   createdAt: string;
+}
+
+interface Permission {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  icon: any;
 }
 
 interface Role {
@@ -81,46 +95,142 @@ const Settings = () => {
   });
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
 
-  // User management state
+  // Available permissions for municipal admin
+  const availablePermissions: Permission[] = [
+    {
+      id: "students_view",
+      name: "View Students", 
+      description: "View student information and records",
+      category: "Students",
+      icon: GraduationCap
+    },
+    {
+      id: "students_edit",
+      name: "Edit Students",
+      description: "Modify student information and enrollment",
+      category: "Students", 
+      icon: GraduationCap
+    },
+    {
+      id: "students_create",
+      name: "Create Students",
+      description: "Add new student records",
+      category: "Students",
+      icon: GraduationCap
+    },
+    {
+      id: "units_view",
+      name: "View School Units",
+      description: "View school unit details and information",
+      category: "School Units",
+      icon: Building
+    },
+    {
+      id: "units_edit", 
+      name: "Edit School Units",
+      description: "Modify school unit details and settings",
+      category: "School Units",
+      icon: Building
+    },
+    {
+      id: "reports_view",
+      name: "View Reports",
+      description: "Access municipal reports and statistics",
+      category: "Reports",
+      icon: BarChart3
+    },
+    {
+      id: "reports_export",
+      name: "Export Reports", 
+      description: "Export reports and data",
+      category: "Reports",
+      icon: FileText
+    },
+    {
+      id: "financial_view",
+      name: "View Financial Data",
+      description: "Access financial reports and data",
+      category: "Financial",
+      icon: DollarSign
+    },
+    {
+      id: "financial_edit",
+      name: "Edit Financial Data",
+      description: "Modify financial information",
+      category: "Financial", 
+      icon: DollarSign
+    },
+    {
+      id: "enrollment_manage",
+      name: "Manage Enrollment",
+      description: "Configure enrollment settings and periods",
+      category: "Administration",
+      icon: SettingsIcon
+    },
+    {
+      id: "users_manage",
+      name: "Manage Users",
+      description: "Create and manage user accounts within municipality",
+      category: "Administration",
+      icon: Users
+    }
+  ];
+
+  // Municipal-specific roles
+  const [roles, setRoles] = useState<Role[]>([
+    {
+      id: "1",
+      name: "School Principal",
+      description: "Principal with full school management access",
+      permissions: ["students_view", "students_edit", "units_view", "units_edit", "reports_view", "enrollment_manage"]
+    },
+    {
+      id: "2", 
+      name: "Administrative Staff",
+      description: "Administrative staff with student and report access",
+      permissions: ["students_view", "students_edit", "students_create", "reports_view", "reports_export"]
+    },
+    {
+      id: "3",
+      name: "Teacher",
+      description: "Teacher with student viewing access",
+      permissions: ["students_view", "reports_view"]
+    },
+    {
+      id: "4",
+      name: "Municipal Coordinator", 
+      description: "Municipal coordinator with broad access",
+      permissions: ["students_view", "students_edit", "units_view", "reports_view", "reports_export", "financial_view", "enrollment_manage"]
+    }
+  ]);
+
   const [users, setUsers] = useState<User[]>([
     {
       id: "1",
-      name: "John Doe",
-      email: "john@example.com",
-      role: "Regional Admin",
-      organization: "Region North",
+      name: "Lars Andersson",
+      email: "lars.andersson@malmoe.se",
+      role: "School Principal",
+      organization: "Malmö Central Elementary",
       status: 'active',
       createdAt: "2024-01-15"
     },
     {
       id: "2",
-      name: "Jane Smith",
-      email: "jane@example.com",
-      role: "Municipality Admin",
-      organization: "City Center",
+      name: "Sofia Eriksson", 
+      email: "sofia.eriksson@malmoe.se",
+      role: "Administrative Staff",
+      organization: "Malmö North High School",
       status: 'active',
       createdAt: "2024-02-10"
-    }
-  ]);
-
-  const [roles, setRoles] = useState<Role[]>([
-    {
-      id: "1",
-      name: "Regional Admin",
-      description: "Full system access and management",
-      permissions: ["all"]
-    },
-    {
-      id: "2",
-      name: "Municipality Admin",
-      description: "Municipal operations and reporting",
-      permissions: ["municipal_admin", "reports", "students"]
     },
     {
       id: "3",
-      name: "School Admin",
-      description: "School-level administration",
-      permissions: ["school_admin", "students", "basic_reports"]
+      name: "Michael Johansson",
+      email: "michael.johansson@malmoe.se", 
+      role: "Teacher",
+      organization: "Malmö Tech Academy",
+      status: 'active',
+      createdAt: "2024-03-05"
     }
   ]);
 
@@ -206,15 +316,15 @@ const Settings = () => {
     
     toast({
       title: "Success",
-      description: "User created successfully!",
+      description: "Municipal user created successfully!",
     });
   };
 
   const handleCreateRole = () => {
-    if (!newRole.name || !newRole.description) {
+    if (!newRole.name || !newRole.description || newRole.permissions.length === 0) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields!",
+        description: "Please fill in all required fields and select at least one permission!",
         variant: "destructive"
       });
       return;
@@ -233,7 +343,7 @@ const Settings = () => {
     
     toast({
       title: "Success",
-      description: "Role created successfully!",
+      description: "Municipal role created successfully!",
     });
   };
 
@@ -277,6 +387,26 @@ const Settings = () => {
     });
   };
 
+  const handlePermissionToggle = (permissionId: string) => {
+    setNewRole(prev => ({
+      ...prev,
+      permissions: prev.permissions.includes(permissionId)
+        ? prev.permissions.filter(p => p !== permissionId)
+        : [...prev.permissions, permissionId]
+    }));
+  };
+
+  const getPermissionsByCategory = () => {
+    const categories: { [key: string]: Permission[] } = {};
+    availablePermissions.forEach(permission => {
+      if (!categories[permission.category]) {
+        categories[permission.category] = [];
+      }
+      categories[permission.category].push(permission);
+    });
+    return categories;
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -284,7 +414,7 @@ const Settings = () => {
         <div>
           <h1 className="text-3xl font-bold text-ike-neutral-dark">{t('settings.title')}</h1>
           <p className="text-ike-neutral mt-2">
-            {t('settings.subtitle')}
+            Municipal Administration Settings
           </p>
         </div>
       </div>
@@ -298,7 +428,7 @@ const Settings = () => {
           </TabsTrigger>
           <TabsTrigger value="users">
             <Users className="mr-2 h-4 w-4" />
-            {t('settings.users')}
+            Municipal Users
           </TabsTrigger>
         </TabsList>
 
@@ -404,8 +534,8 @@ const Settings = () => {
             {/* User Management Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-ike-neutral-dark">User Management</h2>
-                <p className="text-ike-neutral">Manage users and roles in your organization</p>
+                <h2 className="text-2xl font-bold text-ike-neutral-dark">Municipal User Management</h2>
+                <p className="text-ike-neutral">Manage users and roles within your municipality</p>
               </div>
               <div className="flex space-x-2">
                 <Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen}>
@@ -415,21 +545,21 @@ const Settings = () => {
                       Create Role
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
-                      <DialogTitle>Create New Role</DialogTitle>
+                      <DialogTitle>Create New Municipal Role</DialogTitle>
                       <DialogDescription>
-                        Define a new role with specific permissions for your organization.
+                        Define a new role with specific permissions for your municipal users.
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="grid gap-4 py-4">
+                    <div className="grid gap-6 py-4">
                       <div className="space-y-2">
                         <Label htmlFor="role-name">Role Name</Label>
                         <Input
                           id="role-name"
                           value={newRole.name}
                           onChange={(e) => setNewRole(prev => ({ ...prev, name: e.target.value }))}
-                          placeholder="e.g., District Manager"
+                          placeholder="e.g., District Coordinator"
                         />
                       </div>
                       <div className="space-y-2">
@@ -440,6 +570,37 @@ const Settings = () => {
                           onChange={(e) => setNewRole(prev => ({ ...prev, description: e.target.value }))}
                           placeholder="Brief description of the role"
                         />
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <Label>Permissions</Label>
+                        <div className="space-y-6">
+                          {Object.entries(getPermissionsByCategory()).map(([category, permissions]) => (
+                            <div key={category} className="space-y-3">
+                              <h4 className="font-medium text-ike-primary flex items-center space-x-2">
+                                <permissions[0].icon className="w-4 h-4" />
+                                <span>{category}</span>
+                              </h4>
+                              <div className="grid grid-cols-1 gap-3 pl-6">
+                                {permissions.map((permission) => (
+                                  <div key={permission.id} className="flex items-start space-x-3">
+                                    <Checkbox
+                                      id={permission.id}
+                                      checked={newRole.permissions.includes(permission.id)}
+                                      onCheckedChange={() => handlePermissionToggle(permission.id)}
+                                    />
+                                    <div className="space-y-1">
+                                      <Label htmlFor={permission.id} className="font-medium cursor-pointer">
+                                        {permission.name}
+                                      </Label>
+                                      <p className="text-sm text-ike-neutral">{permission.description}</p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                     <DialogFooter>
@@ -456,16 +617,16 @@ const Settings = () => {
 
                 <Dialog open={isUserDialogOpen} onOpenChange={setIsUserDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button>
+                    <Button className="bg-ike-primary hover:bg-ike-primary/90">
                       <UserPlus className="mr-2 h-4 w-4" />
                       Add User
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>{editingUser ? 'Edit User' : 'Create New User'}</DialogTitle>
+                      <DialogTitle>{editingUser ? 'Edit Municipal User' : 'Create New Municipal User'}</DialogTitle>
                       <DialogDescription>
-                        {editingUser ? 'Update user information and role assignment.' : 'Add a new user to your organization and assign them a role.'}
+                        {editingUser ? 'Update user information and role assignment.' : 'Add a new user to your municipality and assign them a role.'}
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
@@ -485,14 +646,14 @@ const Settings = () => {
                           type="email"
                           value={newUser.email}
                           onChange={(e) => setNewUser(prev => ({ ...prev, email: e.target.value }))}
-                          placeholder="john@example.com"
+                          placeholder="john@malmoe.se"
                         />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="user-role">Role</Label>
                         <Select value={newUser.role} onValueChange={(value) => setNewUser(prev => ({ ...prev, role: value }))}>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a role" />
+                            <SelectValue placeholder="Select a municipal role" />
                           </SelectTrigger>
                           <SelectContent>
                             {roles.map((role) => (
@@ -504,12 +665,12 @@ const Settings = () => {
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="user-organization">Organization (Optional)</Label>
+                        <Label htmlFor="user-organization">School/Department</Label>
                         <Input
                           id="user-organization"
                           value={newUser.organization}
                           onChange={(e) => setNewUser(prev => ({ ...prev, organization: e.target.value }))}
-                          placeholder="Department or school name"
+                          placeholder="Malmö Central Elementary"
                         />
                       </div>
                       {!editingUser && (
@@ -547,19 +708,34 @@ const Settings = () => {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Shield className="w-5 h-5 text-ike-primary" />
-                  <span>System Roles</span>
+                  <span>Municipal Roles</span>
                 </CardTitle>
                 <CardDescription>
-                  Manage roles and their permissions
+                  Manage roles and their permissions within your municipality
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4">
                   {roles.map((role) => (
                     <div key={role.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
+                      <div className="flex-1">
                         <h4 className="font-medium">{role.name}</h4>
                         <p className="text-sm text-ike-neutral">{role.description}</p>
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {role.permissions.slice(0, 3).map(permissionId => {
+                            const permission = availablePermissions.find(p => p.id === permissionId);
+                            return permission ? (
+                              <span key={permissionId} className="px-2 py-1 bg-ike-primary/10 text-ike-primary rounded text-xs">
+                                {permission.name}
+                              </span>
+                            ) : null;
+                          })}
+                          {role.permissions.length > 3 && (
+                            <span className="px-2 py-1 bg-ike-neutral-light text-ike-neutral rounded text-xs">
+                              +{role.permissions.length - 3} more
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div className="flex space-x-2">
                         <Button variant="outline" size="sm">
@@ -577,10 +753,10 @@ const Settings = () => {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Users className="w-5 h-5 text-ike-primary" />
-                  <span>Users ({users.length})</span>
+                  <span>Municipal Users ({users.length})</span>
                 </CardTitle>
                 <CardDescription>
-                  Manage user accounts and role assignments
+                  Manage user accounts and role assignments within your municipality
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -623,7 +799,7 @@ const Settings = () => {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Delete User</AlertDialogTitle>
+                              <AlertDialogTitle>Delete Municipal User</AlertDialogTitle>
                               <AlertDialogDescription>
                                 Are you sure you want to delete {user.name}? This action cannot be undone.
                               </AlertDialogDescription>
