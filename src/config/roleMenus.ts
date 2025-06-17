@@ -43,7 +43,8 @@ import {
   Terminal,
   Building2,
   ClipboardList,
-  CreditCard
+  CreditCard,
+  HelpCircle
 } from "lucide-react";
 
 export interface MenuItem {
@@ -97,6 +98,11 @@ export const regionalAdminMenu: MenuItem[] = [
         title: "School Years",
         url: "/system/school-years",
         icon: Calendar,
+      },
+      {
+        title: "Support",
+        url: "/system/support",
+        icon: HelpCircle,
       },
     ],
   },
@@ -183,6 +189,11 @@ export const regionalAdminMenu: MenuItem[] = [
         icon: Settings,
       },
     ],
+  },
+  {
+    title: "Support",
+    url: "/system/support",
+    icon: HelpCircle,
   },
 ];
 
@@ -348,6 +359,11 @@ export const municipalityAdminMenu: MenuItem[] = [
       },
     ],
   },
+  {
+    title: "Support",
+    url: "/system/support",
+    icon: HelpCircle,
+  },
 ];
 
 export const schoolAdminMenu: MenuItem[] = [
@@ -424,6 +440,11 @@ export const schoolAdminMenu: MenuItem[] = [
         icon: Settings,
       },
     ],
+  },
+  {
+    title: "Support",
+    url: "/system/support",
+    icon: HelpCircle,
   },
 ];
 
@@ -526,6 +547,11 @@ export const orgAdminMenu: MenuItem[] = [
         icon: Book,
       },
     ],
+  },
+  {
+    title: "Support",
+    url: "/system/support",
+    icon: HelpCircle,
   },
 ];
 
@@ -654,5 +680,10 @@ export const devAdminMenu: MenuItem[] = [
         icon: Activity,
       },
     ],
+  },
+  {
+    title: "Support",
+    url: "/system/support",
+    icon: HelpCircle,
   },
 ];
