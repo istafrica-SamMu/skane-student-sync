@@ -47,6 +47,7 @@ import {
   MapPin,
   FileText,
   GraduationCap,
+  BookOpen,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -58,6 +59,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 import { StudentHistoryModal } from "@/components/students/StudentHistoryModal";
 import { StudentEducationHistory, EducationHistory } from "@/components/students/StudentEducationHistory";
+import { StudentStudyPaths, StudentStudyPath } from "@/components/students/StudentStudyPaths";
 
 interface Student {
   id: number;
@@ -68,6 +70,8 @@ interface Student {
   address: string;
   municipality: string;
   municipalityCode: string;
+  populationRegMunicipality?: string;
+  populationRegMunicipalityCode?: string;
   school: string;
   program: string;
   class: string;
@@ -81,6 +85,7 @@ interface Student {
   principalEndDate?: string;
   personalSupplement?: string;
   educationHistory?: EducationHistory[];
+  studyPaths?: StudentStudyPath[];
 }
 
 interface HistoryEntry {
@@ -114,6 +119,15 @@ const getStatusBadge = (status: string) => {
   }
 };
 
+const getCurrentStudyPath = (studyPaths: StudentStudyPath[] = []): StudentStudyPath | null => {
+  const currentDate = new Date().toISOString().split('T')[0];
+  return studyPaths.find(sp => 
+    sp.startDate <= currentDate && 
+    (sp.endDate === undefined || sp.endDate === "" || sp.endDate >= currentDate) &&
+    sp.status === 'active'
+  ) || null;
+};
+
 const StudentForm = ({
   formData,
   setFormData,
@@ -135,6 +149,15 @@ const StudentForm = ({
       ...prev,
       municipality: value,
       municipalityCode: muni ? muni.code : "",
+    }));
+  };
+
+  const handlePopulationRegMunicipalityChange = (value: string) => {
+    const muni = municipalities.find((m) => m.name === value);
+    setFormData((prev) => ({
+      ...prev,
+      populationRegMunicipality: value,
+      populationRegMunicipalityCode: muni ? muni.code : "",
     }));
   };
 
@@ -199,14 +222,29 @@ const StudentForm = ({
           </div>
         </div>
 
-        {/* Academic Information */}
+        {/* Registration Information */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-ike-neutral-dark border-b pb-2">Academic Information</h3>
+          <h3 className="text-lg font-semibold text-ike-neutral-dark border-b pb-2">Registration Information</h3>
           <div>
             <Label htmlFor="municipality" className="text-ike-neutral">Municipality *</Label>
             <Select value={formData.municipality} onValueChange={handleMunicipalityChange} required>
               <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
                 <SelectValue placeholder="Select municipality" />
+              </SelectTrigger>
+              <SelectContent>
+                {municipalities.map((muni) => (
+                  <SelectItem key={muni.code} value={muni.name}>
+                    {muni.name} ({muni.code})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="populationRegMunicipality" className="text-ike-neutral">Population Registration Municipality</Label>
+            <Select value={formData.populationRegMunicipality || ""} onValueChange={handlePopulationRegMunicipalityChange}>
+              <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                <SelectValue placeholder="Select population registration municipality" />
               </SelectTrigger>
               <SelectContent>
                 {municipalities.map((muni) => (
@@ -411,6 +449,7 @@ const StudentTable = ({
   handleDelete,
   handleViewHistory,
   handleViewEducationHistory,
+  handleViewStudyPaths,
 }: {
   filteredStudents: Student[];
   handleViewDetails: (student: Student) => void;
@@ -418,6 +457,7 @@ const StudentTable = ({
   handleDelete: (id: number) => void;
   handleViewHistory: (student: Student) => void;
   handleViewEducationHistory: (student: Student) => void;
+  handleViewStudyPaths: (student: Student) => void;
 }) => {
   return (
     <Table>
@@ -425,75 +465,92 @@ const StudentTable = ({
         <TableRow>
           <TableHead className="font-medium">Name</TableHead>
           <TableHead className="font-medium">Personal Number</TableHead>
-          <TableHead className="font-medium">Municipality</TableHead>
+          <TableHead className="font-medium">Current Study Path</TableHead>
           <TableHead className="font-medium">School</TableHead>
-          <TableHead className="font-medium">Program</TableHead>
           <TableHead className="font-medium">Principal</TableHead>
           <TableHead className="font-medium">Status</TableHead>
           <TableHead className="font-medium text-center">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {filteredStudents.map((student) => (
-          <TableRow key={student.id} className="hover:bg-ike-neutral-light/50">
-            <TableCell className="font-medium text-ike-neutral-dark">
-              {student.name}
-            </TableCell>
-            <TableCell className="font-mono text-sm">
-              {student.personalNumber}
-            </TableCell>
-            <TableCell>
-              <div className="flex items-center">
-                <MapPin className="w-4 h-4 mr-1 text-ike-neutral" />
-                {student.municipality}
-              </div>
-            </TableCell>
-            <TableCell>{student.school}</TableCell>
-            <TableCell>{student.program}</TableCell>
-            <TableCell>
-              {student.principalName ? (
-                <div className="text-sm">
-                  <div className="font-medium">{student.principalName}</div>
-                  <div className="text-ike-neutral text-xs">{student.principalEmail}</div>
+        {filteredStudents.map((student) => {
+          const currentStudyPath = getCurrentStudyPath(student.studyPaths);
+          return (
+            <TableRow key={student.id} className="hover:bg-ike-neutral-light/50">
+              <TableCell className="font-medium text-ike-neutral-dark">
+                {student.name}
+              </TableCell>
+              <TableCell className="font-mono text-sm">
+                {student.personalNumber}
+              </TableCell>
+              <TableCell>
+                {currentStudyPath ? (
+                  <div className="flex items-center">
+                    <BookOpen className="w-4 h-4 mr-1 text-ike-primary" />
+                    <div>
+                      <div className="font-medium text-sm">{currentStudyPath?.studyPathName}</div>
+                      <div className="text-xs text-ike-neutral">({currentStudyPath?.studyPathCode})</div>
+                    </div>
+                  </div>
+                ) : (
+                  <span className="text-ike-neutral text-sm">No active study path</span>
+                )}
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center">
+                  <MapPin className="w-4 h-4 mr-1 text-ike-neutral" />
+                  {currentStudyPath?.schoolUnit || student.school}
                 </div>
-              ) : (
-                <span className="text-ike-neutral text-sm">Not assigned</span>
-              )}
-            </TableCell>
-            <TableCell>{getStatusBadge(student.status)}</TableCell>
-            <TableCell className="text-center">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-white border shadow-lg z-50">
-                  <DropdownMenuItem onClick={() => handleViewDetails(student)}>
-                    <Eye className="mr-2 h-4 w-4" />
-                    View Details
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleViewHistory(student)}>
-                    <FileText className="mr-2 h-4 w-4" />
-                    View History
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleViewEducationHistory(student)}>
-                    <GraduationCap className="mr-2 h-4 w-4" />
-                    Education History
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleEdit(student)}>
-                    <Edit className="mr-2 h-4 w-4" />
-                    Edit Student
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleDelete(student.id)}>
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Student
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </TableCell>
-          </TableRow>
-        ))}
+              </TableCell>
+              <TableCell>
+                {(currentStudyPath?.principalName || student.principalName) ? (
+                  <div className="text-sm">
+                    <div className="font-medium">{currentStudyPath?.principalName || student.principalName}</div>
+                    <div className="text-ike-neutral text-xs">{currentStudyPath?.principalEmail || student.principalEmail}</div>
+                  </div>
+                ) : (
+                  <span className="text-ike-neutral text-sm">Not assigned</span>
+                )}
+              </TableCell>
+              <TableCell>{getStatusBadge(student.status)}</TableCell>
+              <TableCell className="text-center">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-white border shadow-lg z-50">
+                    <DropdownMenuItem onClick={() => handleViewDetails(student)}>
+                      <Eye className="mr-2 h-4 w-4" />
+                      View Details
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleViewStudyPaths(student)}>
+                      <BookOpen className="mr-2 h-4 w-4" />
+                      Study Paths
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleViewHistory(student)}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      View History
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleViewEducationHistory(student)}>
+                      <GraduationCap className="mr-2 h-4 w-4" />
+                      Education History
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleEdit(student)}>
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit Student
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleDelete(student.id)}>
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete Student
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );
@@ -510,6 +567,8 @@ const StudentDetailsModal = ({
   setShowStudentDetails: React.Dispatch<React.SetStateAction<boolean>>;
   getStatusBadge: (status: string) => JSX.Element;
 }) => {
+  const currentStudyPath = selectedStudent ? getCurrentStudyPath(selectedStudent.studyPaths) : null;
+
   return (
     <Dialog open={showStudentDetails} onOpenChange={setShowStudentDetails}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -549,30 +608,61 @@ const StudentDetailsModal = ({
               </div>
             </div>
 
-            {/* Academic Information */}
+            {/* Registration Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-ike-neutral-dark border-b pb-2">Academic Information</h3>
+              <h3 className="text-lg font-semibold text-ike-neutral-dark border-b pb-2">Registration Information</h3>
               <div>
                 <label className="text-sm font-medium text-ike-neutral">Municipality</label>
                 <p className="text-ike-neutral-dark">{selectedStudent.municipality} ({selectedStudent.municipalityCode})</p>
               </div>
-              <div>
-                <label className="text-sm font-medium text-ike-neutral">School</label>
-                <p className="text-ike-neutral-dark">{selectedStudent.school}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-ike-neutral">Program</label>
-                <p className="text-ike-neutral-dark">{selectedStudent.program}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-ike-neutral">Class</label>
-                <p className="text-ike-neutral-dark">{selectedStudent.class || "Not assigned"}</p>
-              </div>
+              {selectedStudent.populationRegMunicipality && (
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Population Registration Municipality</label>
+                  <p className="text-ike-neutral-dark">{selectedStudent.populationRegMunicipality} ({selectedStudent.populationRegMunicipalityCode})</p>
+                </div>
+              )}
               <div>
                 <label className="text-sm font-medium text-ike-neutral">Status</label>
                 <div className="mt-1">{getStatusBadge(selectedStudent.status)}</div>
               </div>
             </div>
+
+            {/* Current Study Path */}
+            {currentStudyPath && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-ike-neutral-dark border-b pb-2">Current Study Path</h3>
+                <div className="bg-ike-neutral-light/30 p-4 rounded-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-ike-neutral">Study Path</label>
+                      <p className="text-ike-neutral-dark">{currentStudyPath.studyPathName} ({currentStudyPath.studyPathCode})</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-ike-neutral">School Unit</label>
+                      <p className="text-ike-neutral-dark">{currentStudyPath.schoolUnit}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-ike-neutral">Period</label>
+                      <p className="text-ike-neutral-dark">
+                        {currentStudyPath.startDate} - {currentStudyPath.endDate || 'Ongoing'}
+                      </p>
+                    </div>
+                    {currentStudyPath.year && (
+                      <div>
+                        <label className="text-sm font-medium text-ike-neutral">Year</label>
+                        <p className="text-ike-neutral-dark">{currentStudyPath.year}</p>
+                      </div>
+                    )}
+                    {currentStudyPath.group && (
+                      <div>
+                        <label className="text-sm font-medium text-ike-neutral">Group</label>
+                        <p className="text-ike-neutral-dark">{currentStudyPath.group}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Personal Supplement */}
             {selectedStudent.personalSupplement && (
@@ -665,6 +755,8 @@ const Students = () => {
       address: "Storgatan 12, Malmö",
       municipality: "Malmö kommun",
       municipalityCode: "1280",
+      populationRegMunicipality: "Malmö kommun",
+      populationRegMunicipalityCode: "1280",
       school: "Malmö Gymnasium",
       program: "Naturvetenskapsprogrammet",
       class: "NA21A",
@@ -691,6 +783,22 @@ const Students = () => {
           credits: 320,
           notes: "Completed with good results in mathematics and science"
         }
+      ],
+      studyPaths: [
+        {
+          id: 1,
+          studyPathCode: "NAT",
+          studyPathName: "Naturvetenskapsprogrammet",
+          startDate: "2024-08-15",
+          endDate: "2027-06-15",
+          schoolUnit: "Malmö Gymnasium",
+          principalName: "Erik Johansson",
+          principalEmail: "erik.johansson@malmo.se",
+          year: "1",
+          group: "NA21A",
+          status: "active",
+          notes: "Current enrollment in Natural Science Program"
+        }
       ]
     },
     {
@@ -702,6 +810,8 @@ const Students = () => {
       address: "Lundavägen 34, Malmö",
       municipality: "Malmö kommun",
       municipalityCode: "1280",
+      populationRegMunicipality: "Lund kommun",
+      populationRegMunicipalityCode: "1281",
       school: "Jensen Gymnasium",
       program: "Ekonomiprogrammet",
       class: "EK22B",
@@ -726,6 +836,33 @@ const Students = () => {
           credits: 150,
           notes: "Transferred to focus on economics instead of technology"
         }
+      ],
+      studyPaths: [
+        {
+          id: 2,
+          studyPathCode: "TEK",
+          studyPathName: "Teknikprogrammet",
+          startDate: "2021-08-15",
+          endDate: "2023-01-15",
+          schoolUnit: "Lunds Gymnasium",
+          year: "1",
+          status: "transferred",
+          notes: "Transferred from Technology Program"
+        },
+        {
+          id: 3,
+          studyPathCode: "EK",
+          studyPathName: "Ekonomiprogrammet",
+          startDate: "2023-01-16",
+          endDate: "2026-06-15",
+          schoolUnit: "Jensen Gymnasium",
+          principalName: "Maria Lindberg",
+          principalEmail: "maria.lindberg@jensen.se",
+          year: "2",
+          group: "EK22B",
+          status: "active",
+          notes: "Current enrollment in Economics Program"
+        }
       ]
     },
     {
@@ -737,6 +874,8 @@ const Students = () => {
       address: "Rosengård 45, Malmö",
       municipality: "Lund kommun",
       municipalityCode: "1281",
+      populationRegMunicipality: "Malmö kommun",
+      populationRegMunicipalityCode: "1280",
       school: "Malmö Borgarskola",
       program: "Samhällsvetenskapsprogrammet",
       class: "SA21C",
@@ -748,7 +887,22 @@ const Students = () => {
       principalStartDate: "2024-01-01",
       principalEndDate: "2026-12-31",
       personalSupplement: "Additional information about Lisa Nilsson",
-      educationHistory: []
+      educationHistory: [],
+      studyPaths: [
+        {
+          id: 4,
+          studyPathCode: "SA",
+          studyPathName: "Samhällsvetenskapsprogrammet",
+          startDate: "2024-08-15",
+          schoolUnit: "Malmö Borgarskola",
+          principalName: "Peter Karlsson",
+          principalEmail: "peter.karlsson@borgarskola.se",
+          year: "1",
+          group: "SA21C",
+          status: "active",
+          notes: "New enrollment in Social Science Program"
+        }
+      ]
     }
   ]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -769,6 +923,8 @@ const Students = () => {
     address: "",
     municipality: "",
     municipalityCode: "",
+    populationRegMunicipality: "",
+    populationRegMunicipalityCode: "",
     school: "",
     program: "",
     class: "",
@@ -787,6 +943,8 @@ const Students = () => {
   const [studentHistory, setStudentHistory] = useState<HistoryEntry[]>([]);
   const [showEducationHistory, setShowEducationHistory] = useState(false);
   const [selectedStudentForEducation, setSelectedStudentForEducation] = useState<Student | null>(null);
+  const [showStudyPaths, setShowStudyPaths] = useState(false);
+  const [selectedStudentForStudyPaths, setSelectedStudentForStudyPaths] = useState<Student | null>(null);
 
   const filteredStudents = students.filter(student => {
     const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -814,6 +972,11 @@ const Students = () => {
     setShowEducationHistory(true);
   };
 
+  const handleViewStudyPaths = (student: Student) => {
+    setSelectedStudentForStudyPaths(student);
+    setShowStudyPaths(true);
+  };
+
   const handleEdit = (student: Student) => {
     setFormData({
       id: student.id,
@@ -824,6 +987,8 @@ const Students = () => {
       address: student.address,
       municipality: student.municipality,
       municipalityCode: student.municipalityCode,
+      populationRegMunicipality: student.populationRegMunicipality || "",
+      populationRegMunicipalityCode: student.populationRegMunicipalityCode || "",
       school: student.school,
       program: student.program,
       class: student.class,
@@ -913,7 +1078,8 @@ const Students = () => {
       principalPhone: formData.principalPhone || "",
       principalStartDate: formData.principalStartDate || "",
       principalEndDate: formData.principalEndDate || "",
-      personalSupplement: formData.personalSupplement || ""
+      personalSupplement: formData.personalSupplement || "",
+      studyPaths: editingStudent?.studyPaths || []
     };
 
     if (editingStudent) {
@@ -964,6 +1130,8 @@ const Students = () => {
       address: "",
       municipality: "",
       municipalityCode: "",
+      populationRegMunicipality: "",
+      populationRegMunicipalityCode: "",
       school: "",
       program: "",
       class: "",
@@ -985,6 +1153,14 @@ const Students = () => {
     setStudents(students.map(s => 
       s.id === studentId 
         ? { ...s, educationHistory: history }
+        : s
+    ));
+  };
+
+  const handleUpdateStudyPaths = (studentId: number, studyPaths: StudentStudyPath[]) => {
+    setStudents(students.map(s => 
+      s.id === studentId 
+        ? { ...s, studyPaths: studyPaths }
         : s
     ));
   };
@@ -1126,6 +1302,7 @@ const Students = () => {
             handleDelete={handleDelete}
             handleViewHistory={handleViewHistory}
             handleViewEducationHistory={handleViewEducationHistory}
+            handleViewStudyPaths={handleViewStudyPaths}
           />
         </CardContent>
       </Card>
@@ -1184,6 +1361,23 @@ const Students = () => {
               studentName={selectedStudentForEducation.name}
               educationHistory={selectedStudentForEducation.educationHistory || []}
               onUpdateHistory={(history) => handleUpdateEducationHistory(selectedStudentForEducation.id, history)}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Study Paths Modal */}
+      {selectedStudentForStudyPaths && (
+        <Dialog open={showStudyPaths} onOpenChange={setShowStudyPaths}>
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader className="sr-only">
+              <DialogTitle>Study Paths</DialogTitle>
+            </DialogHeader>
+            <StudentStudyPaths
+              studentId={selectedStudentForStudyPaths.id}
+              studentName={selectedStudentForStudyPaths.name}
+              studyPaths={selectedStudentForStudyPaths.studyPaths || []}
+              onUpdateStudyPaths={(studyPaths) => handleUpdateStudyPaths(selectedStudentForStudyPaths.id, studyPaths)}
             />
           </DialogContent>
         </Dialog>
