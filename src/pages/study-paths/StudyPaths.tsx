@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Book, Plus, Search, Filter, Edit, Trash2, Eye, Download, CalendarIcon } from "lucide-react";
+import { Book, Plus, Search, Filter, Edit, Trash2, Eye, Download, CalendarIcon, Euro, DollarSign } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -26,6 +26,17 @@ interface StudyPath {
   endDate?: Date;
 }
 
+interface PriceCode {
+  id: number;
+  code: string;
+  name: string;
+  specialization: string;
+  normalPrice: number;
+  internalPrice: number;
+  status: "active" | "inactive";
+  lastUpdated: string;
+}
+
 export default function StudyPaths() {
   const { toast } = useToast();
   const [studyPaths, setStudyPaths] = useState<StudyPath[]>([
@@ -35,7 +46,7 @@ export default function StudyPaths() {
       code: "NA001", 
       status: "Active", 
       municipality: "Malmö", 
-      priceCode: "PC001", 
+      priceCode: "NA", 
       students: 120,
       startDate: new Date("2024-08-15"),
       endDate: new Date("2027-06-15")
@@ -46,7 +57,7 @@ export default function StudyPaths() {
       code: "SA002", 
       status: "Active", 
       municipality: "Lund", 
-      priceCode: "PC002", 
+      priceCode: "SA", 
       students: 85,
       startDate: new Date("2024-08-15"),
       endDate: new Date("2027-06-15")
@@ -57,7 +68,7 @@ export default function StudyPaths() {
       code: "TE003", 
       status: "Pending", 
       municipality: "Helsingborg", 
-      priceCode: "PC003", 
+      priceCode: "TE", 
       students: 67,
       startDate: new Date("2025-08-15"),
       endDate: new Date("2028-06-15")
@@ -68,7 +79,7 @@ export default function StudyPaths() {
       code: "AR004", 
       status: "Active", 
       municipality: "Malmö", 
-      priceCode: "PC004", 
+      priceCode: "ES", 
       students: 45,
       startDate: new Date("2024-08-15"),
       endDate: new Date("2027-06-15")
@@ -85,9 +96,62 @@ export default function StudyPaths() {
     },
   ]);
 
+  // Price codes from the financial module
+  const [priceCodes] = useState<PriceCode[]>([
+    {
+      id: 1,
+      code: "NA",
+      name: "Naturvetenskapsprogrammet",
+      specialization: "Naturvetenskap och samhälle",
+      normalPrice: 125000,
+      internalPrice: 118000,
+      status: "active",
+      lastUpdated: "2024-06-15"
+    },
+    {
+      id: 2,
+      code: "SA",
+      name: "Samhällsvetenskapsprogrammet",
+      specialization: "Samhällsvetenskap",
+      normalPrice: 122000,
+      internalPrice: 115000,
+      status: "active",
+      lastUpdated: "2024-06-15"
+    },
+    {
+      id: 3,
+      code: "TE",
+      name: "Teknikprogrammet",
+      specialization: "Teknik",
+      normalPrice: 135000,
+      internalPrice: 128000,
+      status: "active",
+      lastUpdated: "2024-06-15"
+    },
+    {
+      id: 4,
+      code: "EK",
+      name: "Ekonomiprogrammet",
+      specialization: "Ekonomi",
+      normalPrice: 120000,
+      internalPrice: 113000,
+      status: "active",
+      lastUpdated: "2024-05-20"
+    },
+    {
+      id: 5,
+      code: "ES",
+      name: "Estetiska programmet",
+      specialization: "Estetik",
+      normalPrice: 130000,
+      internalPrice: 123000,
+      status: "active",
+      lastUpdated: "2024-06-15"
+    }
+  ]);
+
   // Predefined options for dropdowns
   const municipalities = ["Malmö", "Lund", "Helsingborg", "Kristianstad", "Växjö"];
-  const priceCodes = ["PC001", "PC002", "PC003", "PC004", "PC005", "PC006"];
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -248,6 +312,11 @@ export default function StudyPaths() {
     path.municipality.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const getPriceCodeDetails = (priceCodeValue?: string) => {
+    if (!priceCodeValue) return null;
+    return priceCodes.find(pc => pc.code === priceCodeValue);
+  };
+
   const DatePicker = ({ date, onDateChange, placeholder }: { 
     date?: Date; 
     onDateChange: (date: Date | undefined) => void; 
@@ -376,19 +445,37 @@ export default function StudyPaths() {
                   </Select>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="priceCode">Price Code</Label>
+                  <Label htmlFor="priceCode">Price Code *</Label>
                   <Select value={formData.priceCode} onValueChange={(value) => setFormData({ ...formData, priceCode: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select price code" />
                     </SelectTrigger>
                     <SelectContent>
-                      {priceCodes.map((priceCode) => (
-                        <SelectItem key={priceCode} value={priceCode}>
-                          {priceCode}
+                      {priceCodes.filter(pc => pc.status === "active").map((priceCode) => (
+                        <SelectItem key={priceCode.code} value={priceCode.code}>
+                          <div className="flex items-center justify-between w-full">
+                            <span>{priceCode.code} - {priceCode.name}</span>
+                            <span className="text-xs text-muted-foreground ml-2">
+                              {priceCode.normalPrice.toLocaleString('sv-SE')} SEK
+                            </span>
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  {formData.priceCode && (
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {(() => {
+                        const selectedPrice = priceCodes.find(pc => pc.code === formData.priceCode);
+                        return selectedPrice ? (
+                          <div className="flex gap-4">
+                            <span>Normal: {selectedPrice.normalPrice.toLocaleString('sv-SE')} SEK</span>
+                            <span>Internal: {selectedPrice.internalPrice.toLocaleString('sv-SE')} SEK</span>
+                          </div>
+                        ) : null;
+                      })()}
+                    </div>
+                  )}
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
@@ -472,7 +559,7 @@ export default function StudyPaths() {
           <div className="flex justify-between items-center">
             <div>
               <CardTitle>Study Paths Management</CardTitle>
-              <CardDescription>Manage all study paths in the region</CardDescription>
+              <CardDescription>Manage all study paths in the region with linked price codes</CardDescription>
             </div>
             <div className="flex gap-2">
               <Input
@@ -486,66 +573,91 @@ export default function StudyPaths() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {filteredPaths.map((path) => (
-              <div key={path.id} className="flex justify-between items-center p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                <div className="flex-1">
-                  <h3 className="font-medium">{path.name}</h3>
-                  <p className="text-sm text-ike-neutral">
-                    Code: {path.code} • {path.municipality} • {path.students} students
-                    {path.priceCode && ` • Price Code: ${path.priceCode}`}
-                  </p>
-                  {(path.startDate || path.endDate) && (
-                    <p className="text-sm text-ike-neutral mt-1">
-                      {path.startDate && `Start: ${format(path.startDate, "MMM dd, yyyy")}`}
-                      {path.startDate && path.endDate && " • "}
-                      {path.endDate && `End: ${format(path.endDate, "MMM dd, yyyy")}`}
+            {filteredPaths.map((path) => {
+              const priceCodeDetails = getPriceCodeDetails(path.priceCode);
+              
+              return (
+                <div key={path.id} className="flex justify-between items-center p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-medium">{path.name}</h3>
+                      {priceCodeDetails && (
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-ike-primary border-ike-primary">
+                            <Euro className="w-3 h-3 mr-1" />
+                            {priceCodeDetails.code}
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-sm text-ike-neutral">
+                      Code: {path.code} • {path.municipality} • {path.students} students
                     </p>
-                  )}
-                </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant={
-                    path.status === "Active" ? "default" : 
-                    path.status === "Pending" ? "secondary" : 
-                    "outline"
-                  }>
-                    {path.status}
-                  </Badge>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEdit(path)}
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Study Path</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete "{path.name}"? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDelete(path.id)}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    {priceCodeDetails && (
+                      <div className="flex items-center gap-4 mt-1 text-sm text-ike-neutral">
+                        <span className="flex items-center gap-1">
+                          <DollarSign className="w-3 h-3" />
+                          Normal: {priceCodeDetails.normalPrice.toLocaleString('sv-SE')} SEK
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <DollarSign className="w-3 h-3" />
+                          Internal: {priceCodeDetails.internalPrice.toLocaleString('sv-SE')} SEK
+                        </span>
+                      </div>
+                    )}
+                    {(path.startDate || path.endDate) && (
+                      <p className="text-sm text-ike-neutral mt-1">
+                        {path.startDate && `Start: ${format(path.startDate, "MMM dd, yyyy")}`}
+                        {path.startDate && path.endDate && " • "}
+                        {path.endDate && `End: ${format(path.endDate, "MMM dd, yyyy")}`}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Badge variant={
+                      path.status === "Active" ? "default" : 
+                      path.status === "Pending" ? "secondary" : 
+                      "outline"
+                    }>
+                      {path.status}
+                    </Badge>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEdit(path)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Study Path</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete "{path.name}"? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(path.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             {filteredPaths.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
                 {searchTerm ? "No study paths found matching your search." : "No study paths available."}
@@ -599,19 +711,37 @@ export default function StudyPaths() {
               </Select>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="edit-priceCode">Price Code</Label>
+              <Label htmlFor="edit-priceCode">Price Code *</Label>
               <Select value={formData.priceCode} onValueChange={(value) => setFormData({ ...formData, priceCode: value })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select price code" />
                 </SelectTrigger>
                 <SelectContent>
-                  {priceCodes.map((priceCode) => (
-                    <SelectItem key={priceCode} value={priceCode}>
-                      {priceCode}
+                  {priceCodes.filter(pc => pc.status === "active").map((priceCode) => (
+                    <SelectItem key={priceCode.code} value={priceCode.code}>
+                      <div className="flex items-center justify-between w-full">
+                        <span>{priceCode.code} - {priceCode.name}</span>
+                        <span className="text-xs text-muted-foreground ml-2">
+                          {priceCode.normalPrice.toLocaleString('sv-SE')} SEK
+                        </span>
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {formData.priceCode && (
+                <div className="text-xs text-muted-foreground mt-1">
+                  {(() => {
+                    const selectedPrice = priceCodes.find(pc => pc.code === formData.priceCode);
+                    return selectedPrice ? (
+                      <div className="flex gap-4">
+                        <span>Normal: {selectedPrice.normalPrice.toLocaleString('sv-SE')} SEK</span>
+                        <span>Internal: {selectedPrice.internalPrice.toLocaleString('sv-SE')} SEK</span>
+                      </div>
+                    ) : null;
+                  })()}
+                </div>
+              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="edit-status">Status</Label>
