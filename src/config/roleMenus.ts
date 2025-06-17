@@ -1,3 +1,4 @@
+
 import {
   LayoutDashboard,
   Users,
@@ -20,7 +21,14 @@ import {
   Wrench,
   UserCog,
   Zap,
-  Server
+  Server,
+  DollarSign,
+  Activity,
+  User,
+  Euro,
+  TrendingUp,
+  FileSpreadsheet,
+  Info
 } from "lucide-react";
 
 export interface MenuItem {
