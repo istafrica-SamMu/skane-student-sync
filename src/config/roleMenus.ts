@@ -306,11 +306,6 @@ export const schoolAdminMenu: MenuItem[] = [
         url: "/students",
         icon: Users,
       },
-      {
-        title: "Manage Student Placements",
-        url: "/students/placements",
-        icon: ArrowUpDown,
-      },
     ],
   },
   {
