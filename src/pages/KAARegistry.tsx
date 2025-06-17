@@ -756,7 +756,7 @@ const KAARegistry = () => {
             <AlertDialogTitle className="flex items-center text-ike-neutral-dark">
               <Trash2 className="w-5 h-5 mr-2 text-red-500" />
               Delete KAA Record
-            </AlertDialog​Title>
+            </AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete this KAA record? This action cannot be undone and will permanently remove 
               all data related to this young person's registration.
