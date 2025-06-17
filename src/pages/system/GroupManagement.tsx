@@ -1,145 +1,247 @@
 
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Building2, Plus, Users, School, Edit, Trash2, MoreVertical, MapPin, Phone, Mail, Calendar, Link2, Unlink } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { 
+  Building2, 
+  Edit, 
+  Trash2, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Euro,
+  Calendar,
+  Users,
+  Search,
+  Plus,
+  UserPlus,
+  School,
+  Unlink,
+  Building
+} from "lucide-react";
+
+interface Group {
+  id: string;
+  name: string;
+  municipality: string;
+  organizationNumber: string;
+  startDate: string;
+  endDate?: string;
+  status: 'active' | 'inactive';
+  contactPerson: {
+    name: string;
+    role: string;
+    email: string;
+    phone: string;
+  };
+  address: {
+    street: string;
+    postalCode: string;
+    city: string;
+    country: string;
+  };
+  additionalAmount: number;
+  linkedPrincipals: Array<{
+    id: string;
+    name: string;
+    email: string;
+  }>;
+  linkedSchoolUnits: Array<{
+    id: string;
+    name: string;
+    municipality: string;
+  }>;
+}
+
+interface Principal {
+  id: string;
+  name: string;
+  email: string;
+  municipality: string;
+}
+
+interface SchoolUnit {
+  id: string;
+  name: string;
+  municipality: string;
+  unitCode: string;
+}
 
 const GroupManagement = () => {
   const { toast } = useToast();
-  const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
-  const [isEditGroupOpen, setIsEditGroupOpen] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isLinkPrincipalDialogOpen, setIsLinkPrincipalDialogOpen] = useState(false);
+  const [isLinkSchoolDialogOpen, setIsLinkSchoolDialogOpen] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
 
-  const [groups, setGroups] = useState([
+  // Mock data
+  const [groups, setGroups] = useState<Group[]>([
     {
-      id: 1,
-      name: "Skåne Education Group",
-      organizationNumber: "556123-4567",
-      startDate: "2020-01-01",
-      endDate: null,
-      status: "Active",
-      contactPersons: [
-        { name: "Lars Andersson", role: "Group Manager", email: "lars.andersson@skaneedu.se", phone: "+46 40 123 456" }
-      ],
-      postalAddress: {
-        street: "Bildningsgatan 12",
-        postalCode: "211 45",
-        city: "Malmö",
-        country: "Sweden"
+      id: '1',
+      name: 'Stockholm Central Group',
+      municipality: 'Stockholm',
+      organizationNumber: '212000-1355',
+      startDate: '2023-01-01',
+      status: 'active',
+      contactPerson: {
+        name: 'Maria Andersson',
+        role: 'Group Coordinator',
+        email: 'maria.andersson@stockholm.se',
+        phone: '+46 8 123 4567'
       },
-      municipalityCode: "MAL",
-      municipalityName: "Malmö Municipality",
-      additionalAmount: 15000,
+      address: {
+        street: 'Centralvägen 10',
+        postalCode: '11122',
+        city: 'Stockholm',
+        country: 'Sweden'
+      },
+      additionalAmount: 50000,
       linkedPrincipals: [
-        { id: 1, name: "Malmö Technical School", type: "Principal" },
-        { id: 2, name: "Skåne Business Academy", type: "Principal" }
+        { id: '1', name: 'Anna Andersson', email: 'anna.andersson@example.com' }
       ],
       linkedSchoolUnits: [
-        { id: 1, name: "Malmö Tech Campus A", principalId: 1 },
-        { id: 2, name: "Malmö Tech Campus B", principalId: 1 },
-        { id: 3, name: "Business Academy Main", principalId: 2 }
+        { id: '1', name: 'Stockholm Central High School', municipality: 'Stockholm' }
       ]
     },
     {
-      id: 2,
-      name: "Lund Academic Consortium",
-      organizationNumber: "556789-0123",
-      startDate: "2019-08-15",
-      endDate: null,
-      status: "Active",
-      contactPersons: [
-        { name: "Anna Bergström", role: "Consortium Director", email: "anna.bergstrom@lundacademic.se", phone: "+46 46 987 654" }
-      ],
-      postalAddress: {
-        street: "Universitetsgatan 8",
-        postalCode: "223 50",
-        city: "Lund",
-        country: "Sweden"
+      id: '2',
+      name: 'Göteborg West Group',
+      municipality: 'Göteborg',
+      organizationNumber: '212000-2466',
+      startDate: '2023-03-15',
+      status: 'active',
+      contactPerson: {
+        name: 'Erik Eriksson',
+        role: 'Group Manager',
+        email: 'erik.eriksson@goteborg.se',
+        phone: '+46 31 987 6543'
       },
-      municipalityCode: "LUN",
-      municipalityName: "Lund Municipality",
-      additionalAmount: 8500,
-      linkedPrincipals: [
-        { id: 3, name: "Lund Science Institute", type: "Principal" }
-      ],
-      linkedSchoolUnits: [
-        { id: 4, name: "Science Lab Building", principalId: 3 },
-        { id: 5, name: "Research Wing", principalId: 3 }
-      ]
+      address: {
+        street: 'Västergatan 25',
+        postalCode: '41234',
+        city: 'Göteborg',
+        country: 'Sweden'
+      },
+      additionalAmount: 75000,
+      linkedPrincipals: [],
+      linkedSchoolUnits: []
     }
   ]);
 
-  const handleAddGroup = () => {
+  const [availablePrincipals] = useState<Principal[]>([
+    { id: '1', name: 'Anna Andersson', email: 'anna.andersson@example.com', municipality: 'Stockholm' },
+    { id: '2', name: 'Erik Eriksson', email: 'erik.eriksson@example.com', municipality: 'Göteborg' },
+    { id: '3', name: 'Lisa Svensson', email: 'lisa.svensson@example.com', municipality: 'Stockholm' },
+    { id: '4', name: 'Johan Nilsson', email: 'johan.nilsson@example.com', municipality: 'Malmö' }
+  ]);
+
+  const [availableSchoolUnits] = useState<SchoolUnit[]>([
+    { id: '1', name: 'Stockholm Central High School', municipality: 'Stockholm', unitCode: 'STK001' },
+    { id: '2', name: 'Göteborg West High School', municipality: 'Göteborg', unitCode: 'GTB002' },
+    { id: '3', name: 'Stockholm North High School', municipality: 'Stockholm', unitCode: 'STK003' },
+    { id: '4', name: 'Malmö South High School', municipality: 'Malmö', unitCode: 'MLM004' }
+  ]);
+
+  const filteredGroups = groups.filter(group =>
+    group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    group.municipality.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleLinkPrincipal = (groupId: string, principalId: string) => {
+    const principal = availablePrincipals.find(p => p.id === principalId);
+    if (!principal) return;
+
+    setGroups(prev => prev.map(group => 
+      group.id === groupId
+        ? {
+            ...group,
+            linkedPrincipals: [...group.linkedPrincipals, {
+              id: principal.id,
+              name: principal.name,
+              email: principal.email
+            }]
+          }
+        : group
+    ));
+
     toast({
-      title: "Group Added",
-      description: "New group has been successfully added to the system.",
+      title: "Principal Linked",
+      description: `${principal.name} has been linked to the group`,
     });
-    setIsAddGroupOpen(false);
   };
 
-  const handleEditGroup = (group) => {
+  const handleUnlinkPrincipal = (groupId: string, principalId: string) => {
+    setGroups(prev => prev.map(group => 
+      group.id === groupId
+        ? {
+            ...group,
+            linkedPrincipals: group.linkedPrincipals.filter(p => p.id !== principalId)
+          }
+        : group
+    ));
+
+    toast({
+      title: "Principal Unlinked",
+      description: "Principal has been unlinked from the group",
+    });
+  };
+
+  const handleLinkSchoolUnit = (groupId: string, schoolUnitId: string) => {
+    const schoolUnit = availableSchoolUnits.find(s => s.id === schoolUnitId);
+    if (!schoolUnit) return;
+
+    setGroups(prev => prev.map(group => 
+      group.id === groupId
+        ? {
+            ...group,
+            linkedSchoolUnits: [...group.linkedSchoolUnits, {
+              id: schoolUnit.id,
+              name: schoolUnit.name,
+              municipality: schoolUnit.municipality
+            }]
+          }
+        : group
+    ));
+
+    toast({
+      title: "School Unit Linked",
+      description: `${schoolUnit.name} has been linked to the group`,
+    });
+  };
+
+  const handleUnlinkSchoolUnit = (groupId: string, schoolUnitId: string) => {
+    setGroups(prev => prev.map(group => 
+      group.id === groupId
+        ? {
+            ...group,
+            linkedSchoolUnits: group.linkedSchoolUnits.filter(s => s.id !== schoolUnitId)
+          }
+        : group
+    ));
+
+    toast({
+      title: "School Unit Unlinked",
+      description: "School unit has been unlinked from the group",
+    });
+  };
+
+  const openLinkPrincipalDialog = (group: Group) => {
     setSelectedGroup(group);
-    setIsEditGroupOpen(true);
+    setIsLinkPrincipalDialogOpen(true);
   };
 
-  const handleUpdateGroup = () => {
-    toast({
-      title: "Group Updated",
-      description: "Group information has been successfully updated.",
-    });
-    setIsEditGroupOpen(false);
-    setSelectedGroup(null);
-  };
-
-  const handleDeleteGroup = (groupId) => {
-    setGroups(groups.filter(group => group.id !== groupId));
-    toast({
-      title: "Group Deleted",
-      description: "Group has been successfully removed from the system.",
-      variant: "destructive",
-    });
-  };
-
-  const handleManageGroup = (group) => {
+  const openLinkSchoolDialog = (group: Group) => {
     setSelectedGroup(group);
-    setIsEditGroupOpen(true);
+    setIsLinkSchoolDialogOpen(true);
   };
 
   return (
@@ -147,12 +249,13 @@ const GroupManagement = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-ike-primary">Group Management</h1>
-          <p className="text-ike-neutral">Manage education groups and their affiliated principals and school units</p>
+          <p className="text-ike-neutral mt-2">
+            Manage educational groups and their associations
+          </p>
         </div>
-        
-        <Dialog open={isAddGroupOpen} onOpenChange={setIsAddGroupOpen}>
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-ike-primary hover:bg-ike-primary/90">
+            <Button className="bg-ike-primary hover:bg-ike-primary-dark">
               <Plus className="w-4 h-4 mr-2" />
               Add Group
             </Button>
@@ -160,408 +263,397 @@ const GroupManagement = () => {
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add New Group</DialogTitle>
-              <DialogDescription>
-                Create a new education group and configure its basic information, contacts, and affiliations.
-              </DialogDescription>
             </DialogHeader>
             <Tabs defaultValue="basic" className="w-full">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                <TabsTrigger value="contact">Contact & Address</TabsTrigger>
-                <TabsTrigger value="affiliations">Affiliations</TabsTrigger>
+                <TabsTrigger value="contact">Contact</TabsTrigger>
+                <TabsTrigger value="address">Address</TabsTrigger>
                 <TabsTrigger value="financial">Financial</TabsTrigger>
               </TabsList>
               
               <TabsContent value="basic" className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="groupName">Group Name *</Label>
+                  <div>
+                    <Label htmlFor="groupName">Group Name</Label>
                     <Input id="groupName" placeholder="Enter group name" />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="orgNumber">Organization Number *</Label>
-                    <Input id="orgNumber" placeholder="XXXXXX-XXXX" />
+                  <div>
+                    <Label htmlFor="municipality">Municipality</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select municipality" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="stockholm">Stockholm</SelectItem>
+                        <SelectItem value="göteborg">Göteborg</SelectItem>
+                        <SelectItem value="malmö">Malmö</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="startDate">Start Date *</Label>
+                  <div>
+                    <Label htmlFor="orgNumber">Organization Number</Label>
+                    <Input id="orgNumber" placeholder="212000-XXXX" />
+                  </div>
+                  <div>
+                    <Label htmlFor="status">Status</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="startDate">Start Date</Label>
                     <Input id="startDate" type="date" />
                   </div>
-                  <div className="space-y-2">
+                  <div>
                     <Label htmlFor="endDate">End Date (Optional)</Label>
                     <Input id="endDate" type="date" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="municipalityCode">Municipality Code</Label>
-                    <Input id="municipalityCode" placeholder="Municipality code" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="municipalityName">Municipality Name</Label>
-                    <Input id="municipalityName" placeholder="Municipality name" />
                   </div>
                 </div>
               </TabsContent>
               
               <TabsContent value="contact" className="space-y-4">
-                <div className="space-y-4">
-                  <h4 className="font-medium">Postal Address</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="street">Street Address</Label>
-                      <Input id="street" placeholder="Street address" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="postalCode">Postal Code</Label>
-                      <Input id="postalCode" placeholder="XXX XX" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="city">City</Label>
-                      <Input id="city" placeholder="City" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="country">Country</Label>
-                      <Input id="country" placeholder="Sweden" defaultValue="Sweden" />
-                    </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="contactName">Contact Person Name</Label>
+                    <Input id="contactName" placeholder="Full name" />
                   </div>
-                  
-                  <h4 className="font-medium mt-6">Contact Persons</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="contactName">Contact Name</Label>
-                      <Input id="contactName" placeholder="Full name" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="contactRole">Role</Label>
-                      <Input id="contactRole" placeholder="Group Manager" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="contactEmail">Email</Label>
-                      <Input id="contactEmail" type="email" placeholder="email@group.se" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="contactPhone">Phone</Label>
-                      <Input id="contactPhone" placeholder="+46 XX XXX XXXX" />
-                    </div>
+                  <div>
+                    <Label htmlFor="contactRole">Role</Label>
+                    <Input id="contactRole" placeholder="Position/Title" />
+                  </div>
+                  <div>
+                    <Label htmlFor="contactEmail">Email</Label>
+                    <Input id="contactEmail" type="email" placeholder="email@example.com" />
+                  </div>
+                  <div>
+                    <Label htmlFor="contactPhone">Phone</Label>
+                    <Input id="contactPhone" placeholder="+46 XX XXX XX XX" />
                   </div>
                 </div>
               </TabsContent>
               
-              <TabsContent value="affiliations" className="space-y-4">
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-medium mb-2">Linked Principals</h4>
-                    <p className="text-sm text-ike-neutral mb-4">Select principals to link to this group</p>
-                    <div className="space-y-2">
-                      <Button variant="outline" size="sm">
-                        <Link2 className="w-4 h-4 mr-2" />
-                        Link Principal
-                      </Button>
-                    </div>
+              <TabsContent value="address" className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <Label htmlFor="street">Street Address</Label>
+                    <Input id="street" placeholder="Street name and number" />
                   </div>
-                  
                   <div>
-                    <h4 className="font-medium mb-2">Linked School Units</h4>
-                    <p className="text-sm text-ike-neutral mb-4">School units will be automatically linked through their principals</p>
-                    <div className="space-y-2">
-                      <Button variant="outline" size="sm">
-                        <Link2 className="w-4 h-4 mr-2" />
-                        Link School Unit
-                      </Button>
-                    </div>
+                    <Label htmlFor="postalCode">Postal Code</Label>
+                    <Input id="postalCode" placeholder="XXX XX" />
+                  </div>
+                  <div>
+                    <Label htmlFor="city">City</Label>
+                    <Input id="city" placeholder="City name" />
+                  </div>
+                  <div>
+                    <Label htmlFor="country">Country</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select country" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sweden">Sweden</SelectItem>
+                        <SelectItem value="norway">Norway</SelectItem>
+                        <SelectItem value="denmark">Denmark</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </TabsContent>
               
               <TabsContent value="financial" className="space-y-4">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="additionalAmount">Additional Amount (SEK)</Label>
-                    <Input id="additionalAmount" type="number" placeholder="0" defaultValue="0" />
-                  </div>
+                <div>
+                  <Label htmlFor="additionalAmount">Additional Amount (SEK)</Label>
+                  <Input id="additionalAmount" type="number" placeholder="0" />
+                </div>
+                <div>
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea id="description" placeholder="Additional details about financial arrangements..." />
                 </div>
               </TabsContent>
             </Tabs>
-            <DialogFooter>
-              <Button type="submit" onClick={handleAddGroup}>Add Group</Button>
-            </DialogFooter>
+            
+            <div className="flex justify-end space-x-2 mt-6">
+              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button className="bg-ike-primary hover:bg-ike-primary-dark">
+                Create Group
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {groups.map((group) => (
+      <div className="flex items-center space-x-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ike-neutral w-4 h-4" />
+          <Input
+            placeholder="Search groups..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-6">
+        {filteredGroups.map((group) => (
           <Card key={group.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-ike-primary" />
-                  {group.name}
-                </CardTitle>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <MoreVertical className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-white" align="end">
-                    <DropdownMenuItem onClick={() => handleEditGroup(group)}>
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleManageGroup(group)}>
-                      <Building2 className="w-4 h-4 mr-2" />
-                      Manage
-                    </DropdownMenuItem>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the group
-                            "{group.name}" and remove all associated affiliations.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDeleteGroup(group.id)}>
-                            Delete Group
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-              <CardDescription>
-                <div className="space-y-1">
-                  <div>Org. Nr: {group.organizationNumber}</div>
-                  <div>{group.municipalityName}</div>
-                </div>
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-ike-neutral">Status</span>
-                  <Badge className="bg-green-100 text-green-800">{group.status}</Badge>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-ike-neutral" />
-                      <span className="text-sm">Start Date</span>
-                    </div>
-                    <span className="font-medium">{new Date(group.startDate).toLocaleDateString()}</span>
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-ike-primary/10 rounded-full flex items-center justify-center">
+                    <Building2 className="w-6 h-6 text-ike-primary" />
                   </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Building2 className="w-4 h-4 text-ike-neutral" />
-                      <span className="text-sm">Principals</span>
-                    </div>
-                    <span className="font-medium">{group.linkedPrincipals.length}</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <School className="w-4 h-4 text-ike-neutral" />
-                      <span className="text-sm">School Units</span>
-                    </div>
-                    <span className="font-medium">{group.linkedSchoolUnits.length}</span>
+                  <div>
+                    <CardTitle className="text-ike-primary">{group.name}</CardTitle>
+                    <p className="text-sm text-ike-neutral">{group.municipality} • {group.organizationNumber}</p>
                   </div>
                 </div>
-
-                <div className="space-y-2 pt-2 border-t">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-ike-neutral" />
-                    <span className="text-sm">{group.postalAddress.city}</span>
-                  </div>
-                  {group.additionalAmount > 0 && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">Additional: +{group.additionalAmount.toLocaleString()} SEK</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="pt-4 border-t">
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => handleManageGroup(group)}
-                  >
-                    Manage Group
+                <div className="flex items-center space-x-2">
+                  <Badge variant={group.status === 'active' ? 'default' : 'secondary'}>
+                    {group.status}
+                  </Badge>
+                  <Button variant="outline" size="sm">
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="overview" className="w-full">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="principals">Principals ({group.linkedPrincipals.length})</TabsTrigger>
+                  <TabsTrigger value="schools">School Units ({group.linkedSchoolUnits.length})</TabsTrigger>
+                  <TabsTrigger value="details">Details</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="overview" className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-ike-primary">Contact Information</h4>
+                      <div className="space-y-1 text-sm">
+                        <div className="flex items-center space-x-2">
+                          <Users className="w-4 h-4 text-ike-primary" />
+                          <span>{group.contactPerson.name} ({group.contactPerson.role})</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Mail className="w-4 h-4 text-ike-primary" />
+                          <span>{group.contactPerson.email}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Phone className="w-4 h-4 text-ike-primary" />
+                          <span>{group.contactPerson.phone}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-ike-primary">Address</h4>
+                      <div className="flex items-start space-x-2 text-sm">
+                        <MapPin className="w-4 h-4 text-ike-primary mt-0.5" />
+                        <div>
+                          <p>{group.address.street}</p>
+                          <p>{group.address.postalCode} {group.address.city}</p>
+                          <p>{group.address.country}</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-ike-primary">Financial</h4>
+                      <div className="space-y-1 text-sm">
+                        <div className="flex items-center space-x-2">
+                          <Euro className="w-4 h-4 text-ike-primary" />
+                          <span>{group.additionalAmount.toLocaleString()} SEK</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Calendar className="w-4 h-4 text-ike-primary" />
+                          <span>Start: {group.startDate}</span>
+                        </div>
+                        {group.endDate && (
+                          <div className="flex items-center space-x-2">
+                            <Calendar className="w-4 h-4 text-ike-primary" />
+                            <span>End: {group.endDate}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="principals" className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium text-ike-primary">Linked Principals</h4>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => openLinkPrincipalDialog(group)}
+                    >
+                      <UserPlus className="w-4 h-4 mr-1" />
+                      Link Principal
+                    </Button>
+                  </div>
+                  
+                  {group.linkedPrincipals.length === 0 ? (
+                    <p className="text-sm text-ike-neutral italic">No principals linked to this group</p>
+                  ) : (
+                    <div className="grid gap-2">
+                      {group.linkedPrincipals.map((principal) => (
+                        <div key={principal.id} className="flex items-center justify-between p-3 bg-ike-neutral-light rounded">
+                          <div>
+                            <p className="font-medium">{principal.name}</p>
+                            <p className="text-sm text-ike-neutral">{principal.email}</p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleUnlinkPrincipal(group.id, principal.id)}
+                          >
+                            <Unlink className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="schools" className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium text-ike-primary">Linked School Units</h4>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => openLinkSchoolDialog(group)}
+                    >
+                      <School className="w-4 h-4 mr-1" />
+                      Link School Unit
+                    </Button>
+                  </div>
+                  
+                  {group.linkedSchoolUnits.length === 0 ? (
+                    <p className="text-sm text-ike-neutral italic">No school units linked to this group</p>
+                  ) : (
+                    <div className="grid gap-2">
+                      {group.linkedSchoolUnits.map((school) => (
+                        <div key={school.id} className="flex items-center justify-between p-3 bg-ike-neutral-light rounded">
+                          <div>
+                            <p className="font-medium">{school.name}</p>
+                            <p className="text-sm text-ike-neutral">{school.municipality}</p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleUnlinkSchoolUnit(group.id, school.id)}
+                          >
+                            <Unlink className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="details" className="space-y-4">
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="font-medium text-ike-primary mb-2">Administrative Details</h4>
+                      <div className="space-y-2 text-sm">
+                        <div><span className="font-medium">Group ID:</span> {group.id}</div>
+                        <div><span className="font-medium">Organization Number:</span> {group.organizationNumber}</div>
+                        <div><span className="font-medium">Status:</span> {group.status}</div>
+                        <div><span className="font-medium">Start Date:</span> {group.startDate}</div>
+                        {group.endDate && <div><span className="font-medium">End Date:</span> {group.endDate}</div>}
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-ike-primary mb-2">Summary</h4>
+                      <div className="space-y-2 text-sm">
+                        <div><span className="font-medium">Linked Principals:</span> {group.linkedPrincipals.length}</div>
+                        <div><span className="font-medium">Linked School Units:</span> {group.linkedSchoolUnits.length}</div>
+                        <div><span className="font-medium">Additional Amount:</span> {group.additionalAmount.toLocaleString()} SEK</div>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Edit Group Dialog */}
-      <Dialog open={isEditGroupOpen} onOpenChange={setIsEditGroupOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      {/* Link Principal Dialog */}
+      <Dialog open={isLinkPrincipalDialogOpen} onOpenChange={setIsLinkPrincipalDialogOpen}>
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Group</DialogTitle>
-            <DialogDescription>
-              Update group information, contacts, and manage affiliations.
-            </DialogDescription>
+            <DialogTitle>Link Principal to {selectedGroup?.name}</DialogTitle>
           </DialogHeader>
-          {selectedGroup && (
-            <Tabs defaultValue="basic" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                <TabsTrigger value="contact">Contact & Address</TabsTrigger>
-                <TabsTrigger value="affiliations">Affiliations</TabsTrigger>
-                <TabsTrigger value="financial">Financial</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="basic" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-groupName">Group Name</Label>
-                    <Input id="edit-groupName" defaultValue={selectedGroup.name} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-orgNumber">Organization Number</Label>
-                    <Input id="edit-orgNumber" defaultValue={selectedGroup.organizationNumber} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-startDate">Start Date</Label>
-                    <Input id="edit-startDate" type="date" defaultValue={selectedGroup.startDate} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-endDate">End Date</Label>
-                    <Input id="edit-endDate" type="date" defaultValue={selectedGroup.endDate || ""} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-municipalityCode">Municipality Code</Label>
-                    <Input id="edit-municipalityCode" defaultValue={selectedGroup.municipalityCode} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-municipalityName">Municipality Name</Label>
-                    <Input id="edit-municipalityName" defaultValue={selectedGroup.municipalityName} />
-                  </div>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="contact" className="space-y-4">
-                <div className="space-y-4">
-                  <h4 className="font-medium">Postal Address</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-street">Street Address</Label>
-                      <Input id="edit-street" defaultValue={selectedGroup.postalAddress.street} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-postalCode">Postal Code</Label>
-                      <Input id="edit-postalCode" defaultValue={selectedGroup.postalAddress.postalCode} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-city">City</Label>
-                      <Input id="edit-city" defaultValue={selectedGroup.postalAddress.city} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-country">Country</Label>
-                      <Input id="edit-country" defaultValue={selectedGroup.postalAddress.country} />
-                    </div>
-                  </div>
-                  
-                  <h4 className="font-medium mt-6">Contact Persons</h4>
-                  {selectedGroup.contactPersons.map((contact, index) => (
-                    <div key={index} className="grid grid-cols-2 gap-4 p-4 border rounded">
-                      <div className="space-y-2">
-                        <Label htmlFor={`edit-contactName-${index}`}>Contact Name</Label>
-                        <Input id={`edit-contactName-${index}`} defaultValue={contact.name} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor={`edit-contactRole-${index}`}>Role</Label>
-                        <Input id={`edit-contactRole-${index}`} defaultValue={contact.role} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor={`edit-contactEmail-${index}`}>Email</Label>
-                        <Input id={`edit-contactEmail-${index}`} defaultValue={contact.email} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor={`edit-contactPhone-${index}`}>Phone</Label>
-                        <Input id={`edit-contactPhone-${index}`} defaultValue={contact.phone} />
-                      </div>
-                    </div>
+          <div className="space-y-4">
+            <Label>Select Principal</Label>
+            <Select onValueChange={(principalId) => {
+              if (selectedGroup) {
+                handleLinkPrincipal(selectedGroup.id, principalId);
+                setIsLinkPrincipalDialogOpen(false);
+              }
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a principal to link" />
+              </SelectTrigger>
+              <SelectContent>
+                {availablePrincipals
+                  .filter(principal => !selectedGroup?.linkedPrincipals.some(p => p.id === principal.id))
+                  .map((principal) => (
+                    <SelectItem key={principal.id} value={principal.id}>
+                      {principal.name} ({principal.municipality})
+                    </SelectItem>
                   ))}
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="affiliations" className="space-y-4">
-                <div className="space-y-6">
-                  <div>
-                    <h4 className="font-medium mb-4">Linked Principals</h4>
-                    <div className="space-y-2">
-                      {selectedGroup.linkedPrincipals.map((principal) => (
-                        <div key={principal.id} className="flex items-center justify-between p-3 border rounded">
-                          <div className="flex items-center gap-2">
-                            <Building2 className="w-4 h-4 text-ike-neutral" />
-                            <span>{principal.name}</span>
-                            <Badge variant="outline">{principal.type}</Badge>
-                          </div>
-                          <Button variant="outline" size="sm">
-                            <Unlink className="w-4 h-4 mr-2" />
-                            Unlink
-                          </Button>
-                        </div>
-                      ))}
-                      <Button variant="outline" size="sm">
-                        <Link2 className="w-4 h-4 mr-2" />
-                        Link New Principal
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium mb-4">Linked School Units</h4>
-                    <div className="space-y-2">
-                      {selectedGroup.linkedSchoolUnits.map((unit) => (
-                        <div key={unit.id} className="flex items-center justify-between p-3 border rounded">
-                          <div className="flex items-center gap-2">
-                            <School className="w-4 h-4 text-ike-neutral" />
-                            <span>{unit.name}</span>
-                            <Badge variant="outline">
-                              Principal ID: {unit.principalId}
-                            </Badge>
-                          </div>
-                          <Button variant="outline" size="sm">
-                            <Unlink className="w-4 h-4 mr-2" />
-                            Unlink
-                          </Button>
-                        </div>
-                      ))}
-                      <Button variant="outline" size="sm">
-                        <Link2 className="w-4 h-4 mr-2" />
-                        Link New School Unit
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="financial" className="space-y-4">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-additionalAmount">Additional Amount (SEK)</Label>
-                    <Input id="edit-additionalAmount" type="number" defaultValue={selectedGroup.additionalAmount} />
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          )}
-          <DialogFooter>
-            <Button type="submit" onClick={handleUpdateGroup}>Update Group</Button>
-          </DialogFooter>
+              </SelectContent>
+            </Select>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Link School Unit Dialog */}
+      <Dialog open={isLinkSchoolDialogOpen} onOpenChange={setIsLinkSchoolDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Link School Unit to {selectedGroup?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Label>Select School Unit</Label>
+            <Select onValueChange={(schoolUnitId) => {
+              if (selectedGroup) {
+                handleLinkSchoolUnit(selectedGroup.id, schoolUnitId);
+                setIsLinkSchoolDialogOpen(false);
+              }
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a school unit to link" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableSchoolUnits
+                  .filter(school => !selectedGroup?.linkedSchoolUnits.some(s => s.id === school.id))
+                  .map((school) => (
+                    <SelectItem key={school.id} value={school.id}>
+                      {school.name} ({school.municipality})
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
