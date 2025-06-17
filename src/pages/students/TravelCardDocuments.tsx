@@ -60,6 +60,7 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import TravelCardSyncStatus from "@/components/students/TravelCardSyncStatus";
+import Grade1ImportSystem from "@/components/students/Grade1ImportSystem";
 
 interface TravelCardStudent {
   id: number;
@@ -307,6 +308,9 @@ const TravelCardDocuments = () => {
 
       {/* Daily Data Update Status */}
       <TravelCardSyncStatus />
+
+      {/* Grade 1 Import System */}
+      <Grade1ImportSystem />
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
