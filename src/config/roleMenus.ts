@@ -1,4 +1,3 @@
-
 import {
   Home,
   Users,
@@ -322,11 +321,6 @@ export const schoolAdminMenu: MenuItem[] = [
         title: "School Unit Information",
         url: "/my-school/info",
         icon: Info,
-      },
-      {
-        title: "Programs & Specializations",
-        url: "/study-paths/programs",
-        icon: Book,
       },
       {
         title: "Class Management",
