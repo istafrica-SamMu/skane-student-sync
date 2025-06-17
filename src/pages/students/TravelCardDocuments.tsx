@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -60,6 +59,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
+import TravelCardSyncStatus from "@/components/students/TravelCardSyncStatus";
 
 interface TravelCardStudent {
   id: number;
@@ -304,6 +304,9 @@ const TravelCardDocuments = () => {
           </AlertDialog>
         </div>
       </div>
+
+      {/* Daily Data Update Status */}
+      <TravelCardSyncStatus />
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
