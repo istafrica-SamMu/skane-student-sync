@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, UserPlus, Search, Filter, Edit, Trash2, Mail, Shield, MoreVertical } from "lucide-react";
+import { Users, UserPlus, Search, Filter, Edit, Trash2, Mail, Shield, MoreVertical, Calendar, IdCard } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Dialog,
@@ -53,6 +54,7 @@ const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isEditUserOpen, setIsEditUserOpen] = useState(false);
+  const [isViewRolesOpen, setIsViewRolesOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [newUserRole, setNewUserRole] = useState("");
@@ -70,36 +72,55 @@ const UserManagement = () => {
   const [users, setUsers] = useState([
     {
       id: 1,
+      username: "anna.andersson",
+      socialSecurityNumber: "1985-04-12-1234",
       name: "Anna Andersson",
       email: "anna.andersson@malmoe.se",
       role: "Municipality Admin",
       organization: "Malmö Municipality",
       status: "Active",
-      lastLogin: "2024-06-10"
+      startDate: "2023-01-15",
+      endDate: null,
+      lastLogin: "2024-06-10 14:30",
+      activeRoles: ["Municipality Admin", "Regional Coordinator"],
+      inactiveRoles: ["Teacher"]
     },
     {
       id: 2,
+      username: "erik.eriksson",
+      socialSecurityNumber: "1978-09-23-5678",
       name: "Erik Eriksson",
       email: "erik@skola.se",
       role: "School Admin",
       organization: "Malmö International School",
       status: "Active",
-      lastLogin: "2024-06-11"
+      startDate: "2022-08-20",
+      endDate: null,
+      lastLogin: "2024-06-11 09:15",
+      activeRoles: ["School Admin"],
+      inactiveRoles: []
     },
     {
       id: 3,
+      username: "maria.nilsson",
+      socialSecurityNumber: "1990-11-05-9012",
       name: "Maria Nilsson",
       email: "maria.nilsson@region.se",
       role: "Regional Admin",
       organization: "Skåne Regional Platform",
-      status: "Active",
-      lastLogin: "2024-06-12"
+      status: "Inactive",
+      startDate: "2021-03-10",
+      endDate: "2024-05-30",
+      lastLogin: "2024-05-25 16:45",
+      activeRoles: [],
+      inactiveRoles: ["Regional Admin", "System Administrator"]
     }
   ]);
 
   const filteredUsers = users.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.organization.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -117,6 +138,11 @@ const UserManagement = () => {
     setSelectedUser(user);
     setEditUserRole(user.role);
     setIsEditUserOpen(true);
+  };
+
+  const handleViewRoles = (user) => {
+    setSelectedUser(user);
+    setIsViewRolesOpen(true);
   };
 
   const handleUpdateUser = () => {
@@ -160,14 +186,26 @@ const UserManagement = () => {
               Add User
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Add New User</DialogTitle>
               <DialogDescription>
                 Add a new user to the system. Fill in all the required information.
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
+            <div className="grid gap-4 py-4 max-h-[400px] overflow-y-auto">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="username" className="text-right">
+                  Username
+                </Label>
+                <Input id="username" placeholder="Enter username" className="col-span-3" />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="ssn" className="text-right">
+                  SSN
+                </Label>
+                <Input id="ssn" placeholder="YYYY-MM-DD-XXXX" className="col-span-3" />
+              </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="name" className="text-right">
                   Name
@@ -179,6 +217,18 @@ const UserManagement = () => {
                   Email
                 </Label>
                 <Input id="email" type="email" placeholder="Enter email address" className="col-span-3" />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="startDate" className="text-right">
+                  Start Date
+                </Label>
+                <Input id="startDate" type="date" className="col-span-3" />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="endDate" className="text-right">
+                  End Date
+                </Label>
+                <Input id="endDate" type="date" className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="role" className="text-right">
@@ -218,7 +268,7 @@ const UserManagement = () => {
             System Users
           </CardTitle>
           <CardDescription>
-            Manage user accounts across all municipalities and schools
+            Manage user accounts with complete profile information and role assignments
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -273,11 +323,13 @@ const UserManagement = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
+                  <th className="text-left p-4 font-medium text-ike-neutral-dark">Username</th>
                   <th className="text-left p-4 font-medium text-ike-neutral-dark">Name</th>
                   <th className="text-left p-4 font-medium text-ike-neutral-dark">Email</th>
+                  <th className="text-left p-4 font-medium text-ike-neutral-dark">SSN</th>
                   <th className="text-left p-4 font-medium text-ike-neutral-dark">Role</th>
-                  <th className="text-left p-4 font-medium text-ike-neutral-dark">Organization</th>
                   <th className="text-left p-4 font-medium text-ike-neutral-dark">Status</th>
+                  <th className="text-left p-4 font-medium text-ike-neutral-dark">Start Date</th>
                   <th className="text-left p-4 font-medium text-ike-neutral-dark">Last Login</th>
                   <th className="text-left p-4 font-medium text-ike-neutral-dark">Actions</th>
                 </tr>
@@ -285,16 +337,20 @@ const UserManagement = () => {
               <tbody>
                 {filteredUsers.map((user) => (
                   <tr key={user.id} className="border-b hover:bg-ike-neutral-light/50">
+                    <td className="p-4 font-medium">{user.username}</td>
                     <td className="p-4 font-medium">{user.name}</td>
                     <td className="p-4 text-ike-neutral">{user.email}</td>
+                    <td className="p-4 text-ike-neutral text-sm">{user.socialSecurityNumber}</td>
                     <td className="p-4">
                       <Badge variant="outline">{user.role}</Badge>
                     </td>
-                    <td className="p-4 text-ike-neutral">{user.organization}</td>
                     <td className="p-4">
-                      <Badge className="bg-green-100 text-green-800">{user.status}</Badge>
+                      <Badge className={user.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                        {user.status}
+                      </Badge>
                     </td>
-                    <td className="p-4 text-ike-neutral">{user.lastLogin}</td>
+                    <td className="p-4 text-ike-neutral">{user.startDate}</td>
+                    <td className="p-4 text-ike-neutral text-sm">{user.lastLogin}</td>
                     <td className="p-4">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -306,6 +362,10 @@ const UserManagement = () => {
                           <DropdownMenuItem onClick={() => handleEditUser(user)}>
                             <Edit className="w-4 h-4 mr-2" />
                             Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleViewRoles(user)}>
+                            <Shield className="w-4 h-4 mr-2" />
+                            View Roles
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleSendEmail(user)}>
                             <Mail className="w-4 h-4 mr-2" />
@@ -347,7 +407,7 @@ const UserManagement = () => {
 
       {/* Edit User Dialog */}
       <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
             <DialogDescription>
@@ -355,7 +415,17 @@ const UserManagement = () => {
             </DialogDescription>
           </DialogHeader>
           {selectedUser && (
-            <div className="grid gap-4 py-4">
+            <div className="grid gap-4 py-4 max-h-[400px] overflow-y-auto">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-username" className="text-right">
+                  Username
+                </Label>
+                <Input 
+                  id="edit-username" 
+                  defaultValue={selectedUser.username} 
+                  className="col-span-3" 
+                />
+              </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="edit-name" className="text-right">
                   Name
@@ -378,6 +448,16 @@ const UserManagement = () => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-ssn" className="text-right">
+                  SSN
+                </Label>
+                <Input 
+                  id="edit-ssn" 
+                  defaultValue={selectedUser.socialSecurityNumber} 
+                  className="col-span-3" 
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="edit-role" className="text-right">
                   Role
                 </Label>
@@ -395,6 +475,28 @@ const UserManagement = () => {
                 </Select>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-startDate" className="text-right">
+                  Start Date
+                </Label>
+                <Input 
+                  id="edit-startDate" 
+                  type="date" 
+                  defaultValue={selectedUser.startDate} 
+                  className="col-span-3" 
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-endDate" className="text-right">
+                  End Date
+                </Label>
+                <Input 
+                  id="edit-endDate" 
+                  type="date" 
+                  defaultValue={selectedUser.endDate || ""} 
+                  className="col-span-3" 
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="edit-organization" className="text-right">
                   Organization
                 </Label>
@@ -408,6 +510,63 @@ const UserManagement = () => {
           )}
           <DialogFooter>
             <Button type="submit" onClick={handleUpdateUser}>Update User</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Roles Dialog */}
+      <Dialog open={isViewRolesOpen} onOpenChange={setIsViewRolesOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5" />
+              Role Assignments - {selectedUser?.name}
+            </DialogTitle>
+            <DialogDescription>
+              View active and inactive role assignments for this user.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedUser && (
+            <div className="space-y-6">
+              <div>
+                <h4 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  Active Roles
+                </h4>
+                <div className="space-y-2">
+                  {selectedUser.activeRoles.map((role, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-green-50 rounded-lg border">
+                      <Badge className="bg-green-100 text-green-800">{role}</Badge>
+                      <span className="text-sm text-green-600">Active</span>
+                    </div>
+                  ))}
+                  {selectedUser.activeRoles.length === 0 && (
+                    <p className="text-ike-neutral italic">No active roles assigned</p>
+                  )}
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold text-red-800 mb-3 flex items-center gap-2">
+                  <IdCard className="w-4 h-4" />
+                  Inactive Roles
+                </h4>
+                <div className="space-y-2">
+                  {selectedUser.inactiveRoles.map((role, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-red-50 rounded-lg border">
+                      <Badge variant="outline" className="text-red-700 border-red-200">{role}</Badge>
+                      <span className="text-sm text-red-600">Inactive</span>
+                    </div>
+                  ))}
+                  {selectedUser.inactiveRoles.length === 0 && (
+                    <p className="text-ike-neutral italic">No inactive roles</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsViewRolesOpen(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
