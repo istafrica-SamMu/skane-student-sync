@@ -24,13 +24,16 @@ import {
   UserPlus,
   School,
   Unlink,
-  Building
+  Building,
+  CreditCard,
+  FileText
 } from "lucide-react";
 
 interface Group {
   id: string;
   name: string;
   municipality: string;
+  municipalityCode: string;
   organizationNumber: string;
   startDate: string;
   endDate?: string;
@@ -48,6 +51,10 @@ interface Group {
     country: string;
   };
   additionalAmount: number;
+  bankgiro?: string;
+  postgiro?: string;
+  priceListId?: string;
+  description?: string;
   linkedPrincipals: Array<{
     id: string;
     name: string;
@@ -83,12 +90,13 @@ const GroupManagement = () => {
   const [isLinkSchoolDialogOpen, setIsLinkSchoolDialogOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
 
-  // Mock data
+  // Enhanced mock data with new fields
   const [groups, setGroups] = useState<Group[]>([
     {
       id: '1',
       name: 'Stockholm Central Group',
       municipality: 'Stockholm',
+      municipalityCode: '0180',
       organizationNumber: '212000-1355',
       startDate: '2023-01-01',
       status: 'active',
@@ -105,6 +113,10 @@ const GroupManagement = () => {
         country: 'Sweden'
       },
       additionalAmount: 50000,
+      bankgiro: '123-4567',
+      postgiro: '12 34 56-7',
+      priceListId: 'PL-2024-01',
+      description: 'Central educational group managing multiple high schools in Stockholm region',
       linkedPrincipals: [
         { id: '1', name: 'Anna Andersson', email: 'anna.andersson@example.com' }
       ],
@@ -116,6 +128,7 @@ const GroupManagement = () => {
       id: '2',
       name: 'Göteborg West Group',
       municipality: 'Göteborg',
+      municipalityCode: '1480',
       organizationNumber: '212000-2466',
       startDate: '2023-03-15',
       status: 'active',
@@ -132,6 +145,9 @@ const GroupManagement = () => {
         country: 'Sweden'
       },
       additionalAmount: 75000,
+      bankgiro: '234-5678',
+      priceListId: 'PL-2024-02',
+      description: 'Western Göteborg educational collective focusing on vocational training',
       linkedPrincipals: [],
       linkedSchoolUnits: []
     }
@@ -268,7 +284,7 @@ const GroupManagement = () => {
         <div>
           <h1 className="text-3xl font-bold text-ike-primary">Group Management</h1>
           <p className="text-ike-neutral mt-2">
-            Manage educational groups and their associations
+            Manage educational groups and their associations with enhanced financial integration
           </p>
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -278,13 +294,14 @@ const GroupManagement = () => {
               Add Group
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Add New Group</DialogTitle>
+              <DialogTitle className="text-ike-primary">Add New Educational Group</DialogTitle>
             </DialogHeader>
             <Tabs defaultValue="basic" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="basic">Basic Info</TabsTrigger>
+                <TabsTrigger value="administrative">Administrative</TabsTrigger>
                 <TabsTrigger value="contact">Contact</TabsTrigger>
                 <TabsTrigger value="address">Address</TabsTrigger>
                 <TabsTrigger value="financial">Financial</TabsTrigger>
@@ -310,10 +327,6 @@ const GroupManagement = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="orgNumber">Organization Number</Label>
-                    <Input id="orgNumber" placeholder="212000-XXXX" />
-                  </div>
-                  <div>
                     <Label htmlFor="status">Status</Label>
                     <Select>
                       <SelectTrigger>
@@ -326,6 +339,19 @@ const GroupManagement = () => {
                     </Select>
                   </div>
                   <div>
+                    <Label htmlFor="priceListId">Price List</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select price list" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="PL-2024-01">PL-2024-01 (Standard)</SelectItem>
+                        <SelectItem value="PL-2024-02">PL-2024-02 (Premium)</SelectItem>
+                        <SelectItem value="PL-2024-03">PL-2024-03 (Vocational)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
                     <Label htmlFor="startDate">Start Date</Label>
                     <Input id="startDate" type="date" />
                   </div>
@@ -333,6 +359,30 @@ const GroupManagement = () => {
                     <Label htmlFor="endDate">End Date (Optional)</Label>
                     <Input id="endDate" type="date" />
                   </div>
+                </div>
+                <div>
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea id="description" placeholder="Brief description of the group's purpose and scope..." />
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="administrative" className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="organizationNumber">Organization Number</Label>
+                    <Input id="organizationNumber" placeholder="212000-XXXX" />
+                  </div>
+                  <div>
+                    <Label htmlFor="municipalityCode">Municipality Code</Label>
+                    <Input id="municipalityCode" placeholder="0180" />
+                  </div>
+                </div>
+                <div className="bg-ike-neutral-light p-4 rounded-lg">
+                  <h4 className="font-medium text-ike-primary mb-2">Administrative Notes</h4>
+                  <p className="text-sm text-ike-neutral">
+                    Organization number and municipality code are used for official reporting and integration 
+                    with Swedish National Agency for Education systems.
+                  </p>
                 </div>
               </TabsContent>
               
@@ -388,13 +438,25 @@ const GroupManagement = () => {
               </TabsContent>
               
               <TabsContent value="financial" className="space-y-4">
-                <div>
-                  <Label htmlFor="additionalAmount">Additional Amount (SEK)</Label>
-                  <Input id="additionalAmount" type="number" placeholder="0" />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="additionalAmount">Additional Amount (SEK)</Label>
+                    <Input id="additionalAmount" type="number" placeholder="0" />
+                  </div>
+                  <div>
+                    <Label htmlFor="bankgiro">Bankgiro</Label>
+                    <Input id="bankgiro" placeholder="123-4567" />
+                  </div>
+                  <div>
+                    <Label htmlFor="postgiro">Postgiro</Label>
+                    <Input id="postgiro" placeholder="12 34 56-7" />
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea id="description" placeholder="Additional details about financial arrangements..." />
+                <div className="bg-ike-neutral-light p-4 rounded-lg">
+                  <h4 className="font-medium text-ike-primary mb-2">Financial Information</h4>
+                  <p className="text-sm text-ike-neutral">
+                    Payment details and additional amounts for inter-municipal compensation calculations.
+                  </p>
                 </div>
               </TabsContent>
             </Tabs>
@@ -415,7 +477,7 @@ const GroupManagement = () => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ike-neutral w-4 h-4" />
           <Input
-            placeholder="Search groups..."
+            placeholder="Search groups by name or municipality..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -425,20 +487,35 @@ const GroupManagement = () => {
 
       <div className="grid gap-6">
         {filteredGroups.map((group) => (
-          <Card key={group.id} className="hover:shadow-lg transition-shadow">
+          <Card key={group.id} className="hover:shadow-lg transition-shadow border-l-4 border-l-ike-primary">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-ike-primary/10 rounded-full flex items-center justify-center">
-                    <Building2 className="w-6 h-6 text-ike-primary" />
+                <div className="flex items-center space-x-4">
+                  <div className="w-14 h-14 bg-gradient-to-br from-ike-primary to-ike-primary-dark rounded-full flex items-center justify-center">
+                    <Building2 className="w-7 h-7 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-ike-primary">{group.name}</CardTitle>
-                    <p className="text-sm text-ike-neutral">{group.municipality} • {group.organizationNumber}</p>
+                    <CardTitle className="text-xl text-ike-primary">{group.name}</CardTitle>
+                    <div className="flex items-center space-x-4 mt-1">
+                      <p className="text-sm text-ike-neutral">{group.municipality} • {group.organizationNumber}</p>
+                      {group.municipalityCode && (
+                        <Badge variant="outline" className="text-xs">
+                          Code: {group.municipalityCode}
+                        </Badge>
+                      )}
+                      {group.priceListId && (
+                        <Badge variant="outline" className="text-xs">
+                          {group.priceListId}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Badge variant={group.status === 'active' ? 'default' : 'secondary'}>
+                  <Badge 
+                    variant={group.status === 'active' ? 'default' : 'secondary'}
+                    className={group.status === 'active' ? 'bg-green-100 text-green-800' : ''}
+                  >
                     {group.status}
                   </Badge>
                   <Button 
@@ -460,61 +537,113 @@ const GroupManagement = () => {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid w-full grid-cols-5">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="financial">Financial</TabsTrigger>
                   <TabsTrigger value="principals">Principals ({group.linkedPrincipals.length})</TabsTrigger>
-                  <TabsTrigger value="schools">School Units ({group.linkedSchoolUnits.length})</TabsTrigger>
+                  <TabsTrigger value="schools">Schools ({group.linkedSchoolUnits.length})</TabsTrigger>
                   <TabsTrigger value="details">Details</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="overview" className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <h4 className="font-medium text-ike-primary">Contact Information</h4>
-                      <div className="space-y-1 text-sm">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-ike-primary flex items-center">
+                        <Users className="w-4 h-4 mr-2" />
+                        Contact Information
+                      </h4>
+                      <div className="space-y-2 text-sm bg-gray-50 p-3 rounded-lg">
                         <div className="flex items-center space-x-2">
-                          <Users className="w-4 h-4 text-ike-primary" />
-                          <span>{group.contactPerson.name} ({group.contactPerson.role})</span>
+                          <span className="font-medium">{group.contactPerson.name}</span>
+                          <span className="text-ike-neutral">({group.contactPerson.role})</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Mail className="w-4 h-4 text-ike-primary" />
+                          <Mail className="w-3 h-3 text-ike-primary" />
                           <span>{group.contactPerson.email}</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Phone className="w-4 h-4 text-ike-primary" />
+                          <Phone className="w-3 h-3 text-ike-primary" />
                           <span>{group.contactPerson.phone}</span>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="space-y-2">
-                      <h4 className="font-medium text-ike-primary">Address</h4>
-                      <div className="flex items-start space-x-2 text-sm">
-                        <MapPin className="w-4 h-4 text-ike-primary mt-0.5" />
-                        <div>
-                          <p>{group.address.street}</p>
-                          <p>{group.address.postalCode} {group.address.city}</p>
-                          <p>{group.address.country}</p>
-                        </div>
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-ike-primary flex items-center">
+                        <MapPin className="w-4 h-4 mr-2" />
+                        Address
+                      </h4>
+                      <div className="text-sm bg-gray-50 p-3 rounded-lg">
+                        <p>{group.address.street}</p>
+                        <p>{group.address.postalCode} {group.address.city}</p>
+                        <p>{group.address.country}</p>
                       </div>
                     </div>
                     
-                    <div className="space-y-2">
-                      <h4 className="font-medium text-ike-primary">Financial</h4>
-                      <div className="space-y-1 text-sm">
-                        <div className="flex items-center space-x-2">
-                          <Euro className="w-4 h-4 text-ike-primary" />
-                          <span>{group.additionalAmount.toLocaleString()} SEK</span>
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-ike-primary flex items-center">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Period & Status
+                      </h4>
+                      <div className="space-y-2 text-sm bg-gray-50 p-3 rounded-lg">
+                        <div><span className="font-medium">Start:</span> {group.startDate}</div>
+                        {group.endDate && <div><span className="font-medium">End:</span> {group.endDate}</div>}
+                        <div><span className="font-medium">Status:</span> {group.status}</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {group.description && (
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <h4 className="font-medium text-ike-primary mb-2">Description</h4>
+                      <p className="text-sm text-ike-neutral">{group.description}</p>
+                    </div>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="financial" className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-ike-primary flex items-center">
+                        <Euro className="w-4 h-4 mr-2" />
+                        Financial Details
+                      </h4>
+                      <div className="space-y-2 text-sm bg-gray-50 p-4 rounded-lg">
+                        <div className="flex justify-between">
+                          <span className="font-medium">Additional Amount:</span>
+                          <span className="text-ike-primary font-semibold">
+                            {group.additionalAmount.toLocaleString()} SEK
+                          </span>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <Calendar className="w-4 h-4 text-ike-primary" />
-                          <span>Start: {group.startDate}</span>
-                        </div>
-                        {group.endDate && (
-                          <div className="flex items-center space-x-2">
-                            <Calendar className="w-4 h-4 text-ike-primary" />
-                            <span>End: {group.endDate}</span>
+                        {group.priceListId && (
+                          <div className="flex justify-between">
+                            <span className="font-medium">Price List:</span>
+                            <span>{group.priceListId}</span>
                           </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-ike-primary flex items-center">
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        Payment Information
+                      </h4>
+                      <div className="space-y-2 text-sm bg-gray-50 p-4 rounded-lg">
+                        {group.bankgiro && (
+                          <div className="flex justify-between">
+                            <span className="font-medium">Bankgiro:</span>
+                            <span>{group.bankgiro}</span>
+                          </div>
+                        )}
+                        {group.postgiro && (
+                          <div className="flex justify-between">
+                            <span className="font-medium">Postgiro:</span>
+                            <span>{group.postgiro}</span>
+                          </div>
+                        )}
+                        {!group.bankgiro && !group.postgiro && (
+                          <p className="text-ike-neutral italic">No payment information available</p>
                         )}
                       </div>
                     </div>
@@ -596,18 +725,17 @@ const GroupManagement = () => {
                 <TabsContent value="details" className="space-y-4">
                   <div className="grid grid-cols-2 gap-6">
                     <div>
-                      <h4 className="font-medium text-ike-primary mb-2">Administrative Details</h4>
-                      <div className="space-y-2 text-sm">
+                      <h4 className="font-semibold text-ike-primary mb-3">Administrative Details</h4>
+                      <div className="space-y-2 text-sm bg-gray-50 p-4 rounded-lg">
                         <div><span className="font-medium">Group ID:</span> {group.id}</div>
                         <div><span className="font-medium">Organization Number:</span> {group.organizationNumber}</div>
+                        <div><span className="font-medium">Municipality Code:</span> {group.municipalityCode}</div>
                         <div><span className="font-medium">Status:</span> {group.status}</div>
-                        <div><span className="font-medium">Start Date:</span> {group.startDate}</div>
-                        {group.endDate && <div><span className="font-medium">End Date:</span> {group.endDate}</div>}
                       </div>
                     </div>
                     <div>
-                      <h4 className="font-medium text-ike-primary mb-2">Summary</h4>
-                      <div className="space-y-2 text-sm">
+                      <h4 className="font-semibold text-ike-primary mb-3">Relationships Summary</h4>
+                      <div className="space-y-2 text-sm bg-gray-50 p-4 rounded-lg">
                         <div><span className="font-medium">Linked Principals:</span> {group.linkedPrincipals.length}</div>
                         <div><span className="font-medium">Linked School Units:</span> {group.linkedSchoolUnits.length}</div>
                         <div><span className="font-medium">Additional Amount:</span> {group.additionalAmount.toLocaleString()} SEK</div>
@@ -630,6 +758,7 @@ const GroupManagement = () => {
           <Tabs defaultValue="basic" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="basic">Basic Info</TabsTrigger>
+              <TabsTrigger value="administrative">Administrative</TabsTrigger>
               <TabsTrigger value="contact">Contact</TabsTrigger>
               <TabsTrigger value="address">Address</TabsTrigger>
               <TabsTrigger value="financial">Financial</TabsTrigger>
@@ -655,10 +784,6 @@ const GroupManagement = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="editOrgNumber">Organization Number</Label>
-                  <Input id="editOrgNumber" defaultValue={selectedGroup?.organizationNumber} placeholder="212000-XXXX" />
-                </div>
-                <div>
                   <Label htmlFor="editStatus">Status</Label>
                   <Select defaultValue={selectedGroup?.status}>
                     <SelectTrigger>
@@ -671,6 +796,19 @@ const GroupManagement = () => {
                   </Select>
                 </div>
                 <div>
+                  <Label htmlFor="editPriceListId">Price List</Label>
+                  <Select defaultValue={selectedGroup?.priceListId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select price list" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="PL-2024-01">PL-2024-01 (Standard)</SelectItem>
+                      <SelectItem value="PL-2024-02">PL-2024-02 (Premium)</SelectItem>
+                      <SelectItem value="PL-2024-03">PL-2024-03 (Vocational)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
                   <Label htmlFor="editStartDate">Start Date</Label>
                   <Input id="editStartDate" type="date" defaultValue={selectedGroup?.startDate} />
                 </div>
@@ -678,6 +816,30 @@ const GroupManagement = () => {
                   <Label htmlFor="editEndDate">End Date (Optional)</Label>
                   <Input id="editEndDate" type="date" defaultValue={selectedGroup?.endDate} />
                 </div>
+              </div>
+              <div>
+                <Label htmlFor="editDescription">Description</Label>
+                <Textarea id="editDescription" placeholder="Brief description of the group's purpose and scope..." />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="administrative" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="editOrganizationNumber">Organization Number</Label>
+                  <Input id="editOrganizationNumber" defaultValue={selectedGroup?.organizationNumber} placeholder="212000-XXXX" />
+                </div>
+                <div>
+                  <Label htmlFor="editMunicipalityCode">Municipality Code</Label>
+                  <Input id="editMunicipalityCode" defaultValue={selectedGroup?.municipalityCode} placeholder="0180" />
+                </div>
+              </div>
+              <div className="bg-ike-neutral-light p-4 rounded-lg">
+                <h4 className="font-medium text-ike-primary mb-2">Administrative Notes</h4>
+                <p className="text-sm text-ike-neutral">
+                  Organization number and municipality code are used for official reporting and integration 
+                  with Swedish National Agency for Education systems.
+                </p>
               </div>
             </TabsContent>
             
@@ -738,8 +900,12 @@ const GroupManagement = () => {
                 <Input id="editAdditionalAmount" type="number" defaultValue={selectedGroup?.additionalAmount} placeholder="0" />
               </div>
               <div>
-                <Label htmlFor="editDescription">Description</Label>
-                <Textarea id="editDescription" placeholder="Additional details about financial arrangements..." />
+                <Label htmlFor="editBankgiro">Bankgiro</Label>
+                <Input id="editBankgiro" defaultValue={selectedGroup?.bankgiro} placeholder="123-4567" />
+              </div>
+              <div>
+                <Label htmlFor="editPostgiro">Postgiro</Label>
+                <Input id="editPostgiro" defaultValue={selectedGroup?.postgiro} placeholder="12 34 56-7" />
               </div>
             </TabsContent>
           </Tabs>
