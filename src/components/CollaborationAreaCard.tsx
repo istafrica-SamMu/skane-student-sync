@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Building2, MapPin, Edit, Unlink } from "lucide-react";
+import { Users, Building2, MapPin, Edit, Unlink, Trash2 } from "lucide-react";
 
 interface Municipality {
   id: string;
@@ -25,10 +25,11 @@ interface CollaborationArea {
 interface CollaborationAreaCardProps {
   area: CollaborationArea;
   onEdit?: () => void;
+  onDelete?: () => void;
   onRemoveMunicipality?: (municipalityId: string) => void;
 }
 
-export const CollaborationAreaCard = ({ area, onEdit, onRemoveMunicipality }: CollaborationAreaCardProps) => {
+export const CollaborationAreaCard = ({ area, onEdit, onDelete, onRemoveMunicipality }: CollaborationAreaCardProps) => {
   return (
     <Card className="h-full">
       <CardHeader className="pb-3">
@@ -44,11 +45,18 @@ export const CollaborationAreaCard = ({ area, onEdit, onRemoveMunicipality }: Co
             >
               {area.status}
             </Badge>
-            {onEdit && (
-              <Button variant="outline" size="sm" onClick={onEdit}>
-                <Edit className="w-4 h-4" />
-              </Button>
-            )}
+            <div className="flex items-center space-x-1">
+              {onEdit && (
+                <Button variant="outline" size="sm" onClick={onEdit}>
+                  <Edit className="w-4 h-4" />
+                </Button>
+              )}
+              {onDelete && (
+                <Button variant="outline" size="sm" onClick={onDelete}>
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </CardHeader>

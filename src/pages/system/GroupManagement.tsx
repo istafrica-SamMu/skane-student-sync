@@ -13,6 +13,7 @@ import { ContactInfoCard } from "@/components/ContactInfoCard";
 import { ContactForm } from "@/components/ContactForm";
 import { CollaborationAreaCard } from "@/components/CollaborationAreaCard";
 import { CollaborationAreaForm } from "@/components/CollaborationAreaForm";
+import { ConfirmationModal } from "@/components/ConfirmationModal";
 import { 
   Building2, 
   Edit, 
@@ -30,7 +31,8 @@ import {
   Unlink,
   Building,
   CreditCard,
-  FileText
+  FileText,
+  Filter
 } from "lucide-react";
 
 interface Group {
@@ -103,6 +105,8 @@ interface CollaborationArea {
 const GroupManagement = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [collaborationAreaSearchTerm, setCollaborationAreaSearchTerm] = useState('');
+  const [collaborationAreaFilterStatus, setCollaborationAreaFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isContactEditDialogOpen, setIsContactEditDialogOpen] = useState(false);
@@ -110,6 +114,7 @@ const GroupManagement = () => {
   const [isLinkSchoolDialogOpen, setIsLinkSchoolDialogOpen] = useState(false);
   const [isCollaborationAreaDialogOpen, setIsCollaborationAreaDialogOpen] = useState(false);
   const [isEditCollaborationAreaDialogOpen, setIsEditCollaborationAreaDialogOpen] = useState(false);
+  const [isDeleteCollaborationAreaModalOpen, setIsDeleteCollaborationAreaModalOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [selectedCollaborationArea, setSelectedCollaborationArea] = useState<CollaborationArea | null>(null);
 
@@ -206,6 +211,16 @@ const GroupManagement = () => {
     group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     group.municipality.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const filteredCollaborationAreas = collaborationAreas.filter(area => {
+    const matchesSearch = area.name.toLowerCase().includes(collaborationAreaSearchTerm.toLowerCase()) ||
+      area.region.toLowerCase().includes(collaborationAreaSearchTerm.toLowerCase()) ||
+      area.coordinatorName.toLowerCase().includes(collaborationAreaSearchTerm.toLowerCase());
+    
+    const matchesStatus = collaborationAreaFilterStatus === 'all' || area.status === collaborationAreaFilterStatus;
+    
+    return matchesSearch && matchesStatus;
+  });
 
   const handleLinkPrincipal = (groupId: string, principalId: string) => {
     const principal = availablePrincipals.find(p => p.id === principalId);
@@ -397,6 +412,25 @@ const GroupManagement = () => {
       title: "Collaboration Area Updated",
       description: `${updatedArea.name} has been updated successfully`,
     });
+  };
+
+  const handleDeleteCollaborationArea = (area: CollaborationArea) => {
+    setSelectedCollaborationArea(area);
+    setIsDeleteCollaborationAreaModalOpen(true);
+  };
+
+  const confirmDeleteCollaborationArea = () => {
+    if (!selectedCollaborationArea) return;
+
+    setCollaborationAreas(prev => prev.filter(area => area.id !== selectedCollaborationArea.id));
+    setIsDeleteCollaborationAreaModalOpen(false);
+    
+    toast({
+      title: "Collaboration Area Deleted",
+      description: `${selectedCollaborationArea.name} has been deleted successfully`,
+    });
+    
+    setSelectedCollaborationArea(null);
   };
 
   const handleRemoveMunicipalityFromArea = (areaId: string, municipalityId: string) => {
@@ -924,23 +958,57 @@ const GroupManagement = () => {
         </TabsContent>
         
         <TabsContent value="collaboration-areas" className="space-y-6">
+          <div className="flex items-center space-x-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ike-neutral w-4 h-4" />
+              <Input
+                placeholder="Search collaboration areas by name, region, or coordinator..."
+                value={collaborationAreaSearchTerm}
+                onChange={(e) => setCollaborationAreaSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Filter className="w-4 h-4 text-ike-neutral" />
+              <Select value={collaborationAreaFilterStatus} onValueChange={(value: 'all' | 'active' | 'inactive') => setCollaborationAreaFilterStatus(value)}>
+                <SelectTrigger className="w-36">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div className="grid gap-6">
-            {collaborationAreas.length === 0 ? (
+            {filteredCollaborationAreas.length === 0 ? (
               <div className="text-center p-12 bg-gray-50 rounded-lg">
                 <Users className="w-16 h-16 text-ike-neutral mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-ike-primary mb-2">No Collaboration Areas</h3>
-                <p className="text-ike-neutral mb-4">Create your first collaboration area to start managing municipal partnerships.</p>
-                <Button onClick={() => setIsCollaborationAreaDialogOpen(true)} className="bg-ike-primary hover:bg-ike-primary-dark">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Collaboration Area
-                </Button>
+                <h3 className="text-lg font-medium text-ike-primary mb-2">
+                  {collaborationAreas.length === 0 ? 'No Collaboration Areas' : 'No Results Found'}
+                </h3>
+                <p className="text-ike-neutral mb-4">
+                  {collaborationAreas.length === 0 
+                    ? 'Create your first collaboration area to start managing municipal partnerships.' 
+                    : 'Try adjusting your search terms or filters to find collaboration areas.'}
+                </p>
+                {collaborationAreas.length === 0 && (
+                  <Button onClick={() => setIsCollaborationAreaDialogOpen(true)} className="bg-ike-primary hover:bg-ike-primary-dark">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Collaboration Area
+                  </Button>
+                )}
               </div>
             ) : (
-              collaborationAreas.map((area) => (
+              filteredCollaborationAreas.map((area) => (
                 <CollaborationAreaCard
                   key={area.id}
                   area={area}
                   onEdit={() => handleEditCollaborationArea(area)}
+                  onDelete={() => handleDeleteCollaborationArea(area)}
                   onRemoveMunicipality={(municipalityId) => handleRemoveMunicipalityFromArea(area.id, municipalityId)}
                 />
               ))
@@ -1247,6 +1315,20 @@ const GroupManagement = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Collaboration Area Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isDeleteCollaborationAreaModalOpen}
+        onClose={() => {
+          setIsDeleteCollaborationAreaModalOpen(false);
+          setSelectedCollaborationArea(null);
+        }}
+        onConfirm={confirmDeleteCollaborationArea}
+        title="Delete Collaboration Area"
+        description={`Are you sure you want to delete "${selectedCollaborationArea?.name}"? This action cannot be undone and will remove all associated municipality relationships.`}
+        actionType="delete"
+        jobName={selectedCollaborationArea?.name}
+      />
     </div>
   );
 };
