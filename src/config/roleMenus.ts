@@ -1,13 +1,52 @@
-import { Home, Users, FileText, BarChart3, Settings, Database, ArrowUpDown, AlertTriangle, Package, Euro, TrendingUp, UserCheck, Link as LinkIcon, User, Calendar, Upload, DollarSign, MessageSquare, Building } from "lucide-react";
+import {
+  Home,
+  Users,
+  Calculator,
+  FileText,
+  BarChart3,
+  Settings,
+  Database,
+  ArrowUpDown,
+  AlertTriangle,
+  Package,
+  Euro,
+  TrendingUp,
+  UserCheck,
+  Link,
+  User,
+  Shield,
+  Building,
+  GraduationCap,
+  MessageSquare,
+  Activity,
+  FileSpreadsheet,
+  Calendar,
+  School,
+  UserPlus,
+  DollarSign,
+  MapPin,
+  Book,
+  Briefcase,
+  Clock,
+  Bell,
+  Mail
+} from "lucide-react";
 
-export const regionalAdminMenu = [
+export interface MenuItem {
+  title: string;
+  url?: string;
+  icon: any;
+  items?: MenuItem[];
+}
+
+export const regionalAdminMenu: MenuItem[] = [
   {
     title: "Dashboard",
     url: "/dashboard",
     icon: Home,
   },
   {
-    title: "System",
+    title: "System Management",
     icon: Settings,
     items: [
       {
@@ -23,7 +62,7 @@ export const regionalAdminMenu = [
       {
         title: "School Units",
         url: "/system/schools",
-        icon: Building,
+        icon: School,
       },
       {
         title: "School Years",
@@ -33,162 +72,45 @@ export const regionalAdminMenu = [
     ],
   },
   {
-    title: "Study Paths",
-    icon: FileText,
+    title: "Study Path Management",
+    icon: Book,
     items: [
       {
         title: "Study Paths",
         url: "/study-paths",
-        icon: FileText,
+        icon: Book,
       },
       {
         title: "Price Codes",
         url: "/study-paths/price-codes",
         icon: Euro,
       },
-      {
-        title: "National Programs",
-        url: "/study-paths/programs",
-        icon: FileText,
-      },
     ],
   },
   {
-    title: "Operations",
+    title: "Regional Operations",
     icon: Database,
     items: [
       {
         title: "Population Data",
         url: "/operations/population",
-        icon: User,
-      },
-      {
-        title: "Address Updates",
-        url: "/operations/addresses",
-        icon: MapPin,
-      },
-      {
-        title: "Municipal School Units",
-        url: "/operations/municipal-schools",
-        icon: Building,
-      },
-      {
-        title: "Municipal User Admin",
-        url: "/operations/municipal-users",
-        icon: User,
+        icon: Users,
       },
     ],
   },
   {
-    title: "Studenthantering",
-    icon: Users,
-    items: [
-      {
-        title: "Studentregister",
-        url: "/students",
-        icon: Users,
-      },
-      {
-        title: "Students by Class",
-        url: "/students/classes",
-        icon: Users,
-      },
-      {
-        title: "Municipal Students",
-        url: "/students/municipal",
-        icon: Users,
-      },
-      {
-        title: "External Students",
-        url: "/students/external",
-        icon: Users,
-      },
-      {
-        title: "Placeringar & Överföringar",
-        url: "/students/placements",
-        icon: ArrowUpDown,
-      },
-      {
-        title: "Konfliktlösning",
-        url: "/students/conflicts",
-        icon: AlertTriangle,
-      },
-      {
-        title: "Massoperationer",
-        url: "/students/bulk",
-        icon: Package,
-      },
-    ],
-  },
-  {
-    title: "Ekonomihantering",
+    title: "Calculation Engine",
+    url: "/integration",
     icon: Calculator,
-    items: [
-      {
-        title: "IKE-beräkningar",
-        url: "/financial/calculations",
-        icon: Calculator,
-      },
-      {
-        title: "Additional Amounts",
-        url: "/financial/additional-amounts",
-        icon: Plus,
-      },
-      {
-        title: "Municipal Financial Reports",
-        url: "/financial/reports",
-        icon: FileText,
-      },
-      {
-        title: "Inter-municipal Compensation",
-        url: "/financial/compensation",
-        icon: Euro,
-      },
-      {
-        title: "Prislistor",
-        url: "/financial/pricelists",
-        icon: Euro,
-      },
-    ],
   },
   {
-    title: "Rapporter & Analys",
+    title: "Reports & Analytics",
     icon: FileText,
     items: [
       {
-        title: "Standardrapporter",
-        url: "/reports/standard",
-        icon: FileText,
-      },
-      {
-        title: "Student Lists",
-        url: "/reports/students",
-        icon: Users,
-      },
-      {
-        title: "School Financial Reports",
-        url: "/reports/financial",
-        icon: FileText,
-      },
-      {
-        title: "School Statistics",
-        url: "/reports/statistics",
-        icon: BarChart3,
-      },
-      {
-        title: "Bidragsrapporter",
-        url: "/reports/contributions",
-        icon: Euro,
-      },
-      {
-        title: "Uppföljningsrapporter",
-        url: "/reports/follow-up",
-        icon: UserCheck,
-      },
-      {
         title: "Regional Statistics",
         url: "/reports/regional",
-        icon: TrendingUp,
+        icon: BarChart3,
       },
       {
         title: "Monthly Compilation",
@@ -196,65 +118,14 @@ export const regionalAdminMenu = [
         icon: Calendar,
       },
       {
+        title: "Financial Analysis",
+        url: "/reports/financial",
+        icon: DollarSign,
+      },
+      {
         title: "Change Tracking",
         url: "/reports/changes",
-        icon: LinkIcon,
-      },
-      {
-        title: "Money To Receive",
-        url: "/reports/money-to-receive",
-        icon: Euro,
-      },
-      {
-        title: "Money To Pay",
-        url: "/reports/money-to-pay",
-        icon: Euro,
-      },
-      {
-        title: "Municipal Statistics",
-        url: "/reports/municipal-statistics",
-        icon: BarChart3,
-      },
-      {
-        title: "Financial Export",
-        url: "/reports/financial-export",
-        icon: Upload,
-      },
-    ],
-  },
-  {
-    title: "Integration & Import",
-    icon: Database,
-    items: [
-      {
-        title: "Schedule Integration",
-        url: "/integration/schedule",
-        icon: Calendar,
-      },
-      {
-        title: "Import Student Data",
-        url: "/integration/import",
-        icon: Upload,
-      },
-      {
-        title: "Integration Status",
-        url: "/integration/status",
-        icon: Settings,
-      },
-      {
-        title: "Extens Export",
-        url: "/integration/extens",
-        icon: FileText,
-      },
-      {
-        title: "Population Registry",
-        url: "/integration/population",
-        icon: User,
-      },
-      {
-        title: "Integration Testing",
-        url: "/integration/testing",
-        icon: Settings,
+        icon: Activity,
       },
     ],
   },
@@ -273,9 +144,9 @@ export const regionalAdminMenu = [
         icon: Settings,
       },
       {
-        title: "Activity Logs",
+        title: "System Logs",
         url: "/my-page/logs",
-        icon: FileText,
+        icon: Activity,
       },
       {
         title: "Settings",
@@ -286,90 +157,56 @@ export const regionalAdminMenu = [
   },
 ];
 
-import { Calculator, FileText, Home, Link as LinkIcon, Settings, Upload, User, Users, BarChart3, Building, Calendar, Database, DollarSign, MessageSquare, MapPin, Plus } from "lucide-react";
-
-export const municipalityAdminMenu = [
+export const municipalityAdminMenu: MenuItem[] = [
   {
     title: "Dashboard",
     url: "/dashboard",
     icon: Home,
   },
   {
-    title: "System",
-    icon: Settings,
-    items: [
-      {
-        title: "School Units",
-        url: "/system/schools",
-        icon: Building,
-      },
-    ],
-  },
-  {
-    title: "Operations",
-    icon: Database,
-    items: [
-      {
-        title: "Population Data",
-        url: "/operations/population",
-        icon: User,
-      },
-      {
-        title: "Address Updates",
-        url: "/operations/addresses",
-        icon: MapPin,
-      },
-      {
-        title: "Municipal School Units",
-        url: "/operations/municipal-schools",
-        icon: Building,
-      },
-      {
-        title: "Municipal User Admin",
-        url: "/operations/municipal-users",
-        icon: User,
-      },
-    ],
-  },
-  {
-    title: "Studenthantering",
+    title: "Student Management",
     icon: Users,
     items: [
       {
-        title: "Studentregister",
+        title: "Students Overview",
         url: "/students",
         icon: Users,
       },
       {
-        title: "Students by Class",
+        title: "Students by Class & Study Path",
         url: "/students/classes",
-        icon: Users,
+        icon: GraduationCap,
       },
       {
-        title: "Municipal Students",
+        title: "Municipal School Students",
         url: "/students/municipal",
-        icon: Users,
+        icon: School,
       },
       {
-        title: "External Students",
+        title: "External School Students",
         url: "/students/external",
-        icon: Users,
+        icon: ArrowUpDown,
       },
     ],
   },
   {
-    title: "Ekonomihantering",
+    title: "Import Student Data",
+    url: "/integration/import",
+    icon: Database,
+  },
+  {
+    title: "Financial Management",
     icon: Calculator,
     items: [
       {
-        title: "IKE-beräkningar",
-        url: "/financial/calculations",
-        icon: Calculator,
+        title: "Municipal Price Lists",
+        url: "/financial/pricelists",
+        icon: Euro,
       },
       {
         title: "Additional Amounts",
         url: "/financial/additional-amounts",
-        icon: Plus,
+        icon: DollarSign,
       },
       {
         title: "Municipal Financial Reports",
@@ -377,111 +214,24 @@ export const municipalityAdminMenu = [
         icon: FileText,
       },
       {
-        title: "Inter-municipal Compensation",
+        title: "Inter-Municipal Compensation",
         url: "/financial/compensation",
-        icon: Euro,
+        icon: TrendingUp,
       },
     ],
   },
   {
-    title: "Rapporter & Analys",
-    icon: FileText,
-    items: [
-      {
-        title: "Student Lists",
-        url: "/reports/students",
-        icon: Users,
-      },
-      {
-        title: "Municipal Statistics",
-        url: "/reports/municipal-statistics",
-        icon: BarChart3,
-      },
-      {
-        title: "Financial Export",
-        url: "/reports/financial-export",
-        icon: Upload,
-      },
-    ],
-  },
-  {
-    title: "Integration & Import",
-    icon: Database,
-    items: [
-      {
-        title: "Schedule Integration",
-        url: "/integration/schedule",
-        icon: Calendar,
-      },
-      {
-        title: "Import Student Data",
-        url: "/integration/import",
-        icon: Upload,
-      },
-      {
-        title: "Integration Status",
-        url: "/integration/status",
-        icon: Settings,
-      },
-    ],
-  },
-  {
-    title: "My Page",
-    icon: User,
-    items: [
-      {
-        title: "Messages",
-        url: "/my-page/messages",
-        icon: MessageSquare,
-      },
-      {
-        title: "Enrollment Settings",
-        url: "/my-page/enrollment",
-        icon: Settings,
-      },
-      {
-        title: "Activity Logs",
-        url: "/my-page/logs",
-        icon: FileText,
-      },
-      {
-        title: "Settings",
-        url: "/my-page/settings",
-        icon: Settings,
-      },
-    ],
-  },
-];
-
-export const schoolAdminMenu = [
-  {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: Home,
-  },
-  {
-    title: "My School",
+    title: "Municipal Operations",
     icon: Building,
     items: [
       {
-        title: "School Information",
-        url: "/my-school/info",
-        icon: Building,
-      },
-    ],
-  },
-  {
-    title: "Students",
-    icon: Users,
-    items: [
-      {
-        title: "Student Lists",
-        url: "/reports/students",
-        icon: Users,
+        title: "Municipal School Units",
+        url: "/operations/municipal-schools",
+        icon: School,
       },
       {
-        title: "Students by Class",
-        url: "/students/classes",
+        title: "Municipal User Administration",
+        url: "/operations/municipal-users",
         icon: Users,
       },
     ],
@@ -491,35 +241,24 @@ export const schoolAdminMenu = [
     icon: FileText,
     items: [
       {
-        title: "Financial Reports",
-        url: "/reports/financial",
+        title: "Money to Receive",
+        url: "/reports/money-to-receive",
+        icon: TrendingUp,
+      },
+      {
+        title: "Money to Pay",
+        url: "/reports/money-to-pay",
         icon: DollarSign,
       },
       {
-        title: "Statistics",
-        url: "/reports/statistics",
+        title: "Municipal Statistics",
+        url: "/reports/municipal-statistics",
         icon: BarChart3,
       },
-    ],
-  },
-  {
-    title: "Integration",
-    icon: Database,
-    items: [
       {
-        title: "Schedule Integration",
-        url: "/integration/schedule",
-        icon: Calendar,
-      },
-      {
-        title: "Import Student Data",
-        url: "/integration/import",
-        icon: Upload,
-      },
-      {
-        title: "Integration Status",
-        url: "/integration/status",
-        icon: Settings,
+        title: "Financial System Export",
+        url: "/reports/financial-export",
+        icon: FileSpreadsheet,
       },
     ],
   },
@@ -540,7 +279,99 @@ export const schoolAdminMenu = [
       {
         title: "Activity Logs",
         url: "/my-page/logs",
-        icon: FileText,
+        icon: Activity,
+      },
+      {
+        title: "Settings",
+        url: "/my-page/settings",
+        icon: Settings,
+      },
+    ],
+  },
+];
+
+export const schoolAdminMenu: MenuItem[] = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: Home,
+  },
+  {
+    title: "Student Management",
+    icon: Users,
+    items: [
+      {
+        title: "Student Roster & Classes",
+        url: "/students",
+        icon: Users,
+      },
+      {
+        title: "Manage Student Placements",
+        url: "/students/placements",
+        icon: ArrowUpDown,
+      },
+    ],
+  },
+  {
+    title: "School Operations",
+    icon: School,
+    items: [
+      {
+        title: "School Unit Information",
+        url: "/system/schools",
+        icon: Building,
+      },
+      {
+        title: "Programs & Specializations",
+        url: "/study-paths/programs",
+        icon: Book,
+      },
+      {
+        title: "Class Management",
+        url: "/students/classes",
+        icon: GraduationCap,
+      },
+    ],
+  },
+  {
+    title: "Reports",
+    icon: FileText,
+    items: [
+      {
+        title: "Student Lists",
+        url: "/reports/students",
+        icon: Users,
+      },
+      {
+        title: "Financial Reports",
+        url: "/reports/financial",
+        icon: DollarSign,
+      },
+      {
+        title: "School Statistics",
+        url: "/reports/statistics",
+        icon: BarChart3,
+      },
+    ],
+  },
+  {
+    title: "My Page",
+    icon: User,
+    items: [
+      {
+        title: "Messages",
+        url: "/my-page/messages",
+        icon: MessageSquare,
+      },
+      {
+        title: "Enrollment Info",
+        url: "/my-page/enrollment",
+        icon: Settings,
+      },
+      {
+        title: "Activity Logs",
+        url: "/my-page/logs",
+        icon: Activity,
       },
       {
         title: "Settings",

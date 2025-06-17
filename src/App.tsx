@@ -60,7 +60,6 @@ import MoneyToReceive from "./pages/reports/MoneyToReceive";
 import MoneyToPay from "./pages/reports/MoneyToPay";
 import MunicipalStatistics from "./pages/reports/MunicipalStatistics";
 import FinancialExport from "./pages/reports/FinancialExport";
-import SchoolUnitInfo from "./pages/my-school/SchoolUnitInfo";
 
 const queryClient = new QueryClient();
 
@@ -309,11 +308,6 @@ const AppContent = () => {
               <Route path="/my-page/settings" element={
                 <ProtectedRoute>
                   <Settings />
-                </ProtectedRoute>
-              } />
-              <Route path="/my-school/info" element={
-                <ProtectedRoute>
-                  <SchoolUnitInfo />
                 </ProtectedRoute>
               } />
               <Route path="/integration/schedule" element={
