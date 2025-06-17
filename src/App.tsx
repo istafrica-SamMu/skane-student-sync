@@ -51,6 +51,7 @@ import IntegrationTesting from "./pages/integration/IntegrationTesting";
 import StudentsByClass from "./pages/students/StudentsByClass";
 import MunicipalStudents from "./pages/students/MunicipalStudents";
 import ExternalStudents from "./pages/students/ExternalStudents";
+import TravelCardDocuments from "./pages/students/TravelCardDocuments";
 import ScheduleIntegration from "./pages/integration/ScheduleIntegration";
 import ImportStudentData from "./pages/integration/ImportStudentData";
 import IntegrationStatus from "./pages/integration/IntegrationStatus";
@@ -223,6 +224,11 @@ const AppContent = () => {
               <Route path="/students/external" element={
                 <ProtectedRoute>
                   <ExternalStudents />
+                </ProtectedRoute>
+              } />
+              <Route path="/students/travel-cards" element={
+                <ProtectedRoute>
+                  <TravelCardDocuments />
                 </ProtectedRoute>
               } />
               <Route path="/students/placements" element={
