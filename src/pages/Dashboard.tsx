@@ -26,7 +26,9 @@ import {
   MapPin,
   DollarSign,
   Book,
-  BarChart3
+  BarChart3,
+  UserCheck,
+  BookOpen
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -51,30 +53,30 @@ const Dashboard = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-ike-neutral-dark">
-              School Administration Dashboard
+              Independent School Dashboard
             </h1>
             <p className="text-ike-neutral mt-2">
-              {currentDate} • {user.organization || 'School Unit'} Management
+              {currentDate} • {user.organization || 'Independent School'} Management
             </p>
           </div>
           <div className="flex space-x-3">
             <Button asChild className="bg-ike-primary hover:bg-ike-primary-dark text-white">
               <Link to="/reports/students">
                 <Download className="w-4 h-4 mr-2" />
-                Export Student Lists
+                Export Student Data
               </Link>
             </Button>
             <Button asChild variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
               <Link to="/reports/financial">
                 <FileText className="w-4 h-4 mr-2" />
-                School Reports
+                Financial Reports
               </Link>
             </Button>
           </div>
         </div>
 
         {/* School Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card className="border-l-4 border-l-ike-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-ike-neutral">
@@ -94,29 +96,14 @@ const Dashboard = () => {
           <Card className="border-l-4 border-l-ike-success">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-ike-neutral">
-                Active Classes
+                Active Programs
               </CardTitle>
               <GraduationCap className="h-4 w-4 text-ike-success" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-ike-neutral-dark">34</div>
+              <div className="text-2xl font-bold text-ike-neutral-dark">8</div>
               <div className="text-xs text-ike-neutral mt-1">
-                Across all programs
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-l-4 border-l-ike-warning">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-ike-neutral">
-                Pending Placements
-              </CardTitle>
-              <ArrowUpDown className="h-4 w-4 text-ike-warning" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-ike-neutral-dark">12</div>
-              <div className="text-xs text-ike-warning mt-1">
-                Require attention
+                Educational programs
               </div>
             </CardContent>
           </Card>
@@ -124,7 +111,7 @@ const Dashboard = () => {
           <Card className="border-l-4 border-l-green-500">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-ike-neutral">
-                Monthly Compensation
+                Monthly Revenue
               </CardTitle>
               <DollarSign className="h-4 w-4 text-green-500" />
             </CardHeader>
@@ -144,7 +131,7 @@ const Dashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center text-ike-neutral-dark">
                 <School className="w-5 h-5 mr-2 text-ike-primary" />
-                School Unit Information
+                Independent School Information
               </CardTitle>
               <CardDescription>
                 Current status and key information about your school
@@ -154,22 +141,22 @@ const Dashboard = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-ike-neutral">School Name</label>
-                  <p className="text-lg font-semibold text-ike-neutral-dark">Malmö Gymnasium</p>
+                  <p className="text-lg font-semibold text-ike-neutral-dark">{user?.organization || 'Independent School'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-ike-neutral">School Code</label>
-                  <p className="text-lg font-semibold text-ike-neutral-dark">MA-GYM-001</p>
+                  <p className="text-lg font-semibold text-ike-neutral-dark">IS-001</p>
                 </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-ike-neutral">Municipality</label>
-                  <p className="text-lg font-semibold text-ike-neutral-dark">Malmö</p>
+                  <label className="text-sm font-medium text-ike-neutral">School Type</label>
+                  <p className="text-lg font-semibold text-ike-neutral-dark">Independent School</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-ike-neutral">School Type</label>
-                  <p className="text-lg font-semibold text-ike-neutral-dark">Gymnasium</p>
+                  <label className="text-sm font-medium text-ike-neutral">Accreditation</label>
+                  <p className="text-lg font-semibold text-ike-neutral-dark">Approved</p>
                 </div>
               </div>
 
@@ -177,10 +164,11 @@ const Dashboard = () => {
                 <label className="text-sm font-medium text-ike-neutral">Available Programs</label>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {[
-                    "Naturvetenskapsprogrammet",
-                    "Samhällsvetenskapsprogrammet", 
-                    "Teknikprogrammet",
-                    "Ekonomiprogrammet"
+                    "International Baccalaureate",
+                    "Advanced Mathematics", 
+                    "Science & Technology",
+                    "Language Studies",
+                    "Arts & Creative"
                   ].map((program, index) => (
                     <Badge key={index} variant="secondary" className="bg-ike-primary/10 text-ike-primary">
                       {program}
@@ -194,7 +182,7 @@ const Dashboard = () => {
           {/* School Actions */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-ike-neutral-dark">School Operations</CardTitle>
+              <CardTitle className="text-ike-neutral-dark">School Management</CardTitle>
               <CardDescription>
                 Quick access to key school functions
               </CardDescription>
@@ -206,23 +194,13 @@ const Dashboard = () => {
               >
                 <Link to="/students">
                   <Users className="w-4 h-4 mr-2" />
-                  Student Roster
+                  Student Management
                 </Link>
               </Button>
               <Button 
                 asChild
                 variant="outline" 
                 className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
-              >
-                <Link to="/students/placements">
-                  <ArrowUpDown className="w-4 h-4 mr-2" />
-                  Manage Placements
-                </Link>
-              </Button>
-              <Button 
-                asChild
-                variant="outline" 
-                className="w-full justify-start"
               >
                 <Link to="/students/classes">
                   <GraduationCap className="w-4 h-4 mr-2" />
@@ -236,61 +214,73 @@ const Dashboard = () => {
               >
                 <Link to="/reports/financial">
                   <FileText className="w-4 h-4 mr-2" />
-                  Generate Reports
+                  Financial Reports
+                </Link>
+              </Button>
+              <Button 
+                asChild
+                variant="outline" 
+                className="w-full justify-start"
+              >
+                <Link to="/my-school/info">
+                  <School className="w-4 h-4 mr-2" />
+                  School Settings
                 </Link>
               </Button>
             </CardContent>
           </Card>
         </div>
 
-        {/* Programs & Classes Overview */}
+        {/* Programs & Enrollment Overview */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-ike-neutral-dark">Programs & Classes Overview</CardTitle>
+            <CardTitle className="text-ike-neutral-dark">Programs & Enrollment Overview</CardTitle>
             <CardDescription>
-              Current enrollment status across all programs
+              Current enrollment status across all educational programs
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {[
                 {
-                  program: "Naturvetenskapsprogrammet",
-                  classes: 8,
-                  students: 240,
-                  capacity: 256,
+                  program: "International Baccalaureate",
+                  students: 180,
+                  capacity: 200,
                   statusColor: "success"
                 },
                 {
-                  program: "Samhällsvetenskapsprogrammet", 
-                  classes: 10,
-                  students: 320,
-                  capacity: 320,
+                  program: "Advanced Mathematics", 
+                  students: 95,
+                  capacity: 100,
                   statusColor: "warning"
                 },
                 {
-                  program: "Teknikprogrammet",
-                  classes: 9,
-                  students: 162,
-                  capacity: 288,
+                  program: "Science & Technology",
+                  students: 240,
+                  capacity: 280,
                   statusColor: "success"
                 },
                 {
-                  program: "Ekonomiprogrammet",
-                  classes: 7,
-                  students: 125,
-                  capacity: 224,
+                  program: "Language Studies",
+                  students: 160,
+                  capacity: 180,
+                  statusColor: "warning"
+                },
+                {
+                  program: "Arts & Creative",
+                  students: 172,
+                  capacity: 200,
                   statusColor: "success"
                 }
               ].map((program, index) => (
                 <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex items-center space-x-4">
                     <div className="w-12 h-12 bg-ike-primary/10 rounded-lg flex items-center justify-center">
-                      <Book className="w-6 h-6 text-ike-primary" />
+                      <BookOpen className="w-6 h-6 text-ike-primary" />
                     </div>
                     <div>
                       <h3 className="font-medium text-ike-neutral-dark">{program.program}</h3>
-                      <p className="text-sm text-ike-neutral">{program.classes} classes • {program.students}/{program.capacity} students</p>
+                      <p className="text-sm text-ike-neutral">{program.students}/{program.capacity} students enrolled</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
@@ -313,106 +303,6 @@ const Dashboard = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Recent Student Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-ike-neutral-dark">Recent Student Activity</CardTitle>
-              <CardDescription>
-                Latest changes and updates to student records
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[
-                {
-                  time: "14:30",
-                  action: "New student enrollment",
-                  details: "Erik Andersson - Naturvetenskapsprogrammet",
-                  status: "success"
-                },
-                {
-                  time: "13:15",
-                  action: "Class placement updated",
-                  details: "Maria Johansson moved to SA22B",
-                  status: "info"
-                },
-                {
-                  time: "11:45",
-                  action: "Student transfer request", 
-                  details: "Carl Lindström - Pending approval",
-                  status: "warning"
-                },
-                {
-                  time: "10:20",
-                  action: "Graduation completed",
-                  details: "Anna Petersson - Ekonomiprogrammet",
-                  status: "success"
-                }
-              ].map((activity, index) => (
-                <div key={index} className="flex items-center space-x-4 p-3 rounded-lg bg-ike-neutral-light">
-                  <div className="text-sm text-ike-neutral font-mono">{activity.time}</div>
-                  <div className="flex-1">
-                    <div className="text-sm font-medium text-ike-neutral-dark">
-                      {activity.action}
-                    </div>
-                    <div className="text-xs text-ike-neutral">{activity.details}</div>
-                  </div>
-                  <Badge 
-                    variant="secondary" 
-                    className={
-                      activity.status === "success" ? "bg-ike-success/10 text-ike-success" :
-                      activity.status === "warning" ? "bg-ike-warning/10 text-ike-warning" :
-                      "bg-ike-primary/10 text-ike-primary"
-                    }
-                  >
-                    {activity.status === "success" ? "Completed" :
-                     activity.status === "warning" ? "Pending" : "Updated"}
-                  </Badge>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-ike-neutral-dark">Quick Statistics</CardTitle>
-              <CardDescription>
-                Key metrics for this academic year
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-ike-neutral">New enrollments this month:</span>
-                <span className="font-medium">15 students</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-ike-neutral">Completed transfers:</span>
-                <span className="font-medium">8 students</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-ike-neutral">Pending placements:</span>
-                <span className="font-medium text-ike-warning">12 students</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-ike-neutral">Average class size:</span>
-                <span className="font-medium">24.9 students</span>
-              </div>
-              <div className="border-t pt-4">
-                <div className="flex justify-between items-center text-lg">
-                  <span className="font-medium">Overall capacity:</span>
-                  <span className="font-bold text-ike-primary">79.2%</span>
-                </div>
-              </div>
-              <Button asChild className="w-full mt-4" variant="outline">
-                <Link to="/reports/statistics">
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  View Detailed Statistics
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     );
   }
