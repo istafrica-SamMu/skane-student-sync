@@ -42,7 +42,8 @@ import {
   HardDrive,
   Terminal,
   Building2,
-  ClipboardList
+  ClipboardList,
+  CreditCard
 } from "lucide-react";
 
 export interface MenuItem {
@@ -210,6 +211,11 @@ export const municipalityAdminMenu: MenuItem[] = [
         url: "/students/external",
         icon: ArrowUpDown,
       },
+      {
+        title: "Travel Card Documents",
+        url: "/students/travel-cards",
+        icon: CreditCard,
+      },
     ],
   },
   {
@@ -353,6 +359,11 @@ export const schoolAdminMenu: MenuItem[] = [
         title: "Student Roster & Classes",
         url: "/students",
         icon: Users,
+      },
+      {
+        title: "Travel Card Documents",
+        url: "/students/travel-cards",
+        icon: CreditCard,
       },
     ],
   },
