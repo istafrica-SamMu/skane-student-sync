@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Building2, 
@@ -22,7 +22,9 @@ import {
   Plus,
   Link,
   Unlink,
-  GraduationCap
+  GraduationCap,
+  DollarSign,
+  Hash
 } from "lucide-react";
 
 interface SchoolUnit {
@@ -38,11 +40,21 @@ interface SchoolUnit {
     city: string;
     country: string;
   };
+  visitingAddress: {
+    street: string;
+    postalCode: string;
+    city: string;
+    country: string;
+  };
   municipality: string;
+  municipalityCode: string;
+  municipalityName: string;
   establishedDate: string;
+  endDate?: string;
   status: 'active' | 'inactive';
   capacity: number;
   currentStudents: number;
+  additionalAmount: number;
   principalId?: string;
   principalName?: string;
   groups: Array<{
@@ -89,11 +101,20 @@ const SchoolUnits = () => {
         city: 'Stockholm',
         country: 'Sweden'
       },
+      visitingAddress: {
+        street: 'Skolvägen 10',
+        postalCode: '11122',
+        city: 'Stockholm',
+        country: 'Sweden'
+      },
       municipality: 'Stockholm',
+      municipalityCode: '0180',
+      municipalityName: 'Stockholm Municipality',
       establishedDate: '1985-08-15',
       status: 'active',
       capacity: 500,
       currentStudents: 450,
+      additionalAmount: 25000,
       principalId: '1',
       principalName: 'Anna Andersson',
       groups: [
@@ -113,11 +134,20 @@ const SchoolUnits = () => {
         city: 'Göteborg',
         country: 'Sweden'
       },
+      visitingAddress: {
+        street: 'Gymnasievägen 25',
+        postalCode: '41255',
+        city: 'Göteborg',
+        country: 'Sweden'
+      },
       municipality: 'Göteborg',
+      municipalityCode: '1480',
+      municipalityName: 'Göteborg Municipality',
       establishedDate: '1972-01-10',
       status: 'active',
       capacity: 800,
       currentStudents: 720,
+      additionalAmount: 35000,
       groups: []
     }
   ]);
@@ -267,58 +297,101 @@ const SchoolUnits = () => {
               Add School Unit
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add New School Unit</DialogTitle>
             </DialogHeader>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">School Name</Label>
-                <Input id="name" placeholder="Enter school name" />
-              </div>
-              <div>
-                <Label htmlFor="code">School Code</Label>
-                <Input id="code" placeholder="Enter school code" />
-              </div>
-              <div>
-                <Label htmlFor="type">School Type</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="elementary">Elementary</SelectItem>
-                    <SelectItem value="middle">Middle School</SelectItem>
-                    <SelectItem value="high">High School</SelectItem>
-                    <SelectItem value="special">Special Education</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="municipality">Municipality</Label>
-                <Input id="municipality" placeholder="Enter municipality" />
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="school@example.com" />
-              </div>
-              <div>
-                <Label htmlFor="phone">Phone</Label>
-                <Input id="phone" placeholder="+46 8 123 4567" />
-              </div>
-              <div className="col-span-2">
-                <Label htmlFor="address">Address</Label>
-                <Textarea id="address" placeholder="Street, Postal Code, City, Country" />
-              </div>
-              <div>
-                <Label htmlFor="capacity">Capacity</Label>
-                <Input id="capacity" type="number" placeholder="500" />
-              </div>
-              <div>
-                <Label htmlFor="established">Established Date</Label>
-                <Input id="established" type="date" />
-              </div>
-            </div>
+            <Tabs defaultValue="basic" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="basic">Basic Info</TabsTrigger>
+                <TabsTrigger value="contact">Contact</TabsTrigger>
+                <TabsTrigger value="location">Location</TabsTrigger>
+                <TabsTrigger value="administration">Administration</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="basic" className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="name">School Name</Label>
+                    <Input id="name" placeholder="Enter school name" />
+                  </div>
+                  <div>
+                    <Label htmlFor="code">School Code</Label>
+                    <Input id="code" placeholder="Enter school code" />
+                  </div>
+                  <div>
+                    <Label htmlFor="type">School Type</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="elementary">Elementary</SelectItem>
+                        <SelectItem value="middle">Middle School</SelectItem>
+                        <SelectItem value="high">High School</SelectItem>
+                        <SelectItem value="special">Special Education</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="capacity">Capacity</Label>
+                    <Input id="capacity" type="number" placeholder="500" />
+                  </div>
+                  <div>
+                    <Label htmlFor="established">Established Date</Label>
+                    <Input id="established" type="date" />
+                  </div>
+                  <div>
+                    <Label htmlFor="endDate">End Date (Optional)</Label>
+                    <Input id="endDate" type="date" />
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="contact" className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" placeholder="school@example.com" />
+                  </div>
+                  <div>
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input id="phone" placeholder="+46 8 123 4567" />
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="location" className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <Label htmlFor="address">Postal Address</Label>
+                    <Textarea id="address" placeholder="Street, Postal Code, City, Country" />
+                  </div>
+                  <div className="col-span-2">
+                    <Label htmlFor="visitingAddress">Visiting Address</Label>
+                    <Textarea id="visitingAddress" placeholder="Street, Postal Code, City, Country" />
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="administration" className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="municipalityCode">Municipality Code</Label>
+                    <Input id="municipalityCode" placeholder="0180" />
+                  </div>
+                  <div>
+                    <Label htmlFor="municipalityName">Municipality Name</Label>
+                    <Input id="municipalityName" placeholder="Stockholm Municipality" />
+                  </div>
+                  <div className="col-span-2">
+                    <Label htmlFor="additionalAmount">Additional Amount (SEK)</Label>
+                    <Input id="additionalAmount" type="number" placeholder="0" />
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+            
             <div className="flex justify-end space-x-2 mt-4">
               <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                 Cancel
@@ -363,7 +436,10 @@ const SchoolUnits = () => {
                   </div>
                   <div>
                     <CardTitle className="text-ike-primary">{schoolUnit.name}</CardTitle>
-                    <p className="text-sm text-ike-neutral">Code: {schoolUnit.code}</p>
+                    <div className="flex items-center space-x-4 text-sm text-ike-neutral mt-1">
+                      <span>Code: {schoolUnit.code}</span>
+                      <span>{schoolUnit.municipalityName} ({schoolUnit.municipalityCode})</span>
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -391,7 +467,7 @@ const SchoolUnits = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="space-y-3">
                   <h4 className="font-semibold text-ike-primary">Contact Information</h4>
                   <div className="flex items-center space-x-2 text-sm">
@@ -409,6 +485,22 @@ const SchoolUnits = () => {
                   <div className="flex items-center space-x-2 text-sm">
                     <Calendar className="w-4 h-4 text-ike-primary" />
                     <span>Est. {schoolUnit.establishedDate}</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-ike-primary">Administration</h4>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Hash className="w-4 h-4 text-ike-primary" />
+                    <span>Code: {schoolUnit.municipalityCode}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Building2 className="w-4 h-4 text-ike-primary" />
+                    <span>{schoolUnit.municipalityName}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <DollarSign className="w-4 h-4 text-ike-primary" />
+                    <span>Additional: {schoolUnit.additionalAmount.toLocaleString()} SEK</span>
                   </div>
                 </div>
                 
@@ -504,62 +596,109 @@ const SchoolUnits = () => {
 
       {/* Edit School Unit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit School Unit - {selectedSchoolUnit?.name}</DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="editName">School Name</Label>
-              <Input id="editName" defaultValue={selectedSchoolUnit?.name} placeholder="Enter school name" />
-            </div>
-            <div>
-              <Label htmlFor="editCode">School Code</Label>
-              <Input id="editCode" defaultValue={selectedSchoolUnit?.code} placeholder="Enter school code" />
-            </div>
-            <div>
-              <Label htmlFor="editType">School Type</Label>
-              <Select defaultValue={selectedSchoolUnit?.type}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="elementary">Elementary</SelectItem>
-                  <SelectItem value="middle">Middle School</SelectItem>
-                  <SelectItem value="high">High School</SelectItem>
-                  <SelectItem value="special">Special Education</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="editMunicipality">Municipality</Label>
-              <Input id="editMunicipality" defaultValue={selectedSchoolUnit?.municipality} placeholder="Enter municipality" />
-            </div>
-            <div>
-              <Label htmlFor="editEmail">Email</Label>
-              <Input id="editEmail" type="email" defaultValue={selectedSchoolUnit?.email} placeholder="school@example.com" />
-            </div>
-            <div>
-              <Label htmlFor="editPhone">Phone</Label>
-              <Input id="editPhone" defaultValue={selectedSchoolUnit?.phone} placeholder="+46 8 123 4567" />
-            </div>
-            <div className="col-span-2">
-              <Label htmlFor="editAddress">Address</Label>
-              <Textarea 
-                id="editAddress" 
-                defaultValue={`${selectedSchoolUnit?.address?.street}, ${selectedSchoolUnit?.address?.postalCode} ${selectedSchoolUnit?.address?.city}, ${selectedSchoolUnit?.address?.country}`}
-                placeholder="Street, Postal Code, City, Country" 
-              />
-            </div>
-            <div>
-              <Label htmlFor="editCapacity">Capacity</Label>
-              <Input id="editCapacity" type="number" defaultValue={selectedSchoolUnit?.capacity} />
-            </div>
-            <div>
-              <Label htmlFor="editEstablished">Established Date</Label>
-              <Input id="editEstablished" type="date" defaultValue={selectedSchoolUnit?.establishedDate} />
-            </div>
-          </div>
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="basic">Basic Info</TabsTrigger>
+              <TabsTrigger value="contact">Contact</TabsTrigger>
+              <TabsTrigger value="location">Location</TabsTrigger>
+              <TabsTrigger value="administration">Administration</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="basic" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="editName">School Name</Label>
+                  <Input id="editName" defaultValue={selectedSchoolUnit?.name} placeholder="Enter school name" />
+                </div>
+                <div>
+                  <Label htmlFor="editCode">School Code</Label>
+                  <Input id="editCode" defaultValue={selectedSchoolUnit?.code} placeholder="Enter school code" />
+                </div>
+                <div>
+                  <Label htmlFor="editType">School Type</Label>
+                  <Select defaultValue={selectedSchoolUnit?.type}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="elementary">Elementary</SelectItem>
+                      <SelectItem value="middle">Middle School</SelectItem>
+                      <SelectItem value="high">High School</SelectItem>
+                      <SelectItem value="special">Special Education</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="editCapacity">Capacity</Label>
+                  <Input id="editCapacity" type="number" defaultValue={selectedSchoolUnit?.capacity} />
+                </div>
+                <div>
+                  <Label htmlFor="editEstablished">Established Date</Label>
+                  <Input id="editEstablished" type="date" defaultValue={selectedSchoolUnit?.establishedDate} />
+                </div>
+                <div>
+                  <Label htmlFor="editEndDate">End Date (Optional)</Label>
+                  <Input id="editEndDate" type="date" defaultValue={selectedSchoolUnit?.endDate} />
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="contact" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="editEmail">Email</Label>
+                  <Input id="editEmail" type="email" defaultValue={selectedSchoolUnit?.email} placeholder="school@example.com" />
+                </div>
+                <div>
+                  <Label htmlFor="editPhone">Phone</Label>
+                  <Input id="editPhone" defaultValue={selectedSchoolUnit?.phone} placeholder="+46 8 123 4567" />
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="location" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <Label htmlFor="editAddress">Postal Address</Label>
+                  <Textarea 
+                    id="editAddress" 
+                    defaultValue={`${selectedSchoolUnit?.address?.street}, ${selectedSchoolUnit?.address?.postalCode} ${selectedSchoolUnit?.address?.city}, ${selectedSchoolUnit?.address?.country}`}
+                    placeholder="Street, Postal Code, City, Country" 
+                  />
+                </div>
+                <div className="col-span-2">
+                  <Label htmlFor="editVisitingAddress">Visiting Address</Label>
+                  <Textarea 
+                    id="editVisitingAddress" 
+                    defaultValue={`${selectedSchoolUnit?.visitingAddress?.street}, ${selectedSchoolUnit?.visitingAddress?.postalCode} ${selectedSchoolUnit?.visitingAddress?.city}, ${selectedSchoolUnit?.visitingAddress?.country}`}
+                    placeholder="Street, Postal Code, City, Country" 
+                  />
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="administration" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="editMunicipalityCode">Municipality Code</Label>
+                  <Input id="editMunicipalityCode" defaultValue={selectedSchoolUnit?.municipalityCode} placeholder="0180" />
+                </div>
+                <div>
+                  <Label htmlFor="editMunicipalityName">Municipality Name</Label>
+                  <Input id="editMunicipalityName" defaultValue={selectedSchoolUnit?.municipalityName} placeholder="Stockholm Municipality" />
+                </div>
+                <div className="col-span-2">
+                  <Label htmlFor="editAdditionalAmount">Additional Amount (SEK)</Label>
+                  <Input id="editAdditionalAmount" type="number" defaultValue={selectedSchoolUnit?.additionalAmount} placeholder="0" />
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+          
           <div className="flex justify-end space-x-2 mt-4">
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
               Cancel
