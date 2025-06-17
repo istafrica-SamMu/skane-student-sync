@@ -65,6 +65,7 @@ import SchoolInfo from "./pages/my-school/SchoolInfo";
 import OrgAdminDashboard from "./pages/OrgAdminDashboard";
 import DevAdminDashboard from "./pages/DevAdminDashboard";
 import PrincipalManagement from "./pages/system/PrincipalManagement";
+import ContactOccasions from "./pages/kaa/ContactOccasions";
 
 const queryClient = new QueryClient();
 
