@@ -25,7 +25,6 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import UserManagement from "./pages/system/UserManagement";
 import RoleManagement from "./pages/system/RoleManagement";
-import EnhancedRoleManagement from "./pages/system/EnhancedRoleManagement";
 import MunicipalityManagement from "./pages/system/MunicipalityManagement";
 import GroupManagement from "./pages/system/GroupManagement";
 import SchoolUnits from "./pages/system/SchoolUnits";
@@ -120,7 +119,11 @@ const AppContent = () => {
             <Routes>
               <Route path="/login" element={<Navigate to="/dashboard" replace />} />
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={getDashboardComponent()} />
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  {getDashboardComponent()}
+                </ProtectedRoute>
+              } />
               
               {/* KAA Management Routes */}
               <Route path="/kaa/registry" element={
@@ -144,17 +147,6 @@ const AppContent = () => {
                 </ProtectedRoute>
               } />
               
-              {/* System Administration Routes */}
-              <Route path="/system/users" element={<UserManagement />} />
-              <Route path="/system/roles" element={<RoleManagement />} />
-              <Route path="/system/enhanced-roles" element={<EnhancedRoleManagement />} />
-              <Route path="/system/municipalities" element={<MunicipalityManagement />} />
-              <Route path="/system/school-units" element={<SchoolUnits />} />
-              <Route path="/system/principals" element={<PrincipalManagement />} />
-              <Route path="/system/groups" element={<GroupManagement />} />
-              <Route path="/system/school-years" element={<SchoolYears />} />
-              <Route path="/system/support" element={<Support />} />
-
               {/* System Management Routes */}
               <Route path="/system/users" element={
                 <ProtectedRoute>
@@ -164,11 +156,6 @@ const AppContent = () => {
               <Route path="/system/roles" element={
                 <ProtectedRoute>
                   <RoleManagement />
-                </ProtectedRoute>
-              } />
-              <Route path="/system/enhanced-roles" element={
-                <ProtectedRoute>
-                  <EnhancedRoleManagement />
                 </ProtectedRoute>
               } />
               <Route path="/system/municipalities" element={

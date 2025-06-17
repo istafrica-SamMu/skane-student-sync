@@ -1,29 +1,50 @@
-import { 
-  BarChart3, 
-  Users, 
-  GraduationCap, 
-  DollarSign, 
-  FileText, 
-  Settings, 
-  Building, 
-  Shield,
-  School,
-  MapPin,
-  UserCog,
-  Database,
-  BookOpen,
-  Calendar,
-  MessageSquare,
-  HelpCircle,
-  Activity,
-  Download,
-  Upload,
-  TrendingUp,
-  CreditCard,
-  Mail,
-  Phone,
+import {
   Home,
-  Folder
+  Users,
+  Calculator,
+  FileText,
+  BarChart3,
+  Settings,
+  Database,
+  ArrowUpDown,
+  AlertTriangle,
+  Package,
+  Euro,
+  TrendingUp,
+  UserCheck,
+  Link,
+  User,
+  Shield,
+  Building,
+  GraduationCap,
+  MessageSquare,
+  Activity,
+  FileSpreadsheet,
+  Calendar,
+  School,
+  UserPlus,
+  DollarSign,
+  MapPin,
+  Book,
+  Briefcase,
+  Clock,
+  Bell,
+  Mail,
+  Info,
+  Globe,
+  Code,
+  Key,
+  Languages,
+  Workflow,
+  GitBranch,
+  Server,
+  Monitor,
+  HardDrive,
+  Terminal,
+  Building2,
+  ClipboardList,
+  CreditCard,
+  HelpCircle
 } from "lucide-react";
 
 export interface MenuItem {
@@ -33,133 +54,263 @@ export interface MenuItem {
   items?: MenuItem[];
 }
 
-export const regionalAdminMenu = [
+export const regionalAdminMenu: MenuItem[] = [
   {
     title: "Dashboard",
     url: "/dashboard",
-    icon: BarChart3,
+    icon: Home,
   },
   {
-    title: "Student Management",
-    icon: GraduationCap,
+    title: "System Management",
+    icon: Settings,
     items: [
       {
-        title: "All Students",
-        url: "/students",
+        title: "User Management",
+        url: "/system/users",
         icon: Users,
       },
       {
-        title: "Student Placements",
-        url: "/student-placements", 
-        icon: MapPin,
-      },
-      {
-        title: "Student Conflicts",
-        url: "/student-conflicts",
+        title: "Role Management",
+        url: "/system/roles",
         icon: Shield,
       },
       {
-        title: "Bulk Operations",
-        url: "/student-bulk",
-        icon: Database,
+        title: "Municipality Management",
+        url: "/system/municipalities",
+        icon: Building,
       },
       {
-        title: "Students by Class",
-        url: "/students/by-class",
+        title: "Group Management",
+        url: "/system/groups",
+        icon: Building2,
+      },
+      {
+        title: "Principal Management",
+        url: "/system/principals",
+        icon: UserCheck,
+      },
+      {
+        title: "School Units",
+        url: "/system/schools",
         icon: School,
       },
       {
-        title: "Municipal Students",
-        url: "/students/municipal",
-        icon: Building,
+        title: "School Years",
+        url: "/system/school-years",
+        icon: Calendar,
       },
       {
-        title: "External Students", 
-        url: "/students/external",
-        icon: Users,
+        title: "Support",
+        url: "/system/support",
+        icon: HelpCircle,
       },
-      {
-        title: "Travel Card Documents",
-        url: "/students/travel-cards",
-        icon: CreditCard,
-      }
     ],
   },
   {
-    title: "Financial Management",
-    icon: DollarSign,
+    title: "Study Path Management",
+    icon: Book,
     items: [
       {
-        title: "Financial Overview",
-        url: "/financial",
-        icon: TrendingUp,
+        title: "Study Paths",
+        url: "/study-paths",
+        icon: Book,
       },
       {
-        title: "Price Lists",
-        url: "/price-lists",
-        icon: FileText,
+        title: "Price Codes",
+        url: "/study-paths/price-codes",
+        icon: Euro,
       },
-      {
-        title: "Additional Amounts",
-        url: "/financial/additional-amounts", 
-        icon: DollarSign,
-      },
-      {
-        title: "Municipal Financial Reports",
-        url: "/financial/municipal-reports",
-        icon: BarChart3,
-      },
-      {
-        title: "Inter-Municipal Compensation",
-        url: "/financial/compensation",
-        icon: Building,
-      }
     ],
+  },
+  {
+    title: "Regional Operations",
+    icon: Database,
+    items: [
+      {
+        title: "Population Data",
+        url: "/operations/population",
+        icon: Users,
+      },
+    ],
+  },
+  {
+    title: "Calculation Engine",
+    url: "/integration",
+    icon: Calculator,
   },
   {
     title: "Reports & Analytics",
     icon: FileText,
     items: [
       {
-        title: "Reports Overview",
-        url: "/reports",
-        icon: FileText,
-      },
-      {
         title: "Regional Statistics",
-        url: "/reports/regional-statistics",
-        icon: TrendingUp,
-      },
-      {
-        title: "Monthly Compilation", 
-        url: "/reports/monthly-compilation",
-        icon: Calendar,
-      },
-      {
-        title: "Contribution Reports",
-        url: "/contribution-reports",
+        url: "/reports/regional",
         icon: BarChart3,
       },
       {
-        title: "Follow-up Reports",
-        url: "/follow-up-reports",
-        icon: Activity,
+        title: "Monthly Compilation",
+        url: "/reports/monthly",
+        icon: Calendar,
       },
       {
-        title: "Student Lists",
-        url: "/reports/student-lists",
-        icon: Users,
-      },
-      {
-        title: "School Financial Reports",
-        url: "/reports/school-financial",
+        title: "Financial Analysis",
+        url: "/reports/financial",
         icon: DollarSign,
       },
       {
-        title: "School Statistics",
-        url: "/reports/school-statistics", 
+        title: "Change Tracking",
+        url: "/reports/changes",
+        icon: Activity,
+      },
+    ],
+  },
+  {
+    title: "My Page",
+    icon: User,
+    items: [
+      {
+        title: "Messages",
+        url: "/my-page/messages",
+        icon: MessageSquare,
+      },
+      {
+        title: "Enrollment Settings",
+        url: "/my-page/enrollment",
+        icon: Settings,
+      },
+      {
+        title: "System Logs",
+        url: "/my-page/logs",
+        icon: Activity,
+      },
+      {
+        title: "Settings",
+        url: "/my-page/settings",
+        icon: Settings,
+      },
+    ],
+  },
+  {
+    title: "Support",
+    url: "/system/support",
+    icon: HelpCircle,
+  },
+];
+
+export const municipalityAdminMenu: MenuItem[] = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: Home,
+  },
+  {
+    title: "Student Management",
+    icon: Users,
+    items: [
+      {
+        title: "Students Overview",
+        url: "/students",
+        icon: Users,
+      },
+      {
+        title: "Students by Class & Study Path",
+        url: "/students/classes",
+        icon: GraduationCap,
+      },
+      {
+        title: "Municipal School Students",
+        url: "/students/municipal",
         icon: School,
       },
+      {
+        title: "External School Students",
+        url: "/students/external",
+        icon: ArrowUpDown,
+      },
+      {
+        title: "Travel Card Documents",
+        url: "/students/travel-cards",
+        icon: CreditCard,
+      },
+    ],
+  },
+  {
+    title: "KAA Management",
+    icon: ClipboardList,
+    items: [
+      {
+        title: "KAA Registry",
+        url: "/kaa/registry",
+        icon: Users,
+      },
+      {
+        title: "Measures & Actions",
+        url: "/kaa/measures",
+        icon: Activity,
+      },
+      {
+        title: "Contact Occasions",
+        url: "/kaa/contacts",
+        icon: MessageSquare,
+      },
+      {
+        title: "Statistics Sweden Reports",
+        url: "/kaa/scb-reports",
+        icon: FileText,
+      },
+    ],
+  },
+  {
+    title: "Import Student Data",
+    url: "/integration/import",
+    icon: Database,
+  },
+  {
+    title: "Financial Management",
+    icon: Calculator,
+    items: [
+      {
+        title: "Municipal Price Lists",
+        url: "/financial/pricelists",
+        icon: Euro,
+      },
+      {
+        title: "Additional Amounts",
+        url: "/financial/additional-amounts",
+        icon: DollarSign,
+      },
+      {
+        title: "Municipal Financial Reports",
+        url: "/financial/reports",
+        icon: FileText,
+      },
+      {
+        title: "Inter-Municipal Compensation",
+        url: "/financial/compensation",
+        icon: TrendingUp,
+      },
+    ],
+  },
+  {
+    title: "Municipal Operations",
+    icon: Building,
+    items: [
+      {
+        title: "Municipal School Units",
+        url: "/operations/municipal-schools",
+        icon: School,
+      },
+      {
+        title: "Municipal User Administration",
+        url: "/operations/municipal-users",
+        icon: Users,
+      },
+    ],
+  },
+  {
+    title: "Reports",
+    icon: FileText,
+    items: [
       {
         title: "Money to Receive",
         url: "/reports/money-to-receive",
@@ -173,330 +324,84 @@ export const regionalAdminMenu = [
       {
         title: "Municipal Statistics",
         url: "/reports/municipal-statistics",
-        icon: Building,
+        icon: BarChart3,
       },
       {
-        title: "Financial Export",
+        title: "Financial System Export",
         url: "/reports/financial-export",
-        icon: Download,
+        icon: FileSpreadsheet,
       },
-      {
-        title: "Change Tracking",
-        url: "/reports/change-tracking",
-        icon: Activity,
-      }
-    ],
-  },
-  {
-    title: "System Administration",
-    icon: Settings,
-    items: [
-      {
-        title: "User Management",
-        url: "/system/users",
-        icon: Users,
-      },
-      {
-        title: "Role Management",
-        url: "/system/roles",
-        icon: Shield,
-      },
-      {
-        title: "Enhanced Role Management",
-        url: "/system/enhanced-roles",
-        icon: UserCog,
-      },
-      {
-        title: "Municipality Management",
-        url: "/system/municipalities",
-        icon: Building,
-      },
-      {
-        title: "School Units",
-        url: "/system/school-units",
-        icon: School,
-      },
-      {
-        title: "Principal Management",
-        url: "/system/principals",
-        icon: UserCog,
-      },
-      {
-        title: "Group Management",
-        url: "/system/groups",
-        icon: Users,
-      },
-      {
-        title: "School Years",
-        url: "/system/school-years",
-        icon: Calendar,
-      },
-      {
-        title: "Support",
-        url: "/system/support",
-        icon: HelpCircle,
-      }
-    ],
-  },
-  {
-    title: "Study Paths",
-    icon: BookOpen,
-    items: [
-      {
-        title: "Study Paths Overview",
-        url: "/study-paths",
-        icon: BookOpen,
-      },
-      {
-        title: "Price Codes",
-        url: "/study-paths/price-codes",
-        icon: DollarSign,
-      },
-      {
-        title: "National Programs",
-        url: "/study-paths/national-programs",
-        icon: GraduationCap,
-      }
-    ],
-  },
-  {
-    title: "Operations",
-    icon: Activity,
-    items: [
-      {
-        title: "Population Data",
-        url: "/operations/population-data",
-        icon: Users,
-      },
-      {
-        title: "Address Updates",
-        url: "/operations/address-updates",
-        icon: MapPin,
-      },
-      {
-        title: "Municipal School Units",
-        url: "/operations/municipal-school-units",
-        icon: School,
-      },
-      {
-        title: "Municipal User Admin",
-        url: "/operations/municipal-user-admin",
-        icon: UserCog,
-      }
-    ],
-  },
-  {
-    title: "KAA (Quality Assurance)",
-    icon: Shield,
-    items: [
-      {
-        title: "KAA Registry",
-        url: "/kaa-registry",
-        icon: Database,
-      },
-      {
-        title: "Contact Occasions",
-        url: "/kaa/contact-occasions",
-        icon: Phone,
-      },
-      {
-        title: "Statistics Sweden Reports",
-        url: "/kaa/statistics-sweden-reports",
-        icon: FileText,
-      },
-      {
-        title: "Measures and Actions",
-        url: "/kaa/measures-actions",
-        icon: Activity,
-      }
-    ],
-  },
-  {
-    title: "Integration",
-    icon: Database,
-    items: [
-      {
-        title: "Integration Overview",
-        url: "/integration",
-        icon: Database,
-      },
-      {
-        title: "Extens Export",
-        url: "/integration/extens-export",
-        icon: Download,
-      },
-      {
-        title: "Population Registry",
-        url: "/integration/population-registry",
-        icon: Users,
-      },
-      {
-        title: "Integration Testing",
-        url: "/integration/testing",
-        icon: Activity,
-      },
-      {
-        title: "Schedule Integration",
-        url: "/integration/schedule",
-        icon: Calendar,
-      },
-      {
-        title: "Import Student Data",
-        url: "/integration/import-student-data",
-        icon: Upload,
-      },
-      {
-        title: "Integration Status",
-        url: "/integration/status",
-        icon: Activity,
-      }
     ],
   },
   {
     title: "My Page",
-    icon: Home,
+    icon: User,
     items: [
       {
         title: "Messages",
         url: "/my-page/messages",
-        icon: Mail,
+        icon: MessageSquare,
       },
       {
         title: "Enrollment Settings",
-        url: "/my-page/enrollment-settings",
+        url: "/my-page/enrollment",
         icon: Settings,
       },
       {
         title: "Activity Logs",
-        url: "/my-page/activity-logs",
+        url: "/my-page/logs",
         icon: Activity,
-      }
+      },
+      {
+        title: "Settings",
+        url: "/my-page/settings",
+        icon: Settings,
+      },
     ],
   },
   {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  }
+    title: "Support",
+    url: "/system/support",
+    icon: HelpCircle,
+  },
 ];
 
-export const municipalityAdminMenu = [
+export const schoolAdminMenu: MenuItem[] = [
   {
     title: "Dashboard",
     url: "/dashboard",
-    icon: BarChart3,
+    icon: Home,
   },
   {
     title: "Student Management",
-    icon: GraduationCap,
+    icon: Users,
     items: [
       {
-        title: "Municipal Students",
-        url: "/students/municipal",
-        icon: Building,
-      },
-      {
-        title: "External Students",
-        url: "/students/external", 
+        title: "Student Roster & Classes",
+        url: "/students",
         icon: Users,
-      },
-      {
-        title: "Student Placements",
-        url: "/student-placements",
-        icon: MapPin,
-      },
-      {
-        title: "Students by Class",
-        url: "/students/by-class",
-        icon: School,
-      }
-    ],
-  },
-  {
-    title: "Financial Management",
-    icon: DollarSign,
-    items: [
-      {
-        title: "Municipal Financial Reports",
-        url: "/financial/municipal-reports",
-        icon: BarChart3,
-      },
-      {
-        title: "Price Lists",
-        url: "/price-lists",
-        icon: FileText,
-      },
-      {
-        title: "Additional Amounts",
-        url: "/financial/additional-amounts",
-        icon: DollarSign,
-      }
-    ],
-  },
-  {
-    title: "Reports",
-    icon: FileText,
-    items: [
-      {
-        title: "Municipal Statistics",
-        url: "/reports/municipal-statistics",
-        icon: Building,
-      },
-      {
-        title: "Student Lists",
-        url: "/reports/student-lists",
-        icon: Users,
-      },
-      {
-        title: "Financial Export",
-        url: "/reports/financial-export",
-        icon: Download,
-      }
-    ],
-  },
-  {
-    title: "Operations",
-    icon: Activity,
-    items: [
-      {
-        title: "Municipal School Units",
-        url: "/operations/municipal-school-units",
-        icon: School,
-      },
-      {
-        title: "Municipal User Admin",
-        url: "/operations/municipal-user-admin",
-        icon: UserCog,
-      }
-    ],
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  }
-];
-
-export const schoolAdminMenu = [
-  {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: BarChart3,
-  },
-  {
-    title: "Students",
-    icon: GraduationCap,
-    items: [
-      {
-        title: "Students by Class",
-        url: "/students/by-class",
-        icon: School,
       },
       {
         title: "Travel Card Documents",
         url: "/students/travel-cards",
         icon: CreditCard,
-      }
+      },
+    ],
+  },
+  {
+    title: "School Operations",
+    icon: School,
+    items: [
+      {
+        title: "School Unit Information",
+        url: "/my-school/info",
+        icon: Info,
+      },
+      {
+        title: "Class Management",
+        url: "/students/classes",
+        icon: GraduationCap,
+      },
     ],
   },
   {
@@ -504,140 +409,281 @@ export const schoolAdminMenu = [
     icon: FileText,
     items: [
       {
-        title: "School Statistics",
-        url: "/reports/school-statistics",
-        icon: School,
+        title: "Student Lists",
+        url: "/reports/students",
+        icon: Users,
       },
       {
-        title: "School Financial Reports",
-        url: "/reports/school-financial",
+        title: "Financial Reports",
+        url: "/reports/financial",
         icon: DollarSign,
-      }
+      },
     ],
   },
   {
-    title: "My School",
-    icon: School,
+    title: "My Page",
+    icon: User,
     items: [
       {
-        title: "School Information",
-        url: "/my-school/info",
-        icon: School,
-      }
+        title: "Messages",
+        url: "/my-page/messages",
+        icon: MessageSquare,
+      },
+      {
+        title: "Activity Logs",
+        url: "/my-page/logs",
+        icon: Activity,
+      },
+      {
+        title: "Settings",
+        url: "/my-page/settings",
+        icon: Settings,
+      },
     ],
   },
   {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  }
+    title: "Support",
+    url: "/system/support",
+    icon: HelpCircle,
+  },
 ];
 
-export const orgAdminMenu = [
+export const orgAdminMenu: MenuItem[] = [
   {
-    title: "Organization Dashboard",
+    title: "Dashboard",
     url: "/dashboard",
-    icon: BarChart3,
+    icon: Home,
   },
   {
-    title: "System Administration",
-    icon: Settings,
+    title: "Organization Management",
+    icon: Building,
     items: [
       {
-        title: "User Management",
-        url: "/system/users",
+        title: "Customer Accounts",
+        url: "/org/customers",
         icon: Users,
       },
       {
-        title: "Role Management",
-        url: "/system/roles",
-        icon: Shield,
+        title: "Group Management",
+        url: "/system/groups",
+        icon: Building2,
       },
       {
-        title: "Enhanced Role Management",
-        url: "/system/enhanced-roles",
-        icon: UserCog,
+        title: "Account Hierarchy",
+        url: "/org/hierarchy",
+        icon: GitBranch,
       },
       {
-        title: "Support",
-        url: "/system/support",
-        icon: HelpCircle,
-      }
+        title: "Billing & Subscriptions",
+        url: "/org/billing",
+        icon: DollarSign,
+      },
+      {
+        title: "Organization Settings",
+        url: "/org/settings",
+        icon: Settings,
+      },
     ],
   },
   {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  }
-];
-
-export const devAdminMenu = [
-  {
-    title: "Development Dashboard",
-    url: "/dashboard",
-    icon: BarChart3,
-  },
-  {
-    title: "System Administration",
-    icon: Settings,
+    title: "User Administration",
+    icon: Shield,
     items: [
       {
-        title: "User Management",
-        url: "/system/users",
+        title: "Global User Management",
+        url: "/org/users",
         icon: Users,
       },
       {
-        title: "Role Management",
-        url: "/system/roles",
+        title: "Role & Permissions",
+        url: "/org/permissions",
+        icon: Key,
+      },
+      {
+        title: "Access Control",
+        url: "/org/access",
         icon: Shield,
       },
-      {
-        title: "Enhanced Role Management",
-        url: "/system/enhanced-roles",
-        icon: UserCog,
-      },
-      {
-        title: "Municipality Management",
-        url: "/system/municipalities",
-        icon: Building,
-      },
-      {
-        title: "School Units",
-        url: "/system/school-units",
-        icon: School,
-      },
-      {
-        title: "Principal Management",
-        url: "/system/principals",
-        icon: UserCog,
-      },
-      {
-        title: "Support",
-        url: "/system/support",
-        icon: HelpCircle,
-      }
     ],
   },
   {
-    title: "Integration & Testing",
-    icon: Database,
+    title: "System Oversight",
+    icon: Monitor,
     items: [
+      {
+        title: "System Health",
+        url: "/org/health",
+        icon: Activity,
+      },
+      {
+        title: "Usage Analytics",
+        url: "/org/analytics",
+        icon: BarChart3,
+      },
+      {
+        title: "Audit Logs",
+        url: "/org/audit",
+        icon: FileText,
+      },
+    ],
+  },
+  {
+    title: "Support & Communication",
+    icon: MessageSquare,
+    items: [
+      {
+        title: "Customer Support",
+        url: "/org/support",
+        icon: MessageSquare,
+      },
+      {
+        title: "Announcements",
+        url: "/org/announcements",
+        icon: Bell,
+      },
+      {
+        title: "Knowledge Base",
+        url: "/org/knowledge",
+        icon: Book,
+      },
+    ],
+  },
+  {
+    title: "Support",
+    url: "/system/support",
+    icon: HelpCircle,
+  },
+];
+
+export const devAdminMenu: MenuItem[] = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: Home,
+  },
+  {
+    title: "Integration Management",
+    icon: Workflow,
+    items: [
+      {
+        title: "API Configurations",
+        url: "/dev/integrations",
+        icon: Code,
+      },
+      {
+        title: "Customer Integrations",
+        url: "/dev/customer-integrations",
+        icon: Link,
+      },
       {
         title: "Integration Testing",
-        url: "/integration/testing",
+        url: "/dev/testing",
         icon: Activity,
       },
       {
-        title: "Integration Status",
-        url: "/integration/status",
-        icon: Activity,
-      }
+        title: "API Documentation",
+        url: "/dev/api-docs",
+        icon: FileText,
+      },
     ],
   },
   {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  }
+    title: "Localization & Translations",
+    icon: Languages,
+    items: [
+      {
+        title: "Translation Management",
+        url: "/dev/translations",
+        icon: Languages,
+      },
+      {
+        title: "Language Settings",
+        url: "/dev/languages",
+        icon: Globe,
+      },
+      {
+        title: "Translation Tools",
+        url: "/dev/translation-tools",
+        icon: Settings,
+      },
+    ],
+  },
+  {
+    title: "Development Tools",
+    icon: Terminal,
+    items: [
+      {
+        title: "Environment Management",
+        url: "/dev/environments",
+        icon: Server,
+      },
+      {
+        title: "Database Management",
+        url: "/dev/database",
+        icon: HardDrive,
+      },
+      {
+        title: "System Configuration",
+        url: "/dev/config",
+        icon: Settings,
+      },
+      {
+        title: "Feature Flags",
+        url: "/dev/features",
+        icon: GitBranch,
+      },
+    ],
+  },
+  {
+    title: "Monitoring & Debugging",
+    icon: Monitor,
+    items: [
+      {
+        title: "System Logs",
+        url: "/dev/logs",
+        icon: FileText,
+      },
+      {
+        title: "Performance Monitoring",
+        url: "/dev/performance",
+        icon: BarChart3,
+      },
+      {
+        title: "Error Tracking",
+        url: "/dev/errors",
+        icon: AlertTriangle,
+      },
+      {
+        title: "Debug Tools",
+        url: "/dev/debug",
+        icon: Terminal,
+      },
+    ],
+  },
+  {
+    title: "Development Resources",
+    icon: Code,
+    items: [
+      {
+        title: "Code Repository",
+        url: "/dev/repository",
+        icon: GitBranch,
+      },
+      {
+        title: "Development Docs",
+        url: "/dev/docs",
+        icon: Book,
+      },
+      {
+        title: "Testing Suite",
+        url: "/dev/test-suite",
+        icon: Activity,
+      },
+    ],
+  },
+  {
+    title: "Support",
+    url: "/system/support",
+    icon: HelpCircle,
+  },
 ];
