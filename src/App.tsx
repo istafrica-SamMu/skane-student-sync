@@ -24,6 +24,7 @@ import Integration from "./pages/Integration";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import UserManagement from "./pages/system/UserManagement";
+import RoleManagement from "./pages/system/RoleManagement";
 import MunicipalityManagement from "./pages/system/MunicipalityManagement";
 import GroupManagement from "./pages/system/GroupManagement";
 import SchoolUnits from "./pages/system/SchoolUnits";
@@ -149,6 +150,11 @@ const AppContent = () => {
               <Route path="/system/users" element={
                 <ProtectedRoute>
                   <UserManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/system/roles" element={
+                <ProtectedRoute>
+                  <RoleManagement />
                 </ProtectedRoute>
               } />
               <Route path="/system/municipalities" element={
