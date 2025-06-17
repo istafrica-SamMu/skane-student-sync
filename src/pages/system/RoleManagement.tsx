@@ -71,6 +71,19 @@ const RoleManagement = () => {
     endDate: ""
   });
 
+  const [editRole, setEditRole] = useState({
+    id: "",
+    roleType: "",
+    municipality: "",
+    schoolUnit: "",
+    principal: "",
+    group: "",
+    permissions: [] as string[],
+    startDate: "",
+    endDate: "",
+    isActive: true
+  });
+
   const filteredRoles = organizationalRoles.filter(role =>
     role.roleType.toLowerCase().includes(searchTerm.toLowerCase()) ||
     role.municipality?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -122,8 +135,49 @@ const RoleManagement = () => {
   };
 
   const handleEditRole = (role: OrganizationalRole) => {
+    setEditRole({
+      id: role.id,
+      roleType: role.roleType,
+      municipality: role.municipality || "",
+      schoolUnit: role.schoolUnit || "",
+      principal: role.principal || "",
+      group: role.group || "",
+      permissions: role.permissions.map(p => p.id),
+      startDate: role.startDate,
+      endDate: role.endDate || "",
+      isActive: role.isActive
+    });
     setSelectedRole(role);
     setShowEditRole(true);
+  };
+
+  const handleUpdateRole = () => {
+    if (!selectedRole) return;
+
+    const updatedRole: OrganizationalRole = {
+      id: editRole.id,
+      roleType: editRole.roleType,
+      municipality: editRole.municipality || undefined,
+      schoolUnit: editRole.schoolUnit || undefined,
+      principal: editRole.principal || undefined,
+      group: editRole.group || undefined,
+      permissions: PERMISSIONS.filter(p => editRole.permissions.includes(p.id)),
+      isActive: editRole.isActive,
+      startDate: editRole.startDate,
+      endDate: editRole.endDate || undefined
+    };
+
+    setOrganizationalRoles(organizationalRoles.map(role => 
+      role.id === selectedRole.id ? updatedRole : role
+    ));
+    
+    setShowEditRole(false);
+    setSelectedRole(null);
+
+    toast({
+      title: "Role Updated",
+      description: "Organizational role has been successfully updated.",
+    });
   };
 
   const handleDeleteRole = (roleId: string) => {
@@ -331,6 +385,135 @@ const RoleManagement = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowCreateRole(false)}>Cancel</Button>
             <Button onClick={handleCreateRole}>Create Role</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Role Dialog */}
+      <Dialog open={showEditRole} onOpenChange={setShowEditRole}>
+        <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Organizational Role</DialogTitle>
+            <DialogDescription>
+              Update role details, organizational context and permissions.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="editRoleType" className="text-right">Role Type</Label>
+              <Select value={editRole.roleType} onValueChange={(value) => setEditRole({...editRole, roleType: value})}>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select role type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ROLE_TEMPLATES.map((template) => (
+                    <SelectItem key={template.id} value={template.name}>
+                      {template.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="editMunicipality" className="text-right">Municipality</Label>
+              <Select value={editRole.municipality} onValueChange={(value) => setEditRole({...editRole, municipality: value})}>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select municipality" />
+                </SelectTrigger>
+                <SelectContent>
+                  {municipalities.map((municipality) => (
+                    <SelectItem key={municipality} value={municipality}>
+                      {municipality}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="editSchoolUnit" className="text-right">School Unit</Label>
+              <Select value={editRole.schoolUnit} onValueChange={(value) => setEditRole({...editRole, schoolUnit: value})}>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select school unit" />
+                </SelectTrigger>
+                <SelectContent>
+                  {schoolUnits.map((school) => (
+                    <SelectItem key={school} value={school}>
+                      {school}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="editStartDate" className="text-right">Start Date</Label>
+              <Input 
+                id="editStartDate" 
+                type="date" 
+                className="col-span-3"
+                value={editRole.startDate}
+                onChange={(e) => setEditRole({...editRole, startDate: e.target.value})}
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="editEndDate" className="text-right">End Date</Label>
+              <Input 
+                id="editEndDate" 
+                type="date" 
+                className="col-span-3"
+                value={editRole.endDate}
+                onChange={(e) => setEditRole({...editRole, endDate: e.target.value})}
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="editActive" className="text-right">Status</Label>
+              <Select value={editRole.isActive ? "active" : "inactive"} onValueChange={(value) => setEditRole({...editRole, isActive: value === "active"})}>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-4">
+              <Label className="text-sm font-medium">Permissions</Label>
+              {['student_data', 'financial', 'administration', 'reports'].map(category => (
+                <div key={category} className="space-y-2">
+                  <h4 className="font-medium text-sm capitalize">{category.replace('_', ' ')}</h4>
+                  <div className="grid grid-cols-1 gap-2 pl-4">
+                    {getPermissionsByCategory(category).map(permission => (
+                      <div key={permission.id} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`edit-${permission.id}`}
+                          checked={editRole.permissions.includes(permission.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setEditRole({...editRole, permissions: [...editRole.permissions, permission.id]});
+                            } else {
+                              setEditRole({...editRole, permissions: editRole.permissions.filter(p => p !== permission.id)});
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`edit-${permission.id}`} className="text-sm">
+                          {permission.name}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditRole(false)}>Cancel</Button>
+            <Button onClick={handleUpdateRole}>Update Role</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
