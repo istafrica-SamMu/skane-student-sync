@@ -55,6 +55,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
+import { StudentHistoryModal } from "@/components/students/StudentHistoryModal";
 
 interface Student {
   id: number;
@@ -76,6 +77,17 @@ interface Student {
   principalPhone?: string;
   principalStartDate?: string;
   principalEndDate?: string;
+}
+
+interface HistoryEntry {
+  id: number;
+  date: string;
+  type: 'enrollment' | 'status_change' | 'program_change' | 'school_change' | 'contact_update' | 'principal_change';
+  description: string;
+  oldValue?: string;
+  newValue?: string;
+  changedBy: string;
+  notes?: string;
 }
 
 const municipalities = [
@@ -374,11 +386,13 @@ const StudentTable = ({
   handleViewDetails,
   handleEdit,
   handleDelete,
+  handleViewHistory,
 }: {
   filteredStudents: Student[];
   handleViewDetails: (student: Student) => void;
   handleEdit: (student: Student) => void;
   handleDelete: (id: number) => void;
+  handleViewHistory: (student: Student) => void;
 }) => {
   return (
     <Table>
@@ -433,6 +447,10 @@ const StudentTable = ({
                   <DropdownMenuItem onClick={() => handleViewDetails(student)}>
                     <Eye className="mr-2 h-4 w-4" />
                     View Details
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleViewHistory(student)}>
+                    <FileText className="mr-2 h-4 w-4" />
+                    View History
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleEdit(student)}>
                     <Edit className="mr-2 h-4 w-4" />
@@ -681,6 +699,9 @@ const Students = () => {
     principalStartDate: "",
     principalEndDate: ""
   });
+  const [showStudentHistory, setShowStudentHistory] = useState(false);
+  const [selectedStudentForHistory, setSelectedStudentForHistory] = useState<Student | null>(null);
+  const [studentHistory, setStudentHistory] = useState<HistoryEntry[]>([]);
 
   const filteredStudents = students.filter(student => {
     const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -695,6 +716,12 @@ const Students = () => {
   const handleViewDetails = (student: Student) => {
     setSelectedStudent(student);
     setShowStudentDetails(true);
+  };
+
+  const handleViewHistory = (student: Student) => {
+    setSelectedStudentForHistory(student);
+    setStudentHistory(getStudentHistory(student.id));
+    setShowStudentHistory(true);
   };
 
   const handleEdit = (student: Student) => {
@@ -740,6 +767,51 @@ const Students = () => {
     }
   };
 
+  const getStudentHistory = (studentId: number): HistoryEntry[] => {
+    const mockHistory: HistoryEntry[] = [
+      {
+        id: 1,
+        date: "2024-08-15",
+        type: "enrollment",
+        description: "Student enrolled in Naturvetenskapsprogrammet",
+        changedBy: "Maria Andersson",
+        notes: "Initial enrollment for academic year 2024-2025"
+      },
+      {
+        id: 2,
+        date: "2024-09-01",
+        type: "status_change",
+        description: "Status changed from pending to active",
+        oldValue: "pending",
+        newValue: "active",
+        changedBy: "Erik Johansson",
+        notes: "All required documents received and verified"
+      },
+      {
+        id: 3,
+        date: "2024-10-15",
+        type: "contact_update",
+        description: "Phone number updated",
+        oldValue: "070-1234567",
+        newValue: "070-9876543",
+        changedBy: "System",
+        notes: "Updated by student through self-service portal"
+      },
+      {
+        id: 4,
+        date: "2024-11-01",
+        type: "principal_change",
+        description: "Principal assignment updated",
+        oldValue: "No principal assigned",
+        newValue: "Erik Johansson",
+        changedBy: "Maria Lindberg",
+        notes: "Principal assigned for better student support"
+      }
+    ];
+    
+    return mockHistory.filter(() => Math.random() > 0.3); // Randomly return some entries for demo
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const studentData = {
@@ -758,12 +830,33 @@ const Students = () => {
         title: "Student Updated",
         description: `${studentData.name} has been updated successfully.`,
       });
+      
+      // Add history entry for update
+      const historyEntry: HistoryEntry = {
+        id: Date.now(),
+        date: new Date().toISOString().split('T')[0],
+        type: "contact_update",
+        description: "Student information updated",
+        changedBy: "Current User",
+        notes: "Student record updated through admin interface"
+      };
+      
     } else {
       setStudents([...students, studentData]);
       toast({
         title: "Student Added",
         description: `${studentData.name} has been added successfully.`,
       });
+      
+      // Add history entry for new enrollment
+      const historyEntry: HistoryEntry = {
+        id: Date.now(),
+        date: new Date().toISOString().split('T')[0],
+        type: "enrollment",
+        description: `Student enrolled in ${studentData.program}`,
+        changedBy: "Current User",
+        notes: "New student registration completed"
+      };
     }
 
     resetForm();
@@ -929,7 +1022,8 @@ const Students = () => {
             filteredStudents={filteredStudents} 
             handleViewDetails={handleViewDetails} 
             handleEdit={handleEdit} 
-            handleDelete={handleDelete} 
+            handleDelete={handleDelete}
+            handleViewHistory={handleViewHistory}
           />
         </CardContent>
       </Card>
@@ -964,6 +1058,17 @@ const Students = () => {
         setShowStudentDetails={setShowStudentDetails} 
         getStatusBadge={getStatusBadge} 
       />
+
+      {/* Student History Modal */}
+      {selectedStudentForHistory && (
+        <StudentHistoryModal
+          isOpen={showStudentHistory}
+          onClose={() => setShowStudentHistory(false)}
+          studentName={selectedStudentForHistory.name}
+          studentId={selectedStudentForHistory.id}
+          history={studentHistory}
+        />
+      )}
 
       {/* Delete Confirmation Modal */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
