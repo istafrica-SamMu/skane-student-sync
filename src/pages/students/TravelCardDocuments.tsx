@@ -36,6 +36,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { 
   CreditCard, 
@@ -89,7 +90,6 @@ const TravelCardDocuments = () => {
   const [eligibilityFilter, setEligibilityFilter] = useState("all");
   const [selectedStudent, setSelectedStudent] = useState<TravelCardStudent | null>(null);
   const [showStudentDetails, setShowStudentDetails] = useState(false);
-  const [showExportDialog, setShowExportDialog] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
   // Mock data for travel card students
@@ -180,6 +180,11 @@ const TravelCardDocuments = () => {
     setShowStudentDetails(true);
   };
 
+  const handleCloseDetails = () => {
+    setShowStudentDetails(false);
+    setSelectedStudent(null);
+  };
+
   const handleExportReport = async () => {
     setIsExporting(true);
     
@@ -197,7 +202,6 @@ const TravelCardDocuments = () => {
         filters: { gradeFilter, eligibilityFilter, searchTerm }
       });
       
-      setShowExportDialog(false);
     } catch (error) {
       toast({
         title: "Export Failed",
@@ -206,6 +210,24 @@ const TravelCardDocuments = () => {
       });
     } finally {
       setIsExporting(false);
+    }
+  };
+
+  const handleEditEligibility = (student: TravelCardStudent) => {
+    console.log("Edit eligibility for student:", student.id);
+    toast({
+      title: "Edit Eligibility",
+      description: `Editing eligibility for ${student.firstName} ${student.lastName}`,
+    });
+  };
+
+  const handleGenerateDocumentation = () => {
+    if (selectedStudent) {
+      console.log("Generate documentation for student:", selectedStudent.id);
+      toast({
+        title: "Documentation Generated",
+        description: `Travel card documentation generated for ${selectedStudent.firstName} ${selectedStudent.lastName}`,
+      });
     }
   };
 
@@ -220,15 +242,16 @@ const TravelCardDocuments = () => {
           </p>
         </div>
         <div className="flex space-x-3">
-          <AlertDialog open={showExportDialog} onOpenChange={setShowExportDialog}>
-            <Button 
-              variant="outline" 
-              className="border-ike-primary text-ike-primary hover:bg-ike-primary/10"
-              onClick={() => setShowExportDialog(true)}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export Documentation
-            </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="border-ike-primary text-ike-primary hover:bg-ike-primary/10"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export Documentation
+              </Button>
+            </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle className="flex items-center text-ike-neutral-dark">
@@ -443,11 +466,17 @@ const TravelCardDocuments = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-white border shadow-lg z-50">
-                        <DropdownMenuItem onClick={() => handleViewDetails(student)}>
+                        <DropdownMenuItem 
+                          onClick={() => handleViewDetails(student)}
+                          className="cursor-pointer"
+                        >
                           <Eye className="mr-2 h-4 w-4" />
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => handleEditEligibility(student)}
+                          className="cursor-pointer"
+                        >
                           <Edit className="mr-2 h-4 w-4" />
                           Edit Eligibility
                         </DropdownMenuItem>
@@ -566,10 +595,13 @@ const TravelCardDocuments = () => {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowStudentDetails(false)}>
+            <Button variant="outline" onClick={handleCloseDetails}>
               Close
             </Button>
-            <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+            <Button 
+              className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+              onClick={handleGenerateDocumentation}
+            >
               <FileText className="w-4 h-4 mr-2" />
               Generate Card Documentation
             </Button>
