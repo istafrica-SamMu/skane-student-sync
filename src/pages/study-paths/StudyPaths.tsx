@@ -306,6 +306,11 @@ export default function StudyPaths() {
     setIsImportDialogOpen(false);
   };
 
+  const handleAddDialogOpen = () => {
+    resetForm();
+    setIsAddDialogOpen(true);
+  };
+
   const filteredPaths = studyPaths.filter(path =>
     path.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     path.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -398,7 +403,7 @@ export default function StudyPaths() {
 
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-ike-primary hover:bg-ike-primary/90">
+              <Button className="bg-ike-primary hover:bg-ike-primary/90" onClick={handleAddDialogOpen}>
                 <Plus className="w-4 h-4 mr-2" />
                 Add Study Path
               </Button>
