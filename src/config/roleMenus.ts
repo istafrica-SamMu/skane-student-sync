@@ -1,3 +1,4 @@
+
 import {
   Home,
   Users,
@@ -29,7 +30,8 @@ import {
   Briefcase,
   Clock,
   Bell,
-  Mail
+  Mail,
+  Info
 } from "lucide-react";
 
 export interface MenuItem {
@@ -318,8 +320,8 @@ export const schoolAdminMenu: MenuItem[] = [
     items: [
       {
         title: "School Unit Information",
-        url: "/system/schools",
-        icon: Building,
+        url: "/my-school/info",
+        icon: Info,
       },
       {
         title: "Programs & Specializations",
