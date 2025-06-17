@@ -46,6 +46,7 @@ import {
   Trash2,
   MapPin,
   FileText,
+  GraduationCap,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -56,6 +57,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 import { StudentHistoryModal } from "@/components/students/StudentHistoryModal";
+import { StudentEducationHistory, EducationHistory } from "@/components/students/StudentEducationHistory";
 
 interface Student {
   id: number;
@@ -78,6 +80,7 @@ interface Student {
   principalStartDate?: string;
   principalEndDate?: string;
   personalSupplement?: string;
+  educationHistory?: EducationHistory[];
 }
 
 interface HistoryEntry {
@@ -472,6 +475,10 @@ const StudentTable = ({
                     <FileText className="mr-2 h-4 w-4" />
                     View History
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleViewEducationHistory(student)}>
+                    <GraduationCap className="mr-2 h-4 w-4" />
+                    Education History
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleEdit(student)}>
                     <Edit className="mr-2 h-4 w-4" />
                     Edit Student
@@ -503,7 +510,7 @@ const StudentDetailsModal = ({
 }) => {
   return (
     <Dialog open={showStudentDetails} onOpenChange={setShowStudentDetails}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center text-ike-neutral-dark">
             <Users className="w-5 h-5 mr-2 text-ike-primary" />
@@ -515,97 +522,53 @@ const StudentDetailsModal = ({
         </DialogHeader>
         {selectedStudent && (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Personal Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-ike-neutral-dark border-b pb-2">Personal Information</h3>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Full Name</label>
-                  <p className="text-ike-neutral-dark font-medium">{selectedStudent.name}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Personal Number</label>
-                  <p className="text-ike-neutral-dark font-mono">{selectedStudent.personalNumber}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Email</label>
-                  <p className="text-ike-neutral-dark">{selectedStudent.email || "Not provided"}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Phone</label>
-                  <p className="text-ike-neutral-dark">{selectedStudent.phone || "Not provided"}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Address</label>
-                  <p className="text-ike-neutral-dark">{selectedStudent.address || "Not provided"}</p>
-                </div>
+            {/* Personal Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-ike-neutral-dark border-b pb-2">Personal Information</h3>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">Full Name</label>
+                <p className="text-ike-neutral-dark font-medium">{selectedStudent.name}</p>
               </div>
-
-              {/* Academic Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-ike-neutral-dark border-b pb-2">Academic Information</h3>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Municipality</label>
-                  <p className="text-ike-neutral-dark">{selectedStudent.municipality} ({selectedStudent.municipalityCode})</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">School</label>
-                  <p className="text-ike-neutral-dark">{selectedStudent.school}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Program</label>
-                  <p className="text-ike-neutral-dark">{selectedStudent.program}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Class</label>
-                  <p className="text-ike-neutral-dark">{selectedStudent.class || "Not assigned"}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Status</label>
-                  <div className="mt-1">{getStatusBadge(selectedStudent.status)}</div>
-                </div>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">Personal Number</label>
+                <p className="text-ike-neutral-dark font-mono">{selectedStudent.personalNumber}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">Email</label>
+                <p className="text-ike-neutral-dark">{selectedStudent.email || "Not provided"}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">Phone</label>
+                <p className="text-ike-neutral-dark">{selectedStudent.phone || "Not provided"}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">Address</label>
+                <p className="text-ike-neutral-dark">{selectedStudent.address || "Not provided"}</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Study Period */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-ike-neutral-dark border-b pb-2">Study Period</h3>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Start Date</label>
-                  <p className="text-ike-neutral-dark">{selectedStudent.startDate}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">End Date</label>
-                  <p className="text-ike-neutral-dark">{selectedStudent.endDate || "Ongoing"}</p>
-                </div>
+            {/* Academic Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-ike-neutral-dark border-b pb-2">Academic Information</h3>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">Municipality</label>
+                <p className="text-ike-neutral-dark">{selectedStudent.municipality} ({selectedStudent.municipalityCode})</p>
               </div>
-
-              {/* Principal Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-ike-neutral-dark border-b pb-2">Principal Information</h3>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Principal Name</label>
-                  <p className="text-ike-neutral-dark">{selectedStudent.principalName || "Not assigned"}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Principal Email</label>
-                  <p className="text-ike-neutral-dark">{selectedStudent.principalEmail || "Not provided"}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Principal Phone</label>
-                  <p className="text-ike-neutral-dark">{selectedStudent.principalPhone || "Not provided"}</p>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-ike-neutral">Assignment Start</label>
-                    <p className="text-ike-neutral-dark">{selectedStudent.principalStartDate || "Not specified"}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-ike-neutral">Assignment End</label>
-                    <p className="text-ike-neutral-dark">{selectedStudent.principalEndDate || "Ongoing"}</p>
-                  </div>
-                </div>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">School</label>
+                <p className="text-ike-neutral-dark">{selectedStudent.school}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">Program</label>
+                <p className="text-ike-neutral-dark">{selectedStudent.program}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">Class</label>
+                <p className="text-ike-neutral-dark">{selectedStudent.class || "Not assigned"}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">Status</label>
+                <div className="mt-1">{getStatusBadge(selectedStudent.status)}</div>
               </div>
             </div>
 
@@ -618,6 +581,57 @@ const StudentDetailsModal = ({
                   <p className="text-ike-neutral-dark mt-2 whitespace-pre-wrap">
                     {selectedStudent.personalSupplement}
                   </p>
+                </div>
+              </div>
+            )}
+
+            {/* Education History */}
+            {selectedStudent.educationHistory && selectedStudent.educationHistory.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-ike-neutral-dark border-b pb-2">Education History</h3>
+                <div className="space-y-3">
+                  {selectedStudent.educationHistory.map((education) => (
+                    <div key={education.id} className="bg-ike-neutral-light/30 p-4 rounded-lg">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-ike-neutral">School</label>
+                          <p className="text-ike-neutral-dark">{education.schoolName}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-ike-neutral">Program</label>
+                          <p className="text-ike-neutral-dark">{education.program}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-ike-neutral">Period</label>
+                          <p className="text-ike-neutral-dark">
+                            {education.startDate} - {education.endDate || 'Ongoing'}
+                          </p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-ike-neutral">Status</label>
+                          <p className="text-ike-neutral-dark capitalize">{education.completionStatus.replace('_', ' ')}</p>
+                        </div>
+                        {education.credits && (
+                          <div>
+                            <label className="text-sm font-medium text-ike-neutral">Credits</label>
+                            <p className="text-ike-neutral-dark">{education.credits}</p>
+                          </div>
+                        )}
+                        {education.grades && (
+                          <div>
+                            <label className="text-sm font-medium text-ike-neutral">Grades</label>
+                            <p className="text-ike-neutral-dark">{education.grades}</p>
+                          </div>
+                        )}
+                      </div>
+                      {education.notes && (
+                        <div className="mt-3">
+                          <label className="text-sm font-medium text-ike-neutral">Notes</label>
+                          <p className="text-ike-neutral-dark text-sm mt-1">{education.notes}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -660,7 +674,22 @@ const Students = () => {
       principalPhone: "040-123456",
       principalStartDate: "2023-01-01",
       principalEndDate: "2025-12-31",
-      personalSupplement: "Additional information about Anna Svensson"
+      personalSupplement: "Additional information about Anna Svensson",
+      educationHistory: [
+        {
+          id: 1,
+          schoolName: "Malmö Grundskola",
+          program: "Grundskolan",
+          municipality: "Malmö kommun",
+          startDate: "2018-08-15",
+          endDate: "2021-06-15",
+          completed: true,
+          completionStatus: "completed",
+          grades: "A-B average",
+          credits: 320,
+          notes: "Completed with good results in mathematics and science"
+        }
+      ]
     },
     {
       id: 2,
@@ -681,7 +710,21 @@ const Students = () => {
       principalEmail: "maria.lindberg@jensen.se",
       principalPhone: "040-234567",
       principalStartDate: "2022-08-01",
-      personalSupplement: "Additional information about Johan Andersson"
+      personalSupplement: "Additional information about Johan Andersson",
+      educationHistory: [
+        {
+          id: 2,
+          schoolName: "Lunds Gymnasium",
+          program: "Teknikprogrammet",
+          municipality: "Lund kommun",
+          startDate: "2021-08-15",
+          endDate: "2023-01-15",
+          completed: false,
+          completionStatus: "transferred",
+          credits: 150,
+          notes: "Transferred to focus on economics instead of technology"
+        }
+      ]
     },
     {
       id: 3,
@@ -702,7 +745,8 @@ const Students = () => {
       principalPhone: "040-345678",
       principalStartDate: "2024-01-01",
       principalEndDate: "2026-12-31",
-      personalSupplement: "Additional information about Lisa Nilsson"
+      personalSupplement: "Additional information about Lisa Nilsson",
+      educationHistory: []
     }
   ]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -739,6 +783,8 @@ const Students = () => {
   const [showStudentHistory, setShowStudentHistory] = useState(false);
   const [selectedStudentForHistory, setSelectedStudentForHistory] = useState<Student | null>(null);
   const [studentHistory, setStudentHistory] = useState<HistoryEntry[]>([]);
+  const [showEducationHistory, setShowEducationHistory] = useState(false);
+  const [selectedStudentForEducation, setSelectedStudentForEducation] = useState<Student | null>(null);
 
   const filteredStudents = students.filter(student => {
     const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -759,6 +805,11 @@ const Students = () => {
     setSelectedStudentForHistory(student);
     setStudentHistory(getStudentHistory(student.id));
     setShowStudentHistory(true);
+  };
+
+  const handleViewEducationHistory = (student: Student) => {
+    setSelectedStudentForEducation(student);
+    setShowEducationHistory(true);
   };
 
   const handleEdit = (student: Student) => {
@@ -1108,6 +1159,23 @@ const Students = () => {
           studentId={selectedStudentForHistory.id}
           history={studentHistory}
         />
+      )}
+
+      {/* Education History Modal */}
+      {selectedStudentForEducation && (
+        <Dialog open={showEducationHistory} onOpenChange={setShowEducationHistory}>
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader className="sr-only">
+              <DialogTitle>Education History</DialogTitle>
+            </DialogHeader>
+            <StudentEducationHistory
+              studentId={selectedStudentForEducation.id}
+              studentName={selectedStudentForEducation.name}
+              educationHistory={selectedStudentForEducation.educationHistory || []}
+              onUpdateHistory={(history) => handleUpdateEducationHistory(selectedStudentForEducation.id, history)}
+            />
+          </DialogContent>
+        </Dialog>
       )}
 
       {/* Delete Confirmation Modal */}
