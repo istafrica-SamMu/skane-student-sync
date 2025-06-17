@@ -1,17 +1,12 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { 
   Users, 
-  Search, 
-  Download, 
-  Filter,
+  Download,
   FileText,
-  GraduationCap,
-  Calendar,
-  MapPin
+  GraduationCap
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -38,26 +33,18 @@ const StudentLists = () => {
       format: "Excel/PDF",
       lastGenerated: "2024-11-14",
       icon: GraduationCap
-    },
-    {
-      id: 3,
-      name: "Student Contact Information",
-      description: "Student and guardian contact details",
-      category: "Student Lists",
-      format: "Excel",
-      lastGenerated: "2024-11-13",
-      icon: MapPin
-    },
-    {
-      id: 4,
-      name: "Student Attendance Statistics",
-      description: "Attendance tracking and statistics",
-      category: "Statistics",
-      format: "PDF",
-      lastGenerated: "2024-11-12",
-      icon: Calendar
     }
   ];
+
+  const handleGenerateReport = (reportId: number) => {
+    console.log(`Generating report with ID: ${reportId}`);
+    // Add your report generation logic here
+  };
+
+  const handlePreviewReport = (reportId: number) => {
+    console.log(`Previewing report with ID: ${reportId}`);
+    // Add your report preview logic here
+  };
 
   return (
     <div className="space-y-6">
@@ -69,29 +56,10 @@ const StudentLists = () => {
             Generate and download student lists and statistics for your school
           </p>
         </div>
-        <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
-          <FileText className="w-4 h-4 mr-2" />
-          Generate Custom Report
-        </Button>
-      </div>
-
-      {/* Search and Filter */}
-      <div className="flex space-x-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-ike-neutral" />
-          <Input
-            placeholder="Search student reports..."
-            className="pl-10 border-ike-primary/20 focus:border-ike-primary"
-          />
-        </div>
-        <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-          <Filter className="w-4 h-4 mr-2" />
-          Filter
-        </Button>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="border-l-4 border-l-ike-primary">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
@@ -125,18 +93,6 @@ const StudentLists = () => {
           <CardContent>
             <div className="text-2xl font-bold text-ike-neutral-dark">8</div>
             <div className="text-xs text-ike-neutral mt-1">Available programs</div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-green-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-ike-neutral">
-              Reports Generated
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-ike-neutral-dark">23</div>
-            <div className="text-xs text-ike-neutral mt-1">This month</div>
           </CardContent>
         </Card>
       </div>
@@ -173,10 +129,19 @@ const StudentLists = () => {
                   </div>
                 </div>
                 <div className="flex space-x-2">
-                  <Button size="sm" variant="outline" className="border-ike-neutral text-ike-neutral hover:bg-ike-neutral-light">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="border-ike-neutral text-ike-neutral hover:bg-ike-neutral-light"
+                    onClick={() => handlePreviewReport(report.id)}
+                  >
                     Preview
                   </Button>
-                  <Button size="sm" className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+                  <Button 
+                    size="sm" 
+                    className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+                    onClick={() => handleGenerateReport(report.id)}
+                  >
                     <Download className="w-4 h-4 mr-1" />
                     Generate
                   </Button>
