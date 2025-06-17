@@ -1,17 +1,14 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
-  Settings, 
   Calendar, 
-  Building,
   AlertTriangle,
-  Check,
   FileText,
   Save
 } from "lucide-react";
@@ -29,44 +26,12 @@ const EnrollmentSettings = () => {
     lateApplicationDeadline: "2024-04-15"
   });
 
-  const [schoolSettings, setSchoolSettings] = useState([
-    { 
-      school: "Centralskolan", 
-      maxCapacity: 180, 
-      currentEnrolled: 165, 
-      waitingList: 12, 
-      acceptingApplications: true 
-    },
-    { 
-      school: "Västerskolan", 
-      maxCapacity: 150, 
-      currentEnrolled: 142, 
-      waitingList: 8, 
-      acceptingApplications: true 
-    },
-    { 
-      school: "Norrskolan", 
-      maxCapacity: 200, 
-      currentEnrolled: 195, 
-      waitingList: 25, 
-      acceptingApplications: false 
-    }
-  ]);
-
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
 
   const handleMunicipalSettingChange = (field: string, value: any) => {
     setMunicipalSettings(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleSchoolSettingChange = (index: number, field: string, value: any) => {
-    setSchoolSettings(prev => 
-      prev.map((school, i) => 
-        i === index ? { ...school, [field]: value } : school
-      )
-    );
   };
 
   const handleSaveConfiguration = () => {
@@ -188,108 +153,16 @@ const EnrollmentSettings = () => {
         </CardContent>
       </Card>
 
-      {/* School Capacity Management */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Building className="w-5 h-5 text-ike-primary" />
-            <span>School Capacity Management</span>
-          </CardTitle>
-          <CardDescription>
-            Monitor and manage enrollment capacity for each school in your municipality
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
-            {schoolSettings.map((school, index) => (
-              <div key={school.school} className="p-4 border border-ike-neutral-light rounded-lg">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center space-x-3">
-                    <h4 className="font-medium text-ike-neutral-dark">{school.school}</h4>
-                    <Badge variant={school.acceptingApplications ? "default" : "secondary"}>
-                      {school.acceptingApplications ? "Accepting Applications" : "Closed"}
-                    </Badge>
-                  </div>
-                  <Switch
-                    checked={school.acceptingApplications}
-                    onCheckedChange={(checked) => handleSchoolSettingChange(index, 'acceptingApplications', checked)}
-                  />
-                </div>
-                
-                <div className="grid grid-cols-4 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor={`max-capacity-${index}`}>Max Capacity</Label>
-                    <Input
-                      id={`max-capacity-${index}`}
-                      type="number"
-                      value={school.maxCapacity}
-                      onChange={(e) => handleSchoolSettingChange(index, 'maxCapacity', parseInt(e.target.value))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Current Enrolled</Label>
-                    <div className="text-lg font-medium text-ike-neutral-dark pt-2">{school.currentEnrolled}</div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Waiting List</Label>
-                    <div className="text-lg font-medium text-ike-warning pt-2">{school.waitingList}</div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Available Spots</Label>
-                    <div className="text-lg font-medium text-ike-success pt-2">
-                      {school.maxCapacity - school.currentEnrolled}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Configuration Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Settings className="w-5 h-5 text-ike-primary" />
-            <span>Configuration Management</span>
-          </CardTitle>
-          <CardDescription>
-            Save, export, or reset your enrollment configuration
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="p-4 border border-green-200 bg-green-50 rounded-lg">
-            <div className="flex items-start space-x-2">
-              <Check className="w-5 h-5 text-green-600 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-green-800">Configuration Status</p>
-                <p className="text-sm text-green-700 mt-1">
-                  All enrollment settings are properly configured and ready to use
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-between space-x-4">
-            <div className="flex space-x-3">
-              <Button variant="outline" onClick={handleExportConfiguration}>
-                Export Configuration
-              </Button>
-              <Button variant="outline" onClick={handleResetToDefaults}>
-                Reset to Defaults
-              </Button>
-            </div>
-            <Button 
-              className="bg-ike-primary hover:bg-ike-primary/90"
-              onClick={handleSaveConfiguration}
-            >
-              <Save className="w-4 h-4 mr-2" />
-              Save Configuration
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Save Configuration Button */}
+      <div className="flex justify-end">
+        <Button 
+          className="bg-ike-primary hover:bg-ike-primary/90"
+          onClick={handleSaveConfiguration}
+        >
+          <Save className="w-4 h-4 mr-2" />
+          Save Configuration
+        </Button>
+      </div>
 
       {/* Save Configuration Modal */}
       <Dialog open={isSaveModalOpen} onOpenChange={setIsSaveModalOpen}>
