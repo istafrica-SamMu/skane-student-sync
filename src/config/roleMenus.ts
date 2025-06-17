@@ -1,4 +1,5 @@
-import { Home, Users, FileText, BarChart3, Settings, Database, ArrowUpDown, AlertTriangle, Package, Euro, TrendingUp, UserCheck, Link as LinkIcon, User, Calendar, Upload, DollarSign, MessageSquare, Building } from "lucide-react";
+
+import { Home, Users, FileText, BarChart3, Settings, Database, ArrowUpDown, AlertTriangle, Package, Euro, TrendingUp, UserCheck, Link as LinkIcon, User, Calendar, Upload, DollarSign, MessageSquare, Building, Calculator, Plus, MapPin } from "lucide-react";
 
 export const regionalAdminMenu = [
   {
@@ -285,8 +286,6 @@ export const regionalAdminMenu = [
     ],
   },
 ];
-
-import { Calculator, FileText, Home, Link as LinkIcon, Settings, Upload, User, Users, BarChart3, Building, Calendar, Database, DollarSign, MessageSquare, MapPin, Plus } from "lucide-react";
 
 export const municipalityAdminMenu = [
   {
