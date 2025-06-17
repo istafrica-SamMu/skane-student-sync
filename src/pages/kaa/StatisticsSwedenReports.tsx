@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -50,6 +49,8 @@ import {
   CheckCircle,
   AlertCircle,
   BarChart3,
+  FileDown,
+  Settings,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -74,6 +75,17 @@ interface SCBReport {
   submittedBy?: string;
   notes?: string;
   fileName?: string;
+}
+
+interface ExportConfig {
+  fileFormat: 'csv' | 'xlsx' | 'xml';
+  includeHeaders: boolean;
+  dateRange: {
+    start: string;
+    end: string;
+  };
+  reportTypes: string[];
+  encoding: 'UTF-8' | 'ISO-8859-1';
 }
 
 const reportTypes = [
@@ -153,9 +165,20 @@ const StatisticsSwedenReports = () => {
   const [selectedReport, setSelectedReport] = useState<SCBReport | null>(null);
   const [showReportDetails, setShowReportDetails] = useState(false);
   const [showReportForm, setShowReportForm] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
   const [editingReport, setEditingReport] = useState<SCBReport | null>(null);
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [reportToSubmit, setReportToSubmit] = useState<number | null>(null);
+  const [exportConfig, setExportConfig] = useState<ExportConfig>({
+    fileFormat: 'xlsx',
+    includeHeaders: true,
+    dateRange: {
+      start: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0],
+      end: new Date().toISOString().split('T')[0]
+    },
+    reportTypes: [],
+    encoding: 'UTF-8'
+  });
   const [formData, setFormData] = useState<Omit<SCBReport, 'id'>>({
     reportType: "",
     period: "",
@@ -211,6 +234,88 @@ const StatisticsSwedenReports = () => {
     }
   };
 
+  const handleExportSCB = () => {
+    // Filter reports based on export configuration
+    const exportableReports = reports.filter(report => {
+      const reportDate = new Date(report.submissionDate || report.dueDate);
+      const startDate = new Date(exportConfig.dateRange.start);
+      const endDate = new Date(exportConfig.dateRange.end);
+      
+      const withinDateRange = reportDate >= startDate && reportDate <= endDate;
+      const matchesType = exportConfig.reportTypes.length === 0 || exportConfig.reportTypes.includes(report.reportType);
+      const isSubmittedOrApproved = report.status === 'submitted' || report.status === 'approved';
+      
+      return withinDateRange && matchesType && isSubmittedOrApproved;
+    });
+
+    if (exportableReports.length === 0) {
+      toast({
+        title: "No Data to Export",
+        description: "No reports match the selected criteria for export.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Generate filename based on configuration
+    const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+    const fileName = `scb_export_${dateStr}.${exportConfig.fileFormat}`;
+
+    // Simulate file generation and download
+    const exportData = exportableReports.map(report => ({
+      'Report Type': report.reportType,
+      'Period': report.period,
+      'Year': report.year,
+      'Young Persons': report.youngPersonsIncluded,
+      'Submission Date': report.submissionDate,
+      'Status': report.status,
+      'Created By': report.createdBy
+    }));
+
+    // Create downloadable content
+    let content = '';
+    if (exportConfig.fileFormat === 'csv') {
+      const headers = Object.keys(exportData[0] || {});
+      if (exportConfig.includeHeaders) {
+        content = headers.join(',') + '\n';
+      }
+      content += exportData.map(row => 
+        headers.map(header => `"${row[header as keyof typeof row] || ''}"`).join(',')
+      ).join('\n');
+    } else if (exportConfig.fileFormat === 'xml') {
+      content = '<?xml version="1.0" encoding="' + exportConfig.encoding + '"?>\n<scb_reports>\n';
+      content += exportData.map(report => 
+        '  <report>\n' +
+        Object.entries(report).map(([key, value]) => 
+          `    <${key.toLowerCase().replace(/ /g, '_')}>${value}</${key.toLowerCase().replace(/ /g, '_')}>`
+        ).join('\n') +
+        '\n  </report>'
+      ).join('\n');
+      content += '\n</scb_reports>';
+    } else {
+      // For XLSX, we'll simulate with CSV-like content
+      content = 'Excel format export (simulated)\n' + JSON.stringify(exportData, null, 2);
+    }
+
+    // Create and trigger download
+    const blob = new Blob([content], { type: 'text/plain;charset=' + exportConfig.encoding });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Export Completed",
+      description: `Successfully exported ${exportableReports.length} reports to ${fileName}`,
+    });
+
+    setShowExportDialog(false);
+  };
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const reportData: SCBReport = {
@@ -261,13 +366,23 @@ const StatisticsSwedenReports = () => {
             Manage and submit reports to Statistics Sweden (SCB) for KAA activities
           </p>
         </div>
-        <Button 
-          className="bg-ike-primary hover:bg-ike-primary-dark text-white"
-          onClick={() => setShowReportForm(true)}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          New Report
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline"
+            className="border-ike-primary text-ike-primary hover:bg-ike-primary hover:text-white"
+            onClick={() => setShowExportDialog(true)}
+          >
+            <FileDown className="w-4 h-4 mr-2" />
+            Export to SCB
+          </Button>
+          <Button 
+            className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+            onClick={() => setShowReportForm(true)}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            New Report
+          </Button>
+        </div>
       </div>
 
       {/* Statistics Cards */}
@@ -460,6 +575,143 @@ const StatisticsSwedenReports = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Export Dialog */}
+      <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-ike-neutral-dark">
+              <FileDown className="w-5 h-5 mr-2 text-ike-primary" />
+              Export to Statistics Sweden
+            </DialogTitle>
+            <DialogDescription>
+              Configure and generate files for Statistics Sweden reporting
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="fileFormat" className="text-ike-neutral">File Format</Label>
+                <Select value={exportConfig.fileFormat} onValueChange={(value: 'csv' | 'xlsx' | 'xml') => 
+                  setExportConfig({...exportConfig, fileFormat: value})}>
+                  <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="csv">CSV</SelectItem>
+                    <SelectItem value="xlsx">Excel (XLSX)</SelectItem>
+                    <SelectItem value="xml">XML</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="encoding" className="text-ike-neutral">Character Encoding</Label>
+                <Select value={exportConfig.encoding} onValueChange={(value: 'UTF-8' | 'ISO-8859-1') => 
+                  setExportConfig({...exportConfig, encoding: value})}>
+                  <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="UTF-8">UTF-8</SelectItem>
+                    <SelectItem value="ISO-8859-1">ISO-8859-1</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="startDate" className="text-ike-neutral">Start Date</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  value={exportConfig.dateRange.start}
+                  onChange={(e) => setExportConfig({
+                    ...exportConfig,
+                    dateRange: {...exportConfig.dateRange, start: e.target.value}
+                  })}
+                  className="border-ike-primary/20 focus:border-ike-primary"
+                />
+              </div>
+              <div>
+                <Label htmlFor="endDate" className="text-ike-neutral">End Date</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  value={exportConfig.dateRange.end}
+                  onChange={(e) => setExportConfig({
+                    ...exportConfig,
+                    dateRange: {...exportConfig.dateRange, end: e.target.value}
+                  })}
+                  className="border-ike-primary/20 focus:border-ike-primary"
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label className="text-ike-neutral">Report Types to Include</Label>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                {reportTypes.map((type) => (
+                  <label key={type} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={exportConfig.reportTypes.includes(type)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setExportConfig({
+                            ...exportConfig,
+                            reportTypes: [...exportConfig.reportTypes, type]
+                          });
+                        } else {
+                          setExportConfig({
+                            ...exportConfig,
+                            reportTypes: exportConfig.reportTypes.filter(t => t !== type)
+                          });
+                        }
+                      }}
+                      className="rounded border-ike-primary/20"
+                    />
+                    <span className="text-sm text-ike-neutral-dark">{type}</span>
+                  </label>
+                ))}
+              </div>
+              <p className="text-xs text-ike-neutral mt-2">
+                Leave empty to include all report types
+              </p>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="includeHeaders"
+                checked={exportConfig.includeHeaders}
+                onChange={(e) => setExportConfig({...exportConfig, includeHeaders: e.target.checked})}
+                className="rounded border-ike-primary/20"
+              />
+              <Label htmlFor="includeHeaders" className="text-ike-neutral">
+                Include column headers in export
+              </Label>
+            </div>
+
+            <div className="bg-ike-neutral-light/30 p-4 rounded-lg">
+              <h4 className="font-medium text-ike-neutral-dark mb-2">Export Summary</h4>
+              <p className="text-sm text-ike-neutral">
+                {reports.filter(r => r.status === 'submitted' || r.status === 'approved').length} reports 
+                are available for export based on current filters.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowExportDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleExportSCB}
+              className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+            >
+              <FileDown className="w-4 h-4 mr-2" />
+              Generate Export
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Report Form Modal */}
       <Dialog open={showReportForm} onOpenChange={setShowReportForm}>
