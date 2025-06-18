@@ -45,8 +45,7 @@ import {
   ClipboardList,
   CreditCard,
   HelpCircle,
-  Ban,
-  Zap
+  Ban
 } from "lucide-react";
 
 export interface MenuItem {
@@ -230,88 +229,286 @@ export const regionalAdminMenu: MenuItem[] = [
   },
 ];
 
-export const municipalityAdminMenu = [
+export const municipalityAdminMenu: MenuItem[] = [
   {
-    title: 'Dashboard',
-    icon: BarChart3,
-    url: '/dashboard'
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: Home,
   },
   {
-    title: 'KAA Management',
+    title: "Student Management",
     icon: Users,
     items: [
       {
-        title: 'KAA Dashboard',
-        icon: BarChart3,
-        url: '/kaa/dashboard'
+        title: "Students Overview",
+        url: "/students",
+        icon: Users,
       },
       {
-        title: 'KAA Registry',
-        icon: UserPlus,
-        url: '/kaa-registry'
+        title: "Students by Class & Study Path",
+        url: "/students/classes",
+        icon: GraduationCap,
       },
       {
-        title: 'Contact Occasions',
-        icon: MessageSquare,
-        url: '/kaa/contact-occasions'
+        title: "Municipal School Students",
+        url: "/students/municipal",
+        icon: School,
       },
       {
-        title: 'Measures & Actions',
-        icon: Activity,
-        url: '/kaa/measures-actions'
-      }
-    ]
+        title: "External School Students",
+        url: "/students/external",
+        icon: ArrowUpDown,
+      },
+      {
+        title: "Travel Card Documents",
+        url: "/students/travel-cards",
+        icon: CreditCard,
+      },
+    ],
   },
   {
-    title: 'Integration Management',
-    icon: Zap,
+    title: "KAA Management",
+    icon: ClipboardList,
     items: [
       {
-        title: 'Tax Agency Hub',
-        icon: Building2,
-        url: '/integration/tax-agency'
+        title: "KAA Registry",
+        url: "/kaa/registry",
+        icon: Users,
       },
       {
-        title: 'UHR BEDA',
+        title: "Measures & Actions",
+        url: "/kaa/measures",
+        icon: Activity,
+      },
+      {
+        title: "Contact Occasions",
+        url: "/kaa/contacts",
+        icon: MessageSquare,
+      },
+      {
+        title: "Statistics Sweden Reports",
+        url: "/kaa/scb-reports",
+        icon: FileText,
+      },
+    ],
+  },
+  {
+    title: "Integration Management",
+    icon: Workflow,
+    items: [
+      {
+        title: "Import Student Data",
+        url: "/integration/import",
+        icon: Database,
+      },
+      {
+        title: "Tax Agency Hub",
+        url: "/integration/tax-agency-hub",
+        icon: Database,
+      },
+      {
+        title: "UHR BEDA Integration",
+        url: "/integration/uhr-beda",
         icon: GraduationCap,
-        url: '/integration/uhr-beda'
-      }
-    ]
-  }
+      },
+      {
+        title: "Integration Status",
+        url: "/integration/status",
+        icon: BarChart3,
+      },
+    ],
+  },
+  {
+    title: "Financial Management",
+    icon: Calculator,
+    items: [
+      {
+        title: "Accounting Configuration",
+        url: "/financial/accounting-configuration",
+        icon: Settings,
+      },
+      {
+        title: "Municipal Price Lists",
+        url: "/financial/pricelists",
+        icon: Euro,
+      },
+      {
+        title: "Additional Amounts",
+        url: "/financial/additional-amounts",
+        icon: DollarSign,
+      },
+      {
+        title: "Payment Blocks",
+        url: "/financial/payment-blocks",
+        icon: Ban,
+      },
+      {
+        title: "Municipal Financial Reports",
+        url: "/financial/reports",
+        icon: FileText,
+      },
+      {
+        title: "Inter-Municipal Compensation",
+        url: "/financial/compensation",
+        icon: TrendingUp,
+      },
+    ],
+  },
+  {
+    title: "Municipal Operations",
+    icon: Building,
+    items: [
+      {
+        title: "Municipal School Units",
+        url: "/operations/municipal-schools",
+        icon: School,
+      },
+      {
+        title: "Municipal User Administration",
+        url: "/operations/municipal-users",
+        icon: Users,
+      },
+    ],
+  },
+  {
+    title: "Reports",
+    icon: FileText,
+    items: [
+      {
+        title: "Money to Receive",
+        url: "/reports/money-to-receive",
+        icon: TrendingUp,
+      },
+      {
+        title: "Money to Pay",
+        url: "/reports/money-to-pay",
+        icon: DollarSign,
+      },
+      {
+        title: "Municipal Statistics",
+        url: "/reports/municipal-statistics",
+        icon: BarChart3,
+      },
+      {
+        title: "Financial System Export",
+        url: "/reports/financial-export",
+        icon: FileSpreadsheet,
+      },
+    ],
+  },
+  {
+    title: "My Page",
+    icon: User,
+    items: [
+      {
+        title: "Messages",
+        url: "/my-page/messages",
+        icon: MessageSquare,
+      },
+      {
+        title: "Enrollment Settings",
+        url: "/my-page/enrollment",
+        icon: Settings,
+      },
+      {
+        title: "Activity Logs",
+        url: "/my-page/logs",
+        icon: Activity,
+      },
+      {
+        title: "Settings",
+        url: "/my-page/settings",
+        icon: Settings,
+      },
+    ],
+  },
+  {
+    title: "Support",
+    url: "/system/support",
+    icon: HelpCircle,
+  },
 ];
 
-export const schoolAdminMenu = [
+export const schoolAdminMenu: MenuItem[] = [
   {
-    title: 'Dashboard',
-    icon: BarChart3,
-    url: '/dashboard'
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: Home,
   },
   {
-    title: 'KAA Management',
+    title: "Student Management",
     icon: Users,
     items: [
       {
-        title: 'KAA Dashboard',
-        icon: BarChart3,
-        url: '/kaa/dashboard'
+        title: "Student Roster & Classes",
+        url: "/students",
+        icon: Users,
       },
       {
-        title: 'KAA Registry',
-        icon: UserPlus,
-        url: '/kaa-registry'
+        title: "Travel Card Documents",
+        url: "/students/travel-cards",
+        icon: CreditCard,
+      },
+    ],
+  },
+  {
+    title: "School Operations",
+    icon: School,
+    items: [
+      {
+        title: "School Unit Information",
+        url: "/my-school/info",
+        icon: Info,
       },
       {
-        title: 'Contact Occasions',
+        title: "Class Management",
+        url: "/students/classes",
+        icon: GraduationCap,
+      },
+    ],
+  },
+  {
+    title: "Reports",
+    icon: FileText,
+    items: [
+      {
+        title: "Student Lists",
+        url: "/reports/students",
+        icon: Users,
+      },
+      {
+        title: "Financial Reports",
+        url: "/reports/financial",
+        icon: DollarSign,
+      },
+    ],
+  },
+  {
+    title: "My Page",
+    icon: User,
+    items: [
+      {
+        title: "Messages",
+        url: "/my-page/messages",
         icon: MessageSquare,
-        url: '/kaa/contact-occasions'
       },
       {
-        title: 'Measures & Actions',
+        title: "Activity Logs",
+        url: "/my-page/logs",
         icon: Activity,
-        url: '/kaa/measures-actions'
-      }
-    ]
-  }
+      },
+      {
+        title: "Settings",
+        url: "/my-page/settings",
+        icon: Settings,
+      },
+    ],
+  },
+  {
+    title: "Support",
+    url: "/system/support",
+    icon: HelpCircle,
+  },
 ];
 
 export const orgAdminMenu: MenuItem[] = [
