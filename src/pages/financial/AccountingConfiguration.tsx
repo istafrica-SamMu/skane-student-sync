@@ -92,9 +92,23 @@ const AccountingConfiguration = () => {
         : str
     );
 
+    // Ensure priceCodes is always an array for AccountingString
+    const priceCodesArray = Array.isArray(data.priceCodes) 
+      ? data.priceCodes 
+      : data.priceCodes ? data.priceCodes.split(',').map(code => code.trim()).filter(code => code) : [];
+
     const newString: AccountingString = {
       id: Math.random().toString(36).substr(2, 9),
-      ...data,
+      counterpartyId: data.counterpartyId,
+      counterpartyName: data.counterpartyName,
+      priceCodeGroup: data.priceCodeGroup,
+      priceCodes: priceCodesArray,
+      schoolType: data.schoolType,
+      accountingCode: data.accountingCode,
+      costCenter: data.costCenter,
+      project: data.project,
+      startDate: data.startDate,
+      endDate: data.endDate,
       isActive: true,
       createdBy: "Current User",
       createdAt: new Date().toISOString(),
@@ -113,9 +127,27 @@ const AccountingConfiguration = () => {
   const handleEditString = (data: AccountingStringFormData) => {
     if (!selectedString) return;
     
+    // Ensure priceCodes is always an array for AccountingString
+    const priceCodesArray = Array.isArray(data.priceCodes) 
+      ? data.priceCodes 
+      : data.priceCodes ? data.priceCodes.split(',').map(code => code.trim()).filter(code => code) : [];
+    
     const updatedStrings = accountingStrings.map(str =>
       str.id === selectedString.id
-        ? { ...str, ...data, updatedAt: new Date().toISOString() }
+        ? { 
+            ...str, 
+            counterpartyId: data.counterpartyId,
+            counterpartyName: data.counterpartyName,
+            priceCodeGroup: data.priceCodeGroup,
+            priceCodes: priceCodesArray,
+            schoolType: data.schoolType,
+            accountingCode: data.accountingCode,
+            costCenter: data.costCenter,
+            project: data.project,
+            startDate: data.startDate,
+            endDate: data.endDate,
+            updatedAt: new Date().toISOString() 
+          }
         : str
     );
     
