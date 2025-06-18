@@ -7,7 +7,7 @@ export interface AdditionalAmount {
   school?: string;
   principal?: string;
   program?: string;
-  category: "Basic amount" | "Mother tongue" | "NIU" | "Special support" | "Supplement IMV" | "Other amount";
+  category: string; // Changed from union type to string to support custom categories
   title: string;
   amount: number;
   multiplier: number;
