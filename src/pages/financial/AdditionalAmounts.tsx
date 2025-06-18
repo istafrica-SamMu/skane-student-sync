@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -43,7 +42,8 @@ import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { DollarSign, Search, Plus, Edit, User, School, Trash2, Users } from "lucide-react";
 import { CategoryManagement } from "@/components/CategoryManagement";
-import type { AdditionalAmount, AmountCategory, AmountFormData } from "@/types/additionalAmounts";
+import { BulkAmountOperations } from "@/components/BulkAmountOperations";
+import type { AdditionalAmount, AmountCategory, AmountFormData, BulkAmountOperation } from "@/types/additionalAmounts";
 
 const AdditionalAmounts = () => {
   const { toast } = useToast();
@@ -147,6 +147,36 @@ const AdditionalAmounts = () => {
     amount.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     amount.note.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleBulkOperation = (operation: BulkAmountOperation) => {
+    // Mock implementation - in real app, this would call API
+    console.log("Bulk operation:", operation);
+    
+    if (operation.operation === "create") {
+      // Create multiple amounts based on filters
+      const newAmounts = Array.from({ length: Math.floor(Math.random() * 10) + 1 }, (_, index) => ({
+        id: Math.max(...additionalAmounts.map(a => a.id)) + index + 1,
+        type: "Student" as const,
+        targetId: `bulk-student-${index}`,
+        targetName: `Student ${index + 1}`,
+        school: operation.filters.schoolUnit || "Selected School",
+        principal: "Selected Principal",
+        program: operation.filters.studyPath || "Selected Program",
+        category: operation.changes.category || "Basic amount",
+        title: operation.changes.title || "Bulk Amount",
+        amount: operation.changes.amount || 1000,
+        multiplier: operation.changes.multiplier || 1,
+        note: operation.changes.note || "Bulk created amount",
+        status: "pending" as const,
+        validFrom: operation.changes.validFrom || new Date().toISOString().split('T')[0],
+        validTo: operation.changes.validTo,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }));
+      
+      setAdditionalAmounts(prev => [...prev, ...newAmounts]);
+    }
+  };
 
   const handleAddAmount = (data: AmountFormData) => {
     const newAmount: AdditionalAmount = {
@@ -575,6 +605,7 @@ const AdditionalAmounts = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="amounts">Additional Amounts</TabsTrigger>
+          <TabsTrigger value="bulk">Bulk Operations</TabsTrigger>
           <TabsTrigger value="categories">Manage Categories</TabsTrigger>
         </TabsList>
 
@@ -677,6 +708,13 @@ const AdditionalAmounts = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="bulk" className="space-y-4">
+          <BulkAmountOperations 
+            categories={categories}
+            onBulkOperation={handleBulkOperation}
+          />
         </TabsContent>
 
         <TabsContent value="categories">
