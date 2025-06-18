@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,7 @@ import { useToast } from "@/hooks/use-toast";
 import { DollarSign, Search, Plus, Edit, User, School, Trash2, Users } from "lucide-react";
 import { CategoryManagement } from "@/components/CategoryManagement";
 import { BulkAmountOperations } from "@/components/BulkAmountOperations";
+import { AutomaticTransferHandler } from "@/components/AutomaticTransferHandler";
 import type { AdditionalAmount, AmountCategory, AmountFormData, BulkAmountOperation } from "@/types/additionalAmounts";
 
 const AdditionalAmounts = () => {
