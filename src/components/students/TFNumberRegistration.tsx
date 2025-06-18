@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,9 +46,12 @@ import {
   MapPin,
   AlertTriangle,
   CheckCircle,
-  RefreshCw
+  RefreshCw,
+  RotateCcw
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import DualPlacementDetector from "./DualPlacementDetector";
+import GradeRepetitionDetector from "./GradeRepetitionDetector";
 
 interface TFStudent {
   id: number;
@@ -63,8 +65,11 @@ interface TFStudent {
   studyPath: string;
   schoolYear: string;
   schoolUnit: string;
-  status: "active" | "needs_municipality";
+  status: "active" | "needs_municipality" | "payment_blocked";
   needsHomeMunicipality: boolean;
+  contactEmail?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 const TFNumberRegistration = () => {
@@ -73,6 +78,8 @@ const TFNumberRegistration = () => {
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<TFStudent | null>(null);
   const [studentToConvert, setStudentToConvert] = useState<TFStudent | null>(null);
+  const [hasConflicts, setHasConflicts] = useState(false);
+  const [hasGradeRepetitions, setHasGradeRepetitions] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -104,7 +111,9 @@ const TFNumberRegistration = () => {
       schoolYear: "1",
       schoolUnit: "Malmö Gymnasium",
       status: "active",
-      needsHomeMunicipality: false
+      needsHomeMunicipality: false,
+      contactEmail: "malmo.gym@education.se",
+      startDate: "2024-08-15",
     },
     {
       id: 2,
@@ -119,7 +128,86 @@ const TFNumberRegistration = () => {
       schoolYear: "2",
       schoolUnit: "Lund Gymnasium",
       status: "needs_municipality",
-      needsHomeMunicipality: true
+      needsHomeMunicipality: true,
+      contactEmail: "lund.gym@education.se",
+      startDate: "2024-08-15",
+    },
+    {
+      id: 3,
+      tfNumber: "TF240115003",
+      originalTF: "TF345678",
+      firstName: "Erik",
+      lastName: "Johansson",
+      birthDate: "2008-05-10",
+      municipalCode: "SK03",
+      homeMunicipality: "Assigned: Helsingborg",
+      studyPath: "Teknik",
+      schoolYear: "1",
+      schoolUnit: "Helsingborg Gymnasium",
+      status: "payment_blocked",
+      needsHomeMunicipality: false,
+      contactEmail: "helsingborg.gym@education.se",
+      startDate: "2024-08-15",
+      endDate: "2024-12-15",
+    },
+    {
+      id: 4,
+      tfNumber: "TF240115003", // Same student, different school (dual placement)
+      originalTF: "TF345678",
+      firstName: "Erik",
+      lastName: "Johansson",
+      birthDate: "2008-05-10",
+      municipalCode: "SK03",
+      homeMunicipality: "Assigned: Helsingborg",
+      studyPath: "Teknik",
+      schoolYear: "1",
+      schoolUnit: "Kristianstad Gymnasium",
+      status: "payment_blocked",
+      needsHomeMunicipality: false,
+      contactEmail: "kristianstad.gym@education.se",
+      startDate: "2024-09-01",
+    },
+    {
+      id: 5,
+      tfNumber: "TF240115004",
+      originalTF: "TF456789",
+      firstName: "Maria",
+      lastName: "Svensson",
+      birthDate: "2007-12-03",
+      municipalCode: "SK04",
+      homeMunicipality: "Assigned: Ystad",
+      studyPath: "Ekonomi",
+      schoolYear: "2",
+      schoolUnit: "Ystad Gymnasium",
+      status: "active",
+      needsHomeMunicipality: false,
+      contactEmail: "ystad.gym@education.se",
+      startDate: "2024-08-15",
+    }
+  ]);
+
+  // Mock enrollment history for grade repetition testing
+  const [enrollmentHistory] = useState([
+    {
+      id: 1,
+      studentId: 5,
+      studentName: "Maria Svensson",
+      studyPath: "Ekonomi",
+      schoolYear: "2",
+      schoolUnit: "Malmö Gymnasium",
+      startDate: "2023-08-15",
+      endDate: "2024-06-15",
+      homeMunicipalityContact: "ystad.municipality@kommun.se"
+    },
+    {
+      id: 2,
+      studentId: 5,
+      studentName: "Maria Svensson",
+      studyPath: "Ekonomi",
+      schoolYear: "2", // Same grade repetition
+      schoolUnit: "Ystad Gymnasium",
+      startDate: "2024-08-15",
+      homeMunicipalityContact: "ystad.municipality@kommun.se"
     }
   ]);
 
@@ -204,7 +292,9 @@ const TFNumberRegistration = () => {
       schoolYear: formData.schoolYear,
       schoolUnit: formData.schoolUnit || "To be assigned",
       status: formData.homeMunicipality ? "active" : "needs_municipality",
-      needsHomeMunicipality: !formData.homeMunicipality
+      needsHomeMunicipality: !formData.homeMunicipality,
+      contactEmail: formData.contactEmail || "contact@school.se",
+      startDate: formData.startDate || "2024-08-15"
     };
     
     setTfStudents(prev => [...prev, newStudent]);
@@ -237,6 +327,8 @@ const TFNumberRegistration = () => {
         return <Badge className="bg-ike-success text-white">Active</Badge>;
       case "needs_municipality":
         return <Badge variant="destructive">Needs Municipality</Badge>;
+      case "payment_blocked":
+        return <Badge className="bg-red-600 text-white">Payment Blocked</Badge>;
       default:
         return <Badge variant="secondary">Unknown</Badge>;
     }
@@ -247,6 +339,19 @@ const TFNumberRegistration = () => {
     student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     student.tfNumber.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Convert TF students to enrollment format for dual placement detection
+  const enrollments = tfStudents.map(student => ({
+    id: student.id,
+    studentId: student.id,
+    studentName: `${student.firstName} ${student.lastName}`,
+    schoolUnit: student.schoolUnit,
+    contactEmail: student.contactEmail || 'contact@school.se',
+    startDate: student.startDate || '2024-08-15',
+    endDate: student.endDate,
+    studyPath: student.studyPath,
+    schoolYear: student.schoolYear
+  }));
 
   return (
     <div className="space-y-6">
@@ -375,6 +480,16 @@ const TFNumberRegistration = () => {
                     required
                   />
                 </div>
+
+                <div>
+                  <Label htmlFor="contactEmail" className="text-ike-neutral">Contact Email</Label>
+                  <Input
+                    id="contactEmail"
+                    value={formData.contactEmail}
+                    onChange={(e) => setFormData({...formData, contactEmail: e.target.value})}
+                    className="border-ike-primary/20 focus:border-ike-primary"
+                  />
+                </div>
               </div>
 
               <DialogFooter>
@@ -396,6 +511,46 @@ const TFNumberRegistration = () => {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Conflict Detection Systems */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <DualPlacementDetector 
+          enrollments={enrollments}
+          onDetectionChange={setHasConflicts}
+        />
+        <GradeRepetitionDetector 
+          enrollmentHistory={enrollmentHistory}
+          onDetectionChange={setHasGradeRepetitions}
+        />
+      </div>
+
+      {/* Alert Summary */}
+      {(hasConflicts || hasGradeRepetitions) && (
+        <Card className="border-l-4 border-l-yellow-500">
+          <CardHeader>
+            <CardTitle className="flex items-center text-yellow-700">
+              <AlertTriangle className="w-5 h-5 mr-2" />
+              Detection Summary
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {hasConflicts && (
+                <div className="flex items-center text-red-600">
+                  <AlertTriangle className="w-4 h-4 mr-2" />
+                  <span>Dual placement conflicts detected - Payments blocked</span>
+                </div>
+              )}
+              {hasGradeRepetitions && (
+                <div className="flex items-center text-orange-600">
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  <span>Grade repetitions detected - Municipalities notified</span>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Search and Filters */}
       <Card>
