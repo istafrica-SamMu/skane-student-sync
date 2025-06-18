@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,14 +12,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -30,18 +21,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
-import { Ban, Search, Plus, Edit, User, School, Trash2, Users, Calendar } from "lucide-react";
+import { Ban, Search, Edit, User, School, Trash2, Users, Calendar } from "lucide-react";
 import type { PaymentBlock, PaymentBlockFormData } from "@/types/paymentBlocks";
+import AddPaymentBlockModal from "@/components/modals/AddPaymentBlockModal";
+import EditPaymentBlockModal from "@/components/modals/EditPaymentBlockModal";
 
 const PaymentBlocks = () => {
   const { toast } = useToast();
@@ -203,34 +187,8 @@ const PaymentBlocks = () => {
     });
   };
 
-  const openAddModal = () => {
-    addForm.reset({
-      type: "Student",
-      targetId: "",
-      targetName: "",
-      school: "",
-      principal: "",
-      program: "",
-      reason: "",
-      startDate: "",
-      endDate: "",
-    });
-    setIsAddModalOpen(true);
-  };
-
   const openEditModal = (block: PaymentBlock) => {
     setSelectedBlock(block);
-    editForm.reset({
-      type: block.type,
-      targetId: block.targetId,
-      targetName: block.targetName,
-      school: block.school || "",
-      principal: block.principal || "",
-      program: block.program || "",
-      reason: block.reason,
-      startDate: block.startDate,
-      endDate: block.endDate || "",
-    });
     setIsEditModalOpen(true);
   };
 
@@ -260,311 +218,6 @@ const PaymentBlocks = () => {
     }
   };
 
-  const AddBlockModal = () => (
-    <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-ike-neutral-dark">Block Payment</DialogTitle>
-          <DialogDescription>
-            Block payments for students, schools, or principals with specific validity periods.
-          </DialogDescription>
-        </DialogHeader>
-        
-        <Form {...addForm}>
-          <form onSubmit={addForm.handleSubmit(handleAddBlock)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={addForm.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Type</FormLabel>
-                    <FormControl>
-                      <select 
-                        {...field} 
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                      >
-                        <option value="Student">Student</option>
-                        <option value="School">School Unit</option>
-                        <option value="Principal">Principal</option>
-                      </select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={addForm.control}
-                name="targetName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={addForm.control}
-                name="school"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>School</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter school name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={addForm.control}
-                name="principal"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Principal</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter principal name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={addForm.control}
-              name="program"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Program</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter program name" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={addForm.control}
-              name="reason"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Reason for Block *</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter reason for payment block" required />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={addForm.control}
-                name="startDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Block Start Date *</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="date" required />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={addForm.control}
-                name="endDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Block End Date (Optional)</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="date" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsAddModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" className="bg-ike-error hover:bg-ike-error/90 text-white">
-                Block Payment
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
-  );
-
-  const EditBlockModal = () => (
-    <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-ike-neutral-dark">Edit Payment Block</DialogTitle>
-          <DialogDescription>
-            Update payment block details and validity periods.
-          </DialogDescription>
-        </DialogHeader>
-        
-        <Form {...editForm}>
-          <form onSubmit={editForm.handleSubmit(handleEditBlock)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={editForm.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Type</FormLabel>
-                    <FormControl>
-                      <select 
-                        {...field} 
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                      >
-                        <option value="Student">Student</option>
-                        <option value="School">School Unit</option>
-                        <option value="Principal">Principal</option>
-                      </select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={editForm.control}
-                name="targetName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={editForm.control}
-                name="school"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>School</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter school name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={editForm.control}
-                name="principal"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Principal</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter principal name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={editForm.control}
-              name="program"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Program</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter program name" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={editForm.control}
-              name="reason"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Reason for Block *</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter reason for payment block" required />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={editForm.control}
-                name="startDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Block Start Date *</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="date" required />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={editForm.control}
-                name="endDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Block End Date (Optional)</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="date" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => {
-                setIsEditModalOpen(false);
-                setSelectedBlock(null);
-              }}>
-                Cancel
-              </Button>
-              <Button type="submit" className="bg-ike-error hover:bg-ike-error/90 text-white">
-                Update Block
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
-  );
-
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -577,7 +230,7 @@ const PaymentBlocks = () => {
         </div>
         <Button 
           className="bg-ike-error hover:bg-ike-error/90 text-white"
-          onClick={openAddModal}
+          onClick={() => setIsAddModalOpen(true)}
         >
           <Ban className="w-4 h-4 mr-2" />
           Block Payment
@@ -720,8 +373,21 @@ const PaymentBlocks = () => {
       </Card>
 
       {/* Modals */}
-      <AddBlockModal />
-      <EditBlockModal />
+      <AddPaymentBlockModal 
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSubmit={handleAddBlock}
+      />
+      
+      <EditPaymentBlockModal 
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedBlock(null);
+        }}
+        onSubmit={handleEditBlock}
+        block={selectedBlock}
+      />
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
