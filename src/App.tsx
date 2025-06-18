@@ -51,6 +51,7 @@ import ExtensExport from "./pages/integration/ExtensExport";
 import PopulationRegistry from "./pages/integration/PopulationRegistry";
 import IntegrationTesting from "./pages/integration/IntegrationTesting";
 import TaxAgencyHub from "./pages/integration/TaxAgencyHub";
+import UHRBEDAIntegration from "./pages/integration/UHRBEDAIntegration";
 import StudentsByClass from "./pages/students/StudentsByClass";
 import MunicipalStudents from "./pages/students/MunicipalStudents";
 import ExternalStudents from "./pages/students/ExternalStudents";
@@ -434,6 +435,11 @@ const AppContent = () => {
               <Route path="/integration/tax-agency-hub" element={
                 <ProtectedRoute>
                   <TaxAgencyHub />
+                </ProtectedRoute>
+              } />
+              <Route path="/integration/uhr-beda" element={
+                <ProtectedRoute>
+                  <UHRBEDAIntegration />
                 </ProtectedRoute>
               } />
               <Route path="/integration/*" element={

@@ -149,6 +149,11 @@ export const regionalAdminMenu: MenuItem[] = [
         icon: Database,
       },
       {
+        title: "UHR BEDA Integration",
+        url: "/integration/uhr-beda",
+        icon: GraduationCap,
+      },
+      {
         title: "Integration Testing",
         url: "/integration/testing",
         icon: Activity,
@@ -300,6 +305,11 @@ export const municipalityAdminMenu: MenuItem[] = [
         title: "Tax Agency Hub",
         url: "/integration/tax-agency-hub",
         icon: Database,
+      },
+      {
+        title: "UHR BEDA Integration",
+        url: "/integration/uhr-beda",
+        icon: GraduationCap,
       },
       {
         title: "Integration Status",
