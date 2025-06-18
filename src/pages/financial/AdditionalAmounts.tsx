@@ -728,7 +728,7 @@ const AdditionalAmounts = () => {
               Delete Amount
             </AlertDialogAction>
           </AlertDialogFooter>
-        </AlertDialogFooter>
+        </AlertDialogContent>
       </AlertDialog>
     </div>
   );
