@@ -58,6 +58,7 @@ const GeographicalAnalysis = () => {
   ];
 
   const handleExportData = () => {
+    console.log('Export data clicked');
     toast({
       title: "Export Initiated",
       description: "Geographical data is being prepared for download",
@@ -65,10 +66,42 @@ const GeographicalAnalysis = () => {
   };
 
   const handleSearch = () => {
+    console.log('Search clicked with term:', searchTerm);
     toast({
       title: "Search Updated",
       description: `Filtering locations for: ${searchTerm}`,
     });
+  };
+
+  const handleFilter = () => {
+    console.log('Filter clicked');
+    toast({ 
+      title: "Filter Applied", 
+      description: "Location filters updated" 
+    });
+  };
+
+  const handleViewOnMap = (schoolId: number) => {
+    console.log('View on map clicked for school:', schoolId);
+    const school = schoolLocations.find(s => s.id === schoolId);
+    if (school) {
+      toast({
+        title: "Focusing on School",
+        description: `Centering map on ${school.name}`,
+      });
+    }
+  };
+
+  const handleTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    console.log('Token changed:', value.substring(0, 20) + '...');
+    setMapboxToken(value);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    console.log('Search term changed:', value);
+    setSearchTerm(value);
   };
 
   return (
@@ -87,7 +120,7 @@ const GeographicalAnalysis = () => {
           <Button 
             variant="outline" 
             className="border-ike-primary text-ike-primary hover:bg-ike-primary/10"
-            onClick={() => toast({ title: "Filter Applied", description: "Location filters updated" })}
+            onClick={handleFilter}
           >
             <Filter className="w-4 h-4 mr-2" />
             Filter
@@ -181,7 +214,7 @@ const GeographicalAnalysis = () => {
               <Input
                 placeholder="Enter Mapbox public token (pk.eyJ1...)"
                 value={mapboxToken}
-                onChange={(e) => setMapboxToken(e.target.value)}
+                onChange={handleTokenChange}
                 className="border-ike-primary/20 focus:border-ike-primary"
               />
               <p className="text-xs text-ike-neutral mt-1">
@@ -222,7 +255,7 @@ const GeographicalAnalysis = () => {
               <Input
                 placeholder="Search by school name, address, or program..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={handleSearchChange}
                 className="border-ike-primary/20 focus:border-ike-primary"
               />
             </div>
@@ -277,7 +310,11 @@ const GeographicalAnalysis = () => {
                       </Badge>
                     ))}
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleViewOnMap(school.id)}
+                  >
                     <MapPin className="w-3 h-3 mr-1" />
                     View on Map
                   </Button>

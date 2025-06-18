@@ -19,108 +19,143 @@ interface InteractiveMapProps {
 
 const InteractiveMap: React.FC<InteractiveMapProps> = ({ mapboxToken, schoolLocations }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<any>(null);
   const [mapError, setMapError] = useState<string | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!mapboxToken) {
-      setMapError("Mapbox token required");
+    if (!mapboxToken || !mapboxToken.startsWith('pk.')) {
+      setMapError("Please enter a valid Mapbox public token (starts with 'pk.')");
       return;
     }
 
+    if (!mapContainer.current) return;
+
+    setIsLoading(true);
+    setMapError(null);
+
     const loadMapboxGL = async () => {
       try {
-        // Dynamically import mapbox-gl to avoid SSR issues
-        const mapboxgl = await import('mapbox-gl');
+        console.log('Loading Mapbox GL with token:', mapboxToken.substring(0, 20) + '...');
+        
+        // Dynamically import mapbox-gl
+        const mapboxgl = (await import('mapbox-gl')).default;
+        
+        // Import CSS
         await import('mapbox-gl/dist/mapbox-gl.css');
 
-        if (!mapContainer.current) return;
+        if (!mapContainer.current) {
+          setIsLoading(false);
+          return;
+        }
 
         // Set access token
-        mapboxgl.default.accessToken = mapboxToken;
+        mapboxgl.accessToken = mapboxToken;
+
+        console.log('Initializing map...');
 
         // Initialize map centered on Malmö
-        const map = new mapboxgl.default.Map({
+        const mapInstance = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/light-v11',
           center: [13.0038, 55.6050], // Malmö coordinates
           zoom: 11,
-          pitch: 45,
+          pitch: 0,
         });
 
+        map.current = mapInstance;
+
         // Add navigation controls
-        map.addControl(
-          new mapboxgl.default.NavigationControl({
+        mapInstance.addControl(
+          new mapboxgl.NavigationControl({
             visualizePitch: true,
           }),
           'top-right'
         );
 
-        map.on('load', () => {
+        mapInstance.on('load', () => {
+          console.log('Map loaded successfully');
           setIsMapLoaded(true);
+          setIsLoading(false);
           
           // Add school markers
           schoolLocations.forEach((school) => {
             // Create marker element
             const markerEl = document.createElement('div');
             markerEl.className = 'school-marker';
-            markerEl.style.width = '30px';
-            markerEl.style.height = '30px';
-            markerEl.style.borderRadius = '50%';
-            markerEl.style.backgroundColor = '#2563eb';
-            markerEl.style.border = '3px solid white';
-            markerEl.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
-            markerEl.style.cursor = 'pointer';
-            markerEl.style.display = 'flex';
-            markerEl.style.alignItems = 'center';
-            markerEl.style.justifyContent = 'center';
-            markerEl.style.color = 'white';
-            markerEl.style.fontSize = '12px';
-            markerEl.style.fontWeight = 'bold';
-            markerEl.textContent = school.students.toString().slice(0, 2);
+            markerEl.style.cssText = `
+              width: 30px;
+              height: 30px;
+              border-radius: 50%;
+              background-color: #2563eb;
+              border: 3px solid white;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-size: 10px;
+              font-weight: bold;
+            `;
+            markerEl.textContent = school.students.toString().slice(0, 3);
 
             // Create popup
-            const popup = new mapboxgl.default.Popup({ 
+            const popup = new mapboxgl.Popup({ 
               offset: 25,
               closeButton: true,
               closeOnClick: false
             }).setHTML(`
-              <div style="padding: 10px; min-width: 200px;">
-                <h3 style="margin: 0 0 8px 0; font-weight: bold; color: #1f2937;">${school.name}</h3>
-                <p style="margin: 0 0 4px 0; color: #6b7280; font-size: 14px;">${school.address}</p>
-                <p style="margin: 0 0 8px 0; color: #374151;"><strong>${school.students}</strong> students</p>
+              <div style="padding: 12px; min-width: 200px; font-family: system-ui;">
+                <h3 style="margin: 0 0 8px 0; font-weight: bold; color: #1f2937; font-size: 14px;">${school.name}</h3>
+                <p style="margin: 0 0 4px 0; color: #6b7280; font-size: 12px;">${school.address}</p>
+                <p style="margin: 0 0 8px 0; color: #374151; font-size: 13px;"><strong>${school.students}</strong> students</p>
                 <div style="display: flex; gap: 4px; flex-wrap: wrap;">
                   ${school.programs.map(program => 
-                    `<span style="background: #eff6ff; color: #2563eb; padding: 2px 6px; border-radius: 4px; font-size: 12px;">${program}</span>`
+                    `<span style="background: #eff6ff; color: #2563eb; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${program}</span>`
                   ).join('')}
                 </div>
               </div>
             `);
 
             // Add marker to map
-            new mapboxgl.default.Marker(markerEl)
+            const marker = new mapboxgl.Marker(markerEl)
               .setLngLat(school.coordinates)
               .setPopup(popup)
-              .addTo(map);
+              .addTo(mapInstance);
+
+            console.log(`Added marker for ${school.name} at`, school.coordinates);
           });
         });
 
-        map.on('error', (e) => {
-          console.error('Map error:', e);
-          setMapError("Failed to load map. Please check your Mapbox token.");
+        mapInstance.on('error', (e: any) => {
+          console.error('Mapbox error:', e);
+          setMapError("Failed to load map. Please check your Mapbox token and internet connection.");
+          setIsLoading(false);
         });
 
-        // Cleanup function
-        return () => {
-          map.remove();
-        };
+        mapInstance.on('styledata', () => {
+          console.log('Map style loaded');
+        });
+
       } catch (error) {
         console.error('Error loading Mapbox:', error);
-        setMapError("Failed to initialize map. Please check your internet connection.");
+        setMapError("Failed to initialize map. Please check your internet connection and token.");
+        setIsLoading(false);
       }
     };
 
     loadMapboxGL();
+
+    // Cleanup function
+    return () => {
+      if (map.current) {
+        console.log('Cleaning up map');
+        map.current.remove();
+        map.current = null;
+      }
+    };
   }, [mapboxToken, schoolLocations]);
 
   if (!mapboxToken) {
@@ -154,7 +189,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({ mapboxToken, schoolLoca
         className="h-96 w-full rounded-lg shadow-lg border"
         style={{ minHeight: '400px' }}
       />
-      {!isMapLoaded && (
+      {(isLoading || !isMapLoaded) && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-lg">
           <div className="text-center text-ike-neutral">
             <div className="animate-spin w-8 h-8 border-2 border-ike-primary border-t-transparent rounded-full mx-auto mb-2"></div>
