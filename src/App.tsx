@@ -50,6 +50,7 @@ import ActivityLogs from "./pages/my-page/ActivityLogs";
 import ExtensExport from "./pages/integration/ExtensExport";
 import PopulationRegistry from "./pages/integration/PopulationRegistry";
 import IntegrationTesting from "./pages/integration/IntegrationTesting";
+import TaxAgencyHub from "./pages/integration/TaxAgencyHub";
 import StudentsByClass from "./pages/students/StudentsByClass";
 import MunicipalStudents from "./pages/students/MunicipalStudents";
 import ExternalStudents from "./pages/students/ExternalStudents";
@@ -428,6 +429,11 @@ const AppContent = () => {
               <Route path="/integration/testing" element={
                 <ProtectedRoute>
                   <IntegrationTesting />
+                </ProtectedRoute>
+              } />
+              <Route path="/integration/tax-agency-hub" element={
+                <ProtectedRoute>
+                  <TaxAgencyHub />
                 </ProtectedRoute>
               } />
               <Route path="/integration/*" element={
