@@ -81,7 +81,7 @@ const TFNumberRegistration = () => {
   const [hasConflicts, setHasConflicts] = useState(false);
   const [hasGradeRepetitions, setHasGradeRepetitions] = useState(false);
 
-  // Form state
+  // Form state - Fixed to include contactEmail
   const [formData, setFormData] = useState({
     tfNumber: "",
     firstName: "",
@@ -93,7 +93,8 @@ const TFNumberRegistration = () => {
     studyPath: "",
     schoolYear: "",
     schoolUnit: "",
-    startDate: ""
+    startDate: "",
+    contactEmail: ""
   });
 
   // Mock data for TF number students with state management
@@ -316,7 +317,8 @@ const TFNumberRegistration = () => {
       studyPath: "",
       schoolYear: "",
       schoolUnit: "",
-      startDate: ""
+      startDate: "",
+      contactEmail: ""
     });
     setShowRegistrationForm(false);
   };
