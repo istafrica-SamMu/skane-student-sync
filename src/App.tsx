@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -61,6 +62,7 @@ import AdditionalAmounts from "./pages/financial/AdditionalAmounts";
 import PaymentBlocks from "./pages/financial/PaymentBlocks";
 import MunicipalFinancialReports from "./pages/financial/MunicipalFinancialReports";
 import InterMunicipalCompensation from "./pages/financial/InterMunicipalCompensation";
+import AccountingConfiguration from "./pages/financial/AccountingConfiguration";
 import MoneyToReceive from "./pages/reports/MoneyToReceive";
 import MoneyToPay from "./pages/reports/MoneyToPay";
 import MunicipalStatistics from "./pages/reports/MunicipalStatistics";

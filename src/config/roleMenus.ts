@@ -271,6 +271,11 @@ export const municipalityAdminMenu: MenuItem[] = [
     icon: Calculator,
     items: [
       {
+        title: "Accounting Configuration",
+        url: "/financial/accounting-configuration",
+        icon: Settings,
+      },
+      {
         title: "Municipal Price Lists",
         url: "/financial/pricelists",
         icon: Euro,
