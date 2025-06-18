@@ -26,8 +26,8 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { AddAccountingStringModal } from "@/components/modals/AddAccountingStringModal";
-import { EditAccountingStringModal } from "@/components/modals/EditAccountingStringModal";
+import AddAccountingStringModal from "@/components/modals/AddAccountingStringModal";
+import EditAccountingStringModal from "@/components/modals/EditAccountingStringModal";
 import { ViewManagement } from "@/components/ViewManagement";
 import { AdvancedFilter } from "@/components/AdvancedFilter";
 import { ColumnManagement } from "@/components/ColumnManagement";
@@ -414,15 +414,15 @@ const AccountingConfiguration = () => {
       </Tabs>
 
       <AddAccountingStringModal
-        open={showAddModal}
-        onOpenChange={setShowAddModal}
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
         onSubmit={handleAddString}
       />
 
       {editingString && (
         <EditAccountingStringModal
-          open={!!editingString}
-          onOpenChange={(open) => !open && setEditingString(null)}
+          isOpen={!!editingString}
+          onClose={() => setEditingString(null)}
           onSubmit={handleEditString}
           accountingString={editingString}
         />
