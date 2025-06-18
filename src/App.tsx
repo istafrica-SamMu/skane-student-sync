@@ -4,7 +4,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { RoleBasedSidebar } from '@/components/RoleBasedSidebar';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/AuthContext';
-import LoginPage from '@/pages/LoginPage';
+import Login from '@/pages/Login';
 import Dashboard from '@/pages/Dashboard';
 import KAARegistry from '@/pages/KAARegistry';
 import ContactOccasions from '@/pages/kaa/ContactOccasions';
@@ -19,7 +19,7 @@ function App() {
       <Router>
         <div className="min-h-screen bg-background">
           <Routes>
-            <Route path="/login" element={<LoginPage />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/*" element={
               <SidebarProvider>
                 <div className="min-h-screen flex w-full">
