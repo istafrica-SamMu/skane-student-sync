@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { MapPin, AlertCircle } from 'lucide-react';
@@ -37,8 +36,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({ mapboxToken, schoolLoca
       return;
     }
 
-    // Basic token format validation
-    if (trimmedToken.length < 100) {
+    // Basic token format validation - Mapbox tokens are typically 80+ characters
+    if (trimmedToken.length < 80) {
       setMapError("The token appears to be incomplete. Please check your Mapbox token.");
       return;
     }
