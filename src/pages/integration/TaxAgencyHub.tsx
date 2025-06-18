@@ -40,8 +40,10 @@ import {
   AlertCircle, 
   Play,
   History,
-  Database
+  Database,
+  AlertOctagon
 } from "lucide-react";
+import { ErrorDetailsModal } from "@/components/integration/ErrorDetailsModal";
 
 const TaxAgencyHub = () => {
   const [isManualUpdateOpen, setIsManualUpdateOpen] = useState(false);
@@ -49,6 +51,10 @@ const TaxAgencyHub = () => {
   const [personalNumber, setPersonalNumber] = useState("");
   const [selectedDay, setSelectedDay] = useState("tuesday");
   const [selectedTime, setSelectedTime] = useState("02:00");
+  const [refreshing, setRefreshing] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [selectedSyncErrors, setSelectedSyncErrors] = useState<any[]>([]);
+  const [selectedSyncDate, setSelectedSyncDate] = useState("");
 
   // Mock data for current configuration
   const currentConfig = {
@@ -105,6 +111,33 @@ const TaxAgencyHub = () => {
     }
   ];
 
+  // Mock error data
+  const errorDetails = {
+    4: [
+      {
+        id: 1,
+        recordType: "Municipality: Malmö",
+        message: "Connection timeout when retrieving population data for 250 records.",
+        timestamp: "2024-01-02 02:15:23",
+        severity: "medium"
+      },
+      {
+        id: 2,
+        recordType: "Municipality: Lund",
+        message: "Invalid personal number format detected in batch import.",
+        timestamp: "2024-01-02 02:28:45",
+        severity: "low"
+      },
+      {
+        id: 3,
+        recordType: "Authentication",
+        message: "Temporary authentication failure with Tax Agency API.",
+        timestamp: "2024-01-02 02:35:12",
+        severity: "high"
+      }
+    ]
+  };
+
   const handleManualUpdate = () => {
     console.log("Triggering manual update for:", personalNumber);
     setIsManualUpdateOpen(false);
@@ -114,6 +147,20 @@ const TaxAgencyHub = () => {
   const handleScheduleUpdate = () => {
     console.log("Updating schedule:", selectedDay, selectedTime);
     setIsScheduleConfigOpen(false);
+  };
+
+  const handleRefreshStatus = () => {
+    setRefreshing(true);
+    // Simulate refresh
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
+  const handleViewErrors = (syncId: number, date: string) => {
+    setSelectedSyncErrors(errorDetails[syncId as keyof typeof errorDetails] || []);
+    setSelectedSyncDate(date);
+    setIsErrorModalOpen(true);
   };
 
   const getStatusBadge = (status: string) => {
@@ -188,8 +235,8 @@ const TaxAgencyHub = () => {
             </DialogContent>
           </Dialog>
           
-          <Button>
-            <RefreshCw className="w-4 h-4 mr-2" />
+          <Button onClick={handleRefreshStatus} disabled={refreshing}>
+            <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
             Refresh Status
           </Button>
         </div>
@@ -321,6 +368,7 @@ const TaxAgencyHub = () => {
                   <TableHead>Records</TableHead>
                   <TableHead>Duration</TableHead>
                   <TableHead>Errors</TableHead>
+                  <TableHead className="w-[80px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -356,6 +404,19 @@ const TaxAgencyHub = () => {
                         <span className="text-ike-neutral">0</span>
                       )}
                     </TableCell>
+                    <TableCell>
+                      {sync.errors > 0 && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="flex items-center px-2"
+                          onClick={() => handleViewErrors(sync.id, sync.date)}
+                        >
+                          <AlertOctagon className="w-4 h-4 mr-1 text-yellow-600" />
+                          <span>View</span>
+                        </Button>
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -363,6 +424,14 @@ const TaxAgencyHub = () => {
           </div>
         </CardContent>
       </Card>
+
+      <ErrorDetailsModal
+        isOpen={isErrorModalOpen}
+        onClose={() => setIsErrorModalOpen(false)}
+        integrationName="Tax Agency Hub"
+        syncDate={selectedSyncDate}
+        errors={selectedSyncErrors}
+      />
     </div>
   );
 };

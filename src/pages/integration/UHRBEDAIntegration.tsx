@@ -45,8 +45,11 @@ import {
   GraduationCap,
   FileCheck,
   Users,
-  Filter
+  Filter,
+  ExternalLink,
+  AlertOctagon,
 } from "lucide-react";
+import { ErrorDetailsModal, ErrorDetailsModalProps } from "@/components/integration/ErrorDetailsModal";
 
 const UHRBEDAIntegration = () => {
   const [isManualSyncOpen, setIsManualSyncOpen] = useState(false);
@@ -55,6 +58,10 @@ const UHRBEDAIntegration = () => {
   const [includeGraduated, setIncludeGraduated] = useState(true);
   const [includeCurrent, setIncludeCurrent] = useState(true);
   const [syncTime, setSyncTime] = useState("02:30");
+  const [refreshing, setRefreshing] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [selectedSyncErrors, setSelectedSyncErrors] = useState<any[]>([]);
+  const [selectedSyncDate, setSelectedSyncDate] = useState("");
 
   // Mock data for current configuration
   const currentConfig = {
@@ -120,6 +127,26 @@ const UHRBEDAIntegration = () => {
     }
   ];
 
+  // Mock data for errors
+  const errorDetails = {
+    3: [
+      {
+        id: 1,
+        recordType: "Student Record: 199001011234",
+        message: "Invalid diploma format received from BEDA. Expected XML format but received malformed data.",
+        timestamp: "2024-01-15 02:45:12",
+        severity: "medium"
+      },
+      {
+        id: 2,
+        recordType: "Student Record: 199212123456",
+        message: "Connection timeout when retrieving student graduation data.",
+        timestamp: "2024-01-15 02:48:33",
+        severity: "low"
+      }
+    ]
+  };
+
   const handleManualSync = () => {
     console.log("Triggering manual BEDA sync for:", personalNumber);
     setIsManualSyncOpen(false);
@@ -129,6 +156,20 @@ const UHRBEDAIntegration = () => {
   const handleConfigUpdate = () => {
     console.log("Updating BEDA config:", { includeGraduated, includeCurrent, syncTime });
     setIsConfigOpen(false);
+  };
+
+  const handleRefreshStatus = () => {
+    setRefreshing(true);
+    // Simulate refresh
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
+  const handleViewErrors = (syncId: number, date: string) => {
+    setSelectedSyncErrors(errorDetails[syncId as keyof typeof errorDetails] || []);
+    setSelectedSyncDate(date);
+    setIsErrorModalOpen(true);
   };
 
   const getStatusBadge = (status: string) => {
@@ -203,8 +244,8 @@ const UHRBEDAIntegration = () => {
             </DialogContent>
           </Dialog>
           
-          <Button>
-            <RefreshCw className="w-4 h-4 mr-2" />
+          <Button onClick={handleRefreshStatus} disabled={refreshing}>
+            <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
             Refresh Status
           </Button>
         </div>
@@ -349,6 +390,7 @@ const UHRBEDAIntegration = () => {
                   <TableHead>Updates</TableHead>
                   <TableHead>Duration</TableHead>
                   <TableHead>Errors</TableHead>
+                  <TableHead className="w-[80px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -396,6 +438,19 @@ const UHRBEDAIntegration = () => {
                         <span className="text-ike-neutral">0</span>
                       )}
                     </TableCell>
+                    <TableCell>
+                      {sync.errors > 0 && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="flex items-center px-2"
+                          onClick={() => handleViewErrors(sync.id, sync.date)}
+                        >
+                          <AlertOctagon className="w-4 h-4 mr-1 text-yellow-600" />
+                          <span>View</span>
+                        </Button>
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -403,6 +458,14 @@ const UHRBEDAIntegration = () => {
           </div>
         </CardContent>
       </Card>
+
+      <ErrorDetailsModal
+        isOpen={isErrorModalOpen}
+        onClose={() => setIsErrorModalOpen(false)}
+        integrationName="UHR BEDA"
+        syncDate={selectedSyncDate}
+        errors={selectedSyncErrors}
+      />
     </div>
   );
 };
