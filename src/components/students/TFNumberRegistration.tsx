@@ -20,6 +20,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { 
   UserPlus,
   Search,
@@ -31,11 +51,28 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+interface TFStudent {
+  id: number;
+  tfNumber: string;
+  originalTF: string;
+  firstName: string;
+  lastName: string;
+  birthDate: string;
+  municipalCode: string;
+  homeMunicipality: string;
+  studyPath: string;
+  schoolYear: string;
+  schoolUnit: string;
+  status: "active" | "needs_municipality";
+  needsHomeMunicipality: boolean;
+}
+
 const TFNumberRegistration = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<any>(null);
+  const [selectedStudent, setSelectedStudent] = useState<TFStudent | null>(null);
+  const [studentToConvert, setStudentToConvert] = useState<TFStudent | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -52,8 +89,8 @@ const TFNumberRegistration = () => {
     startDate: ""
   });
 
-  // Mock data for TF number students
-  const tfStudents = [
+  // Mock data for TF number students with state management
+  const [tfStudents, setTfStudents] = useState<TFStudent[]>([
     {
       id: 1,
       tfNumber: "TF240115001",
@@ -84,7 +121,7 @@ const TFNumberRegistration = () => {
       status: "needs_municipality",
       needsHomeMunicipality: true
     }
-  ];
+  ]);
 
   const municipalities = [
     "Malmö", "Lund", "Helsingborg", "Kristianstad", "Landskrona",
@@ -96,17 +133,42 @@ const TFNumberRegistration = () => {
     "Estetik", "Hantverksprogrammet", "Vård och omsorg"
   ];
 
-  const handleConvertTF = (student: any) => {
-    // Simulate TF number conversion
+  const handleConvertTF = (student: TFStudent) => {
+    setStudentToConvert(student);
+  };
+
+  const confirmConvertTF = () => {
+    if (!studentToConvert) return;
+    
     const newMunicipalCode = `SK${String(tfStudents.length + 1).padStart(2, '0')}`;
+    
+    // Update student state
+    setTfStudents(prev => prev.map(s => 
+      s.id === studentToConvert.id 
+        ? { ...s, municipalCode: newMunicipalCode, status: "active" as const }
+        : s
+    ));
     
     toast({
       title: "TF Number Converted",
       description: `TF number converted to unique municipal code: ${newMunicipalCode}`,
     });
+    
+    setStudentToConvert(null);
   };
 
   const handleAssignMunicipality = (studentId: number, municipality: string) => {
+    setTfStudents(prev => prev.map(s => 
+      s.id === studentId 
+        ? { 
+            ...s, 
+            homeMunicipality: `Assigned: ${municipality}`, 
+            needsHomeMunicipality: false,
+            status: "active" as const
+          }
+        : s
+    ));
+    
     toast({
       title: "Municipality Assigned",
       description: `Home municipality "${municipality}" assigned successfully.`,
@@ -128,11 +190,31 @@ const TFNumberRegistration = () => {
     // Generate unique municipal code
     const municipalCode = `SK${String(tfStudents.length + 1).padStart(2, '0')}`;
     
+    // Add new student to state
+    const newStudent: TFStudent = {
+      id: tfStudents.length + 1,
+      tfNumber: formData.tfNumber,
+      originalTF: formData.tfNumber,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      birthDate: formData.birthDate,
+      municipalCode: municipalCode,
+      homeMunicipality: formData.homeMunicipality ? `Assigned: ${formData.homeMunicipality}` : "Not Assigned",
+      studyPath: formData.studyPath,
+      schoolYear: formData.schoolYear,
+      schoolUnit: formData.schoolUnit || "To be assigned",
+      status: formData.homeMunicipality ? "active" : "needs_municipality",
+      needsHomeMunicipality: !formData.homeMunicipality
+    };
+    
+    setTfStudents(prev => [...prev, newStudent]);
+    
     toast({
       title: "Student Registered",
       description: `Student with TF number registered successfully. Municipal code: ${municipalCode}`,
     });
     
+    // Reset form
     setFormData({
       tfNumber: "",
       firstName: "",
@@ -176,13 +258,143 @@ const TFNumberRegistration = () => {
             Manage students with temporary personal identity numbers (TF numbers)
           </p>
         </div>
-        <Button 
-          onClick={() => setShowRegistrationForm(true)}
-          className="bg-ike-primary hover:bg-ike-primary-dark text-white"
-        >
-          <UserPlus className="w-4 h-4 mr-2" />
-          Register TF Student
-        </Button>
+        <Dialog open={showRegistrationForm} onOpenChange={setShowRegistrationForm}>
+          <DialogTrigger asChild>
+            <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+              <UserPlus className="w-4 h-4 mr-2" />
+              Register TF Student
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-ike-neutral-dark">Register TF Number Student</DialogTitle>
+              <DialogDescription>Register a new student with temporary personal identity number</DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleSubmitRegistration} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="tfNumber" className="text-ike-neutral">TF Number *</Label>
+                  <Input
+                    id="tfNumber"
+                    value={formData.tfNumber}
+                    onChange={(e) => setFormData({...formData, tfNumber: e.target.value})}
+                    placeholder="TF123456"
+                    className="border-ike-primary/20 focus:border-ike-primary"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="firstName" className="text-ike-neutral">First Name *</Label>
+                  <Input
+                    id="firstName"
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                    className="border-ike-primary/20 focus:border-ike-primary"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="lastName" className="text-ike-neutral">Last Name *</Label>
+                  <Input
+                    id="lastName"
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                    className="border-ike-primary/20 focus:border-ike-primary"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="birthDate" className="text-ike-neutral">Birth Date *</Label>
+                  <Input
+                    id="birthDate"
+                    type="date"
+                    value={formData.birthDate}
+                    onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
+                    className="border-ike-primary/20 focus:border-ike-primary"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="homeMunicipality" className="text-ike-neutral">Home Municipality</Label>
+                  <Select value={formData.homeMunicipality} onValueChange={(value) => setFormData({...formData, homeMunicipality: value})}>
+                    <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                      <SelectValue placeholder="Select municipality" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {municipalities.map((municipality) => (
+                        <SelectItem key={municipality} value={municipality}>
+                          {municipality}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="studyPath" className="text-ike-neutral">Study Path *</Label>
+                  <Select value={formData.studyPath} onValueChange={(value) => setFormData({...formData, studyPath: value})}>
+                    <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                      <SelectValue placeholder="Select study path" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {studyPaths.map((path) => (
+                        <SelectItem key={path} value={path}>
+                          {path}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="schoolYear" className="text-ike-neutral">School Year *</Label>
+                  <Select value={formData.schoolYear} onValueChange={(value) => setFormData({...formData, schoolYear: value})}>
+                    <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                      <SelectValue placeholder="Select year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Year 1</SelectItem>
+                      <SelectItem value="2">Year 2</SelectItem>
+                      <SelectItem value="3">Year 3</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="startDate" className="text-ike-neutral">Start Date *</Label>
+                  <Input
+                    id="startDate"
+                    type="date"
+                    value={formData.startDate}
+                    onChange={(e) => setFormData({...formData, startDate: e.target.value})}
+                    className="border-ike-primary/20 focus:border-ike-primary"
+                    required
+                  />
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setShowRegistrationForm(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit"
+                  className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+                >
+                  Register Student
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Search and Filters */}
@@ -271,14 +483,36 @@ const TFNumberRegistration = () => {
                           </SelectContent>
                         </Select>
                       )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleConvertTF(student)}
-                      >
-                        <RefreshCw className="w-3 h-3 mr-1" />
-                        Convert
-                      </Button>
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleConvertTF(student)}
+                          >
+                            <RefreshCw className="w-3 h-3 mr-1" />
+                            Convert
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Convert TF Number</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to convert TF number "{studentToConvert?.tfNumber}" to a unique municipal code? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel onClick={() => setStudentToConvert(null)}>
+                              Cancel
+                            </AlertDialogCancel>
+                            <AlertDialogAction onClick={confirmConvertTF}>
+                              Convert
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+
                       <Button
                         variant="outline"
                         size="sm"
@@ -295,141 +529,55 @@ const TFNumberRegistration = () => {
         </CardContent>
       </Card>
 
-      {/* Registration Form Modal */}
-      {showRegistrationForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <CardHeader>
-              <CardTitle className="text-ike-neutral-dark">Register TF Number Student</CardTitle>
-              <CardDescription>Register a new student with temporary personal identity number</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmitRegistration} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="tfNumber" className="text-ike-neutral">TF Number *</Label>
-                    <Input
-                      id="tfNumber"
-                      value={formData.tfNumber}
-                      onChange={(e) => setFormData({...formData, tfNumber: e.target.value})}
-                      placeholder="TF123456"
-                      className="border-ike-primary/20 focus:border-ike-primary"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="firstName" className="text-ike-neutral">First Name *</Label>
-                    <Input
-                      id="firstName"
-                      value={formData.firstName}
-                      onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                      className="border-ike-primary/20 focus:border-ike-primary"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="lastName" className="text-ike-neutral">Last Name *</Label>
-                    <Input
-                      id="lastName"
-                      value={formData.lastName}
-                      onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                      className="border-ike-primary/20 focus:border-ike-primary"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="birthDate" className="text-ike-neutral">Birth Date *</Label>
-                    <Input
-                      id="birthDate"
-                      type="date"
-                      value={formData.birthDate}
-                      onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
-                      className="border-ike-primary/20 focus:border-ike-primary"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="homeMunicipality" className="text-ike-neutral">Home Municipality</Label>
-                    <Select value={formData.homeMunicipality} onValueChange={(value) => setFormData({...formData, homeMunicipality: value})}>
-                      <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
-                        <SelectValue placeholder="Select municipality" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {municipalities.map((municipality) => (
-                          <SelectItem key={municipality} value={municipality}>
-                            {municipality}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="studyPath" className="text-ike-neutral">Study Path *</Label>
-                    <Select value={formData.studyPath} onValueChange={(value) => setFormData({...formData, studyPath: value})}>
-                      <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
-                        <SelectValue placeholder="Select study path" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {studyPaths.map((path) => (
-                          <SelectItem key={path} value={path}>
-                            {path}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="schoolYear" className="text-ike-neutral">School Year *</Label>
-                    <Select value={formData.schoolYear} onValueChange={(value) => setFormData({...formData, schoolYear: value})}>
-                      <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
-                        <SelectValue placeholder="Select year" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">Year 1</SelectItem>
-                        <SelectItem value="2">Year 2</SelectItem>
-                        <SelectItem value="3">Year 3</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="startDate" className="text-ike-neutral">Start Date *</Label>
-                    <Input
-                      id="startDate"
-                      type="date"
-                      value={formData.startDate}
-                      onChange={(e) => setFormData({...formData, startDate: e.target.value})}
-                      className="border-ike-primary/20 focus:border-ike-primary"
-                      required
-                    />
-                  </div>
+      {/* Edit Student Dialog */}
+      {selectedStudent && (
+        <Dialog open={!!selectedStudent} onOpenChange={() => setSelectedStudent(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Student: {selectedStudent.firstName} {selectedStudent.lastName}</DialogTitle>
+              <DialogDescription>Update student information</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>TF Number</Label>
+                <Input value={selectedStudent.tfNumber} disabled />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>First Name</Label>
+                  <Input value={selectedStudent.firstName} />
                 </div>
-
-                <div className="flex gap-2 justify-end pt-4">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setShowRegistrationForm(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    type="submit"
-                    className="bg-ike-primary hover:bg-ike-primary-dark text-white"
-                  >
-                    Register Student
-                  </Button>
+                <div>
+                  <Label>Last Name</Label>
+                  <Input value={selectedStudent.lastName} />
                 </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
+              </div>
+              <div>
+                <Label>Study Path</Label>
+                <Select value={selectedStudent.studyPath}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {studyPaths.map((path) => (
+                      <SelectItem key={path} value={path}>
+                        {path}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setSelectedStudent(null)}>
+                Cancel
+              </Button>
+              <Button onClick={() => setSelectedStudent(null)}>
+                Save Changes
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
