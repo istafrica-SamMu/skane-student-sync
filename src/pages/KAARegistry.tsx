@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -57,6 +56,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
+import ProtectedDataDisplay from "@/components/students/ProtectedDataDisplay";
+import PrivacyIndicator from "@/components/students/PrivacyIndicator";
+import { privacyService } from "@/services/privacyService";
 
 interface KAARecord {
   id: number;
@@ -478,54 +480,88 @@ const KAARegistry = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredRecords.map((record) => (
-                <TableRow key={record.id} className="hover:bg-ike-neutral-light/50">
-                  <TableCell className="font-medium text-ike-neutral-dark">
-                    {record.firstName} {record.lastName}
-                  </TableCell>
-                  <TableCell className="font-mono text-sm">
-                    {record.personalNumber}
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      <div>{record.populationRegMunicipalityName}</div>
-                      <div className="text-ike-neutral text-xs">({record.populationRegMunicipalityCode})</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-xs">
-                      {record.category}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {record.registrationDate}
-                  </TableCell>
-                  <TableCell>{getStatusBadge(record.status)}</TableCell>
-                  <TableCell className="text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-white border shadow-lg z-50">
-                        <DropdownMenuItem onClick={() => handleViewDetails(record)}>
-                          <Eye className="mr-2 h-4 w-4" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleEdit(record)}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit Record
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(record.id)}>
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete Record
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {filteredRecords.map((record) => {
+                const isProtected = privacyService.isStudentProtected(record.id);
+                const privacyMark = privacyService.getPrivacyMark(record.id);
+                
+                return (
+                  <TableRow key={record.id} className="hover:bg-ike-neutral-light/50">
+                    <TableCell className="font-medium text-ike-neutral-dark">
+                      <div className="flex items-center gap-2">
+                        {isProtected ? (
+                          <ProtectedDataDisplay 
+                            studentId={record.id}
+                            field="displayName"
+                            fallbackValue={`${record.firstName} ${record.lastName}`}
+                            userRole="municipal_admin"
+                            showPrivacyIndicator={true}
+                          />
+                        ) : (
+                          <span>{record.firstName} {record.lastName}</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-mono text-sm">
+                      {isProtected ? (
+                        <ProtectedDataDisplay 
+                          studentId={record.id}
+                          field="personalNumber"
+                          fallbackValue={record.personalNumber}
+                          userRole="municipal_admin"
+                          showPrivacyIndicator={false}
+                        />
+                      ) : (
+                        record.personalNumber
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <div>{record.populationRegMunicipalityName}</div>
+                        <div className="text-ike-neutral text-xs">({record.populationRegMunicipalityCode})</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="text-xs">
+                        {record.category}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {record.registrationDate}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {getStatusBadge(record.status)}
+                        {isProtected && privacyMark && (
+                          <PrivacyIndicator privacyMark={privacyMark} showDetails={false} />
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-white border shadow-lg z-50">
+                          <DropdownMenuItem onClick={() => handleViewDetails(record)}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEdit(record)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit Record
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDelete(record.id)}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete Record
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>

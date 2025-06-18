@@ -52,6 +52,9 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import DualPlacementDetector from "./DualPlacementDetector";
 import GradeRepetitionDetector from "./GradeRepetitionDetector";
+import ProtectedDataDisplay from "./ProtectedDataDisplay";
+import PrivacyIndicator from "./PrivacyIndicator";
+import { privacyService } from "@/services/privacyService";
 
 interface TFStudent {
   id: number;
@@ -601,86 +604,122 @@ const TFNumberRegistration = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredStudents.map((student) => (
-                <TableRow key={student.id}>
-                  <TableCell className="font-mono">{student.tfNumber}</TableCell>
-                  <TableCell className="font-medium">
-                    {student.firstName} {student.lastName}
-                  </TableCell>
-                  <TableCell>{student.birthDate}</TableCell>
-                  <TableCell className="font-mono">{student.municipalCode}</TableCell>
-                  <TableCell>
-                    {student.needsHomeMunicipality ? (
+              {filteredStudents.map((student) => {
+                const isProtected = privacyService.isStudentProtected(student.id);
+                const privacyMark = privacyService.getPrivacyMark(student.id);
+                
+                return (
+                  <TableRow key={student.id}>
+                    <TableCell className="font-mono">{student.tfNumber}</TableCell>
+                    <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
-                        <AlertTriangle className="w-4 h-4 text-orange-500" />
-                        <span className="text-orange-600">Not Assigned</span>
+                        {isProtected ? (
+                          <ProtectedDataDisplay 
+                            studentId={student.id}
+                            field="displayName"
+                            fallbackValue={`${student.firstName} ${student.lastName}`}
+                            userRole="principal"
+                            showPrivacyIndicator={true}
+                          />
+                        ) : (
+                          <span>{student.firstName} {student.lastName}</span>
+                        )}
                       </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-green-500" />
-                        <span>{student.homeMunicipality}</span>
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>{student.studyPath}</TableCell>
-                  <TableCell>{getStatusBadge(student.status)}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2 justify-center">
-                      {student.needsHomeMunicipality && (
-                        <Select onValueChange={(value) => handleAssignMunicipality(student.id, value)}>
-                          <SelectTrigger className="w-32 h-8">
-                            <SelectValue placeholder="Assign" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {municipalities.map((municipality) => (
-                              <SelectItem key={municipality} value={municipality}>
-                                {municipality}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                    </TableCell>
+                    <TableCell>
+                      {isProtected ? (
+                        <ProtectedDataDisplay 
+                          studentId={student.id}
+                          field="birthDate"
+                          fallbackValue={student.birthDate}
+                          userRole="principal"
+                          showPrivacyIndicator={false}
+                        />
+                      ) : (
+                        student.birthDate
                       )}
-                      
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleConvertTF(student)}
-                          >
-                            <RefreshCw className="w-3 h-3 mr-1" />
-                            Convert
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Convert TF Number</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to convert TF number "{studentToConvert?.tfNumber}" to a unique municipal code? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel onClick={() => setStudentToConvert(null)}>
-                              Cancel
-                            </AlertDialogCancel>
-                            <AlertDialogAction onClick={confirmConvertTF}>
+                    </TableCell>
+                    <TableCell className="font-mono">{student.municipalCode}</TableCell>
+                    <TableCell>
+                      {student.needsHomeMunicipality ? (
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4 text-orange-500" />
+                          <span className="text-orange-600">Not Assigned</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <span>{student.homeMunicipality}</span>
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>{student.studyPath}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {getStatusBadge(student.status)}
+                        {isProtected && privacyMark && (
+                          <PrivacyIndicator privacyMark={privacyMark} showDetails={false} />
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2 justify-center">
+                        {student.needsHomeMunicipality && (
+                          <Select onValueChange={(value) => handleAssignMunicipality(student.id, value)}>
+                            <SelectTrigger className="w-32 h-8">
+                              <SelectValue placeholder="Assign" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {municipalities.map((municipality) => (
+                                <SelectItem key={municipality} value={municipality}>
+                                  {municipality}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                        
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleConvertTF(student)}
+                            >
+                              <RefreshCw className="w-3 h-3 mr-1" />
                               Convert
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Convert TF Number</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to convert TF number "{studentToConvert?.tfNumber}" to a unique municipal code? This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel onClick={() => setStudentToConvert(null)}>
+                                Cancel
+                              </AlertDialogCancel>
+                              <AlertDialogAction onClick={confirmConvertTF}>
+                                Convert
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
 
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedStudent(student)}
-                      >
-                        <Edit className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedStudent(student)}
+                        >
+                          <Edit className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>
