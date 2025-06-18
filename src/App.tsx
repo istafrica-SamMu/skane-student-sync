@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -274,6 +273,11 @@ const AppContent = () => {
               <Route path="/financial/pricelists" element={
                 <ProtectedRoute>
                   <PriceLists />
+                </ProtectedRoute>
+              } />
+              <Route path="/financial/accounting-configuration" element={
+                <ProtectedRoute>
+                  <AccountingConfiguration />
                 </ProtectedRoute>
               } />
               <Route path="/financial/additional-amounts" element={
