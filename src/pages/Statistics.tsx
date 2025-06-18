@@ -1,7 +1,8 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, BarChart3, Download, PieChart, Calendar, ArrowUp, ArrowDown, MapIcon, Filter } from "lucide-react";
+import { TrendingUp, BarChart3, Download, PieChart, Calendar, ArrowUp, ArrowDown } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Statistics = () => {
@@ -28,46 +29,6 @@ const Statistics = () => {
           </Button>
         </div>
       </div>
-
-      {/* Analysis Tools Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-ike-neutral-dark">Advanced Analysis Tools</CardTitle>
-          <CardDescription>
-            Access specialized analysis and geographical mapping features
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => window.location.href = '/analysis/geographical'}>
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-ike-primary/10 rounded-lg flex items-center justify-center">
-                    <MapIcon className="w-5 h-5 text-ike-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-ike-neutral-dark">Geographical Analysis</h3>
-                    <p className="text-sm text-ike-neutral">Interactive map view of student and school locations</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => window.location.href = '/analysis/advanced'}>
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-ike-success/10 rounded-lg flex items-center justify-center">
-                    <Filter className="w-5 h-5 text-ike-success" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-ike-neutral-dark">Advanced Analytics</h3>
-                    <p className="text-sm text-ike-neutral">Comprehensive filtering and historical analysis</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
