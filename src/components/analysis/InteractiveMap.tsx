@@ -25,8 +25,21 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({ mapboxToken, schoolLoca
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!mapboxToken || !mapboxToken.startsWith('pk.')) {
+    // Improved token validation
+    if (!mapboxToken || !mapboxToken.trim()) {
+      setMapError("Please enter a Mapbox public token");
+      return;
+    }
+
+    const trimmedToken = mapboxToken.trim();
+    if (!trimmedToken.startsWith('pk.')) {
       setMapError("Please enter a valid Mapbox public token (starts with 'pk.')");
+      return;
+    }
+
+    // Basic token format validation
+    if (trimmedToken.length < 100) {
+      setMapError("The token appears to be incomplete. Please check your Mapbox token.");
       return;
     }
 
@@ -37,7 +50,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({ mapboxToken, schoolLoca
 
     const loadMapboxGL = async () => {
       try {
-        console.log('Loading Mapbox GL with token:', mapboxToken.substring(0, 20) + '...');
+        console.log('Loading Mapbox GL with token:', trimmedToken.substring(0, 20) + '...');
         
         // Dynamically import mapbox-gl
         const mapboxgl = (await import('mapbox-gl')).default;
@@ -51,7 +64,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({ mapboxToken, schoolLoca
         }
 
         // Set access token
-        mapboxgl.accessToken = mapboxToken;
+        mapboxgl.accessToken = trimmedToken;
 
         console.log('Initializing map...');
 
@@ -131,7 +144,17 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({ mapboxToken, schoolLoca
 
         mapInstance.on('error', (e: any) => {
           console.error('Mapbox error:', e);
-          setMapError("Failed to load map. Please check your Mapbox token and internet connection.");
+          if (e.error && e.error.message) {
+            if (e.error.message.includes('401')) {
+              setMapError("Invalid Mapbox token. Please check your token is correct and has the necessary permissions.");
+            } else if (e.error.message.includes('403')) {
+              setMapError("Access denied. Please check your Mapbox token permissions.");
+            } else {
+              setMapError(`Mapbox error: ${e.error.message}`);
+            }
+          } else {
+            setMapError("Failed to load map. Please check your Mapbox token and internet connection.");
+          }
           setIsLoading(false);
         });
 
