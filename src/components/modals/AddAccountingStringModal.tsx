@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import {
@@ -34,7 +33,7 @@ const AddAccountingStringModal = ({ isOpen, onClose, onSubmit }: AddAccountingSt
       counterpartyId: "",
       counterpartyName: "",
       priceCodeGroup: "university_prep",
-      priceCodes: [],
+      priceCodes: "",
       schoolType: "upper_secondary",
       accountingCode: "",
       costCenter: "",
@@ -45,10 +44,10 @@ const AddAccountingStringModal = ({ isOpen, onClose, onSubmit }: AddAccountingSt
   });
 
   const handleSubmit = (data: AccountingStringFormData) => {
-    // Parse price codes from comma-separated string
-    const priceCodesArray = typeof data.priceCodes === 'string' 
-      ? data.priceCodes.split(',').map(code => code.trim()).filter(code => code)
-      : data.priceCodes;
+    // Parse price codes from comma-separated string to array
+    const priceCodesArray = data.priceCodes 
+      ? (data.priceCodes as string).split(',').map(code => code.trim()).filter(code => code)
+      : [];
     
     onSubmit({
       ...data,
@@ -160,7 +159,6 @@ const AddAccountingStringModal = ({ isOpen, onClose, onSubmit }: AddAccountingSt
                     <Input 
                       {...field} 
                       placeholder="Enter price codes separated by commas (e.g., NA01, NA02, NA03)"
-                      value={Array.isArray(field.value) ? field.value.join(', ') : field.value}
                     />
                   </FormControl>
                   <FormMessage />

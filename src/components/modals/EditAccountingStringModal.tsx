@@ -34,7 +34,7 @@ const EditAccountingStringModal = ({ isOpen, onClose, onSubmit, accountingString
       counterpartyId: "",
       counterpartyName: "",
       priceCodeGroup: "university_prep",
-      priceCodes: [],
+      priceCodes: "",
       schoolType: "upper_secondary",
       accountingCode: "",
       costCenter: "",
@@ -50,7 +50,7 @@ const EditAccountingStringModal = ({ isOpen, onClose, onSubmit, accountingString
         counterpartyId: accountingString.counterpartyId,
         counterpartyName: accountingString.counterpartyName,
         priceCodeGroup: accountingString.priceCodeGroup,
-        priceCodes: accountingString.priceCodes,
+        priceCodes: Array.isArray(accountingString.priceCodes) ? accountingString.priceCodes.join(', ') : "",
         schoolType: accountingString.schoolType,
         accountingCode: accountingString.accountingCode,
         costCenter: accountingString.costCenter,
@@ -62,10 +62,10 @@ const EditAccountingStringModal = ({ isOpen, onClose, onSubmit, accountingString
   }, [accountingString, isOpen, form]);
 
   const handleSubmit = (data: AccountingStringFormData) => {
-    // Parse price codes from comma-separated string
-    const priceCodesArray = typeof data.priceCodes === 'string' 
-      ? data.priceCodes.split(',').map(code => code.trim()).filter(code => code)
-      : data.priceCodes;
+    // Parse price codes from comma-separated string to array
+    const priceCodesArray = data.priceCodes 
+      ? (data.priceCodes as string).split(',').map(code => code.trim()).filter(code => code)
+      : [];
     
     onSubmit({
       ...data,
