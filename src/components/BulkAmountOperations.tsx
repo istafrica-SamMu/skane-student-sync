@@ -77,6 +77,7 @@ export const BulkAmountOperations = ({ categories, onBulkOperation }: BulkAmount
   };
 
   const handleFilterChange = (filterType: string, value: string) => {
+    console.log("Filter changed:", filterType, value);
     setSelectedFilters(prev => ({
       ...prev,
       [filterType]: value
@@ -90,7 +91,14 @@ export const BulkAmountOperations = ({ categories, onBulkOperation }: BulkAmount
     setPreviewCount(count);
   };
 
+  const clearFilters = () => {
+    setSelectedFilters({ year: "", studyPath: "", schoolUnit: "", municipality: "" });
+    setPreviewCount(0);
+  };
+
   const handleBulkSubmit = (data: AmountFormData) => {
+    console.log("Bulk submit:", data);
+    
     const bulkOperation: BulkAmountOperation = {
       operation,
       filters: selectedFilters,
@@ -100,8 +108,7 @@ export const BulkAmountOperations = ({ categories, onBulkOperation }: BulkAmount
     onBulkOperation(bulkOperation);
     setIsModalOpen(false);
     form.reset();
-    setSelectedFilters({ year: "", studyPath: "", schoolUnit: "", municipality: "" });
-    setPreviewCount(0);
+    clearFilters();
 
     toast({
       title: "Bulk Operation Completed",
@@ -122,6 +129,28 @@ export const BulkAmountOperations = ({ categories, onBulkOperation }: BulkAmount
     }
   };
 
+  const handleOperationChange = (newOperation: "create" | "update" | "terminate") => {
+    console.log("Operation changed to:", newOperation);
+    setOperation(newOperation);
+    // Reset preview count when changing operation
+    if (previewCount > 0) {
+      const hasFilters = Object.values(selectedFilters).some(filter => filter !== "");
+      if (hasFilters) {
+        setPreviewCount(Math.floor(Math.random() * 50) + 1);
+      }
+    }
+  };
+
+  const openConfigurationModal = () => {
+    console.log("Opening configuration modal");
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    form.reset();
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -138,21 +167,21 @@ export const BulkAmountOperations = ({ categories, onBulkOperation }: BulkAmount
           <div className="flex gap-2">
             <Button
               variant={operation === "create" ? "default" : "outline"}
-              onClick={() => setOperation("create")}
+              onClick={() => handleOperationChange("create")}
               className={operation === "create" ? "bg-ike-primary hover:bg-ike-primary-dark text-white" : ""}
             >
               Create Amounts
             </Button>
             <Button
               variant={operation === "update" ? "default" : "outline"}
-              onClick={() => setOperation("update")}
+              onClick={() => handleOperationChange("update")}
               className={operation === "update" ? "bg-ike-primary hover:bg-ike-primary-dark text-white" : ""}
             >
               Update Amounts
             </Button>
             <Button
               variant={operation === "terminate" ? "default" : "outline"}
-              onClick={() => setOperation("terminate")}
+              onClick={() => handleOperationChange("terminate")}
               className={operation === "terminate" ? "bg-ike-error hover:bg-ike-error/90 text-white" : ""}
             >
               Terminate Amounts
@@ -214,13 +243,22 @@ export const BulkAmountOperations = ({ categories, onBulkOperation }: BulkAmount
                 </span>
                 <Badge variant="secondary">{previewCount}</Badge>
               </div>
-              <Button
-                onClick={() => setIsModalOpen(true)}
-                className="bg-ike-primary hover:bg-ike-primary-dark text-white"
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Configure {operation === "create" ? "Creation" : operation === "update" ? "Update" : "Termination"}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={clearFilters}
+                  className="text-ike-neutral hover:text-ike-neutral-dark"
+                >
+                  Clear Filters
+                </Button>
+                <Button
+                  onClick={openConfigurationModal}
+                  className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Configure {operation === "create" ? "Creation" : operation === "update" ? "Update" : "Termination"}
+                </Button>
+              </div>
             </div>
           )}
         </div>
@@ -295,7 +333,8 @@ export const BulkAmountOperations = ({ categories, onBulkOperation }: BulkAmount
                               {...field} 
                               type="number" 
                               placeholder="Enter amount"
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              value={field.value || ""}
+                              onChange={(e) => field.onChange(e.target.value === "" ? 0 : parseInt(e.target.value))}
                             />
                           </FormControl>
                           <FormMessage />
@@ -315,7 +354,8 @@ export const BulkAmountOperations = ({ categories, onBulkOperation }: BulkAmount
                               type="number" 
                               min="1"
                               placeholder="Multiplier"
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                              value={field.value || 1}
+                              onChange={(e) => field.onChange(e.target.value === "" ? 1 : parseInt(e.target.value))}
                             />
                           </FormControl>
                           <FormMessage />
@@ -387,7 +427,7 @@ export const BulkAmountOperations = ({ categories, onBulkOperation }: BulkAmount
               )}
 
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+                <Button type="button" variant="outline" onClick={closeModal}>
                   Cancel
                 </Button>
                 <Button 
