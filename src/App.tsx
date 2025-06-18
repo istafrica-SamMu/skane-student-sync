@@ -132,6 +132,20 @@ const AppContent = () => {
                 </ProtectedRoute>
               } />
               
+              {/* Statistics Route */}
+              <Route path="/statistics" element={
+                <ProtectedRoute>
+                  <Statistics />
+                </ProtectedRoute>
+              } />
+              
+              {/* Analysis Routes */}
+              <Route path="/analysis/geographical" element={
+                <ProtectedRoute>
+                  <GeographicalAnalysis />
+                </ProtectedRoute>
+              } />
+              
               {/* KAA Management Routes */}
               <Route path="/kaa/dashboard" element={
                 <ProtectedRoute>
