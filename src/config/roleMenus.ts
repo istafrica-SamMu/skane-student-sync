@@ -271,6 +271,11 @@ export const municipalityAdminMenu: MenuItem[] = [
     icon: ClipboardList,
     items: [
       {
+        title: "KAA Dashboard",
+        url: "/kaa/dashboard",
+        icon: BarChart3,
+      },
+      {
         title: "KAA Registry",
         url: "/kaa/registry",
         icon: Users,
@@ -448,6 +453,27 @@ export const schoolAdminMenu: MenuItem[] = [
         title: "Travel Card Documents",
         url: "/students/travel-cards",
         icon: CreditCard,
+      },
+    ],
+  },
+  {
+    title: "KAA Management",
+    icon: ClipboardList,
+    items: [
+      {
+        title: "KAA Dashboard",
+        url: "/kaa/dashboard",
+        icon: BarChart3,
+      },
+      {
+        title: "KAA Registry",
+        url: "/kaa/registry",
+        icon: Users,
+      },
+      {
+        title: "Contact Occasions",
+        url: "/kaa/contacts",
+        icon: MessageSquare,
       },
     ],
   },

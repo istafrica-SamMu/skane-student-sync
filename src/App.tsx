@@ -76,6 +76,7 @@ import ContactOccasions from "./pages/kaa/ContactOccasions";
 import KAARegistry from "./pages/KAARegistry";
 import StatisticsSwedenReports from "./pages/kaa/StatisticsSwedenReports";
 import MeasuresAndActions from "./pages/kaa/MeasuresAndActions";
+import KAADashboard from "./pages/kaa/KAADashboard";
 
 const queryClient = new QueryClient();
 
@@ -130,6 +131,11 @@ const AppContent = () => {
               } />
               
               {/* KAA Management Routes */}
+              <Route path="/kaa/dashboard" element={
+                <ProtectedRoute>
+                  <KAADashboard />
+                </ProtectedRoute>
+              } />
               <Route path="/kaa/registry" element={
                 <ProtectedRoute>
                   <KAARegistry />
