@@ -608,6 +608,7 @@ const AdditionalAmounts = () => {
         <TabsList>
           <TabsTrigger value="amounts">Additional Amounts</TabsTrigger>
           <TabsTrigger value="bulk">Bulk Operations</TabsTrigger>
+          <TabsTrigger value="transfers">Municipality Transfers</TabsTrigger>
           <TabsTrigger value="categories">Manage Categories</TabsTrigger>
         </TabsList>
 
@@ -716,6 +717,18 @@ const AdditionalAmounts = () => {
           <BulkAmountOperations 
             categories={categories}
             onBulkOperation={handleBulkOperation}
+          />
+        </TabsContent>
+
+        <TabsContent value="transfers" className="space-y-4">
+          <AutomaticTransferHandler 
+            onTransferProcessed={(transferId) => {
+              console.log("Transfer processed:", transferId);
+              toast({
+                title: "Transfer Processed",
+                description: "Additional amounts have been automatically ended.",
+              });
+            }}
           />
         </TabsContent>
 
