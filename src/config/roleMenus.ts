@@ -135,6 +135,32 @@ export const regionalAdminMenu: MenuItem[] = [
     ],
   },
   {
+    title: "Integration Management",
+    icon: Workflow,
+    items: [
+      {
+        title: "Integration Overview",
+        url: "/integration",
+        icon: Monitor,
+      },
+      {
+        title: "Tax Agency Hub",
+        url: "/integration/tax-agency-hub",
+        icon: Database,
+      },
+      {
+        title: "Integration Testing",
+        url: "/integration/testing",
+        icon: Activity,
+      },
+      {
+        title: "Integration Status",
+        url: "/integration/status",
+        icon: BarChart3,
+      },
+    ],
+  },
+  {
     title: "Calculation Engine",
     url: "/integration",
     icon: Calculator,
@@ -262,9 +288,25 @@ export const municipalityAdminMenu: MenuItem[] = [
     ],
   },
   {
-    title: "Import Student Data",
-    url: "/integration/import",
-    icon: Database,
+    title: "Integration Management",
+    icon: Workflow,
+    items: [
+      {
+        title: "Import Student Data",
+        url: "/integration/import",
+        icon: Database,
+      },
+      {
+        title: "Tax Agency Hub",
+        url: "/integration/tax-agency-hub",
+        icon: Database,
+      },
+      {
+        title: "Integration Status",
+        url: "/integration/status",
+        icon: BarChart3,
+      },
+    ],
   },
   {
     title: "Financial Management",
