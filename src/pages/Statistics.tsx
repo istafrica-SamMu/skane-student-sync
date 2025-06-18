@@ -304,6 +304,37 @@ const Statistics = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Advanced Analysis Tools */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-ike-neutral-dark">Advanced Analysis Tools</CardTitle>
+          <CardDescription>
+            Access specialized analytical tools for deeper insights
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Button 
+              className="bg-ike-success hover:bg-ike-success/90 text-white h-20 flex flex-col items-center justify-center"
+              onClick={() => window.location.href = '/analysis/geographical'}
+            >
+              <MapPin className="w-6 h-6 mb-2" />
+              <span className="font-medium">Geographical Analysis</span>
+              <span className="text-xs opacity-90">Interactive maps & location data</span>
+            </Button>
+            <Button 
+              variant="outline" 
+              className="border-ike-primary text-ike-primary hover:bg-ike-primary/10 h-20 flex flex-col items-center justify-center"
+              onClick={() => window.location.href = '/analysis/advanced'}
+            >
+              <BarChart3 className="w-6 h-6 mb-2" />
+              <span className="font-medium">Advanced Analytics</span>
+              <span className="text-xs opacity-90">Deep statistical analysis</span>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

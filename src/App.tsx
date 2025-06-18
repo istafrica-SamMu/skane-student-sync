@@ -78,6 +78,7 @@ import StatisticsSwedenReports from "./pages/kaa/StatisticsSwedenReports";
 import MeasuresAndActions from "./pages/kaa/MeasuresAndActions";
 import KAADashboard from "./pages/kaa/KAADashboard";
 import TFRegistration from "@/pages/students/TFRegistration";
+import GeographicalAnalysis from "./pages/analysis/GeographicalAnalysis";
 
 const queryClient = new QueryClient();
 
