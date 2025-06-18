@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { MapPin, AlertCircle } from 'lucide-react';
@@ -24,23 +25,33 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({ mapboxToken, schoolLoca
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Improved token validation
-    if (!mapboxToken || !mapboxToken.trim()) {
+    // Clean and validate token
+    const trimmedToken = mapboxToken?.trim() || '';
+    
+    console.log('Token validation - raw token:', mapboxToken);
+    console.log('Token validation - trimmed token:', trimmedToken);
+    console.log('Token validation - token length:', trimmedToken.length);
+    console.log('Token validation - starts with pk.:', trimmedToken.startsWith('pk.'));
+
+    if (!trimmedToken) {
+      console.log('Token validation - empty token');
       setMapError("Please enter a Mapbox public token");
       return;
     }
 
-    const trimmedToken = mapboxToken.trim();
     if (!trimmedToken.startsWith('pk.')) {
+      console.log('Token validation - invalid format');
       setMapError("Please enter a valid Mapbox public token (starts with 'pk.')");
       return;
     }
 
-    // Basic token format validation - Mapbox tokens are typically 80+ characters
-    if (trimmedToken.length < 80) {
+    if (trimmedToken.length < 50) {
+      console.log('Token validation - token too short');
       setMapError("The token appears to be incomplete. Please check your Mapbox token.");
       return;
     }
+
+    console.log('Token validation - passed all checks');
 
     if (!mapContainer.current) return;
 
@@ -180,7 +191,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({ mapboxToken, schoolLoca
     };
   }, [mapboxToken, schoolLocations]);
 
-  if (!mapboxToken) {
+  // Check if token exists and is not empty
+  if (!mapboxToken || !mapboxToken.trim()) {
     return (
       <div className="h-96 flex items-center justify-center border rounded-lg bg-ike-neutral-light">
         <div className="text-center text-ike-neutral">
