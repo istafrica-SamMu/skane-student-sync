@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,35 +35,6 @@ const PaymentBlocks = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedBlock, setSelectedBlock] = useState<PaymentBlock | null>(null);
-
-  // Separate forms for add and edit
-  const addForm = useForm<PaymentBlockFormData>({
-    defaultValues: {
-      type: "Student",
-      targetId: "",
-      targetName: "",
-      school: "",
-      principal: "",
-      program: "",
-      reason: "",
-      startDate: "",
-      endDate: "",
-    },
-  });
-
-  const editForm = useForm<PaymentBlockFormData>({
-    defaultValues: {
-      type: "Student",
-      targetId: "",
-      targetName: "",
-      school: "",
-      principal: "",
-      program: "",
-      reason: "",
-      startDate: "",
-      endDate: "",
-    },
-  });
 
   const [paymentBlocks, setPaymentBlocks] = useState<PaymentBlock[]>([
     {
@@ -141,7 +113,6 @@ const PaymentBlocks = () => {
     
     setPaymentBlocks([...paymentBlocks, newBlock]);
     setIsAddModalOpen(false);
-    addForm.reset();
     
     toast({
       title: "Payment Block Added",
@@ -165,7 +136,6 @@ const PaymentBlocks = () => {
     setPaymentBlocks(updatedBlocks);
     setIsEditModalOpen(false);
     setSelectedBlock(null);
-    editForm.reset();
     
     toast({
       title: "Payment Block Updated",
