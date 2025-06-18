@@ -36,7 +36,7 @@ const GeographicalAnalysis = () => {
       name: "Municipal Gymnasium A",
       students: 450,
       address: "Storgatan 15, Malmö",
-      coordinates: [13.0038, 55.6050],
+      coordinates: [13.0038, 55.6050] as [number, number],
       programs: ["Naturvetenskap", "Teknik"]
     },
     {
@@ -44,7 +44,7 @@ const GeographicalAnalysis = () => {
       name: "Technical School Central",
       students: 380,
       address: "Industrigatan 22, Malmö",
-      coordinates: [12.9944, 55.5950],
+      coordinates: [12.9944, 55.5950] as [number, number],
       programs: ["Teknik", "Hantverksprogram"]
     },
     {
@@ -52,7 +52,7 @@ const GeographicalAnalysis = () => {
       name: "Social Sciences High",
       students: 520,
       address: "Kungsgatan 8, Malmö",
-      coordinates: [13.0110, 55.6080],
+      coordinates: [13.0110, 55.6080] as [number, number],
       programs: ["Samhällsvetenskap", "Ekonomi"]
     }
   ];
