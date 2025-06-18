@@ -45,7 +45,8 @@ import {
   ClipboardList,
   CreditCard,
   HelpCircle,
-  Ban
+  Ban,
+  IdCard
 } from "lucide-react";
 
 export interface MenuItem {
@@ -243,6 +244,11 @@ export const municipalityAdminMenu: MenuItem[] = [
         title: "Students Overview",
         url: "/students",
         icon: Users,
+      },
+      {
+        title: "TF Number Registration",
+        url: "/students/tf-registration",
+        icon: IdCard,
       },
       {
         title: "Students by Class & Study Path",
@@ -448,6 +454,11 @@ export const schoolAdminMenu: MenuItem[] = [
         title: "Student Roster & Classes",
         url: "/students",
         icon: Users,
+      },
+      {
+        title: "TF Number Registration",
+        url: "/students/tf-registration",
+        icon: IdCard,
       },
       {
         title: "Travel Card Documents",
