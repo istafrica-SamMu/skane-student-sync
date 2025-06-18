@@ -43,6 +43,8 @@ const EditPaymentBlockModal = ({ isOpen, onClose, onSubmit, block }: EditPayment
     },
   });
 
+  const selectedType = form.watch("type");
+
   useEffect(() => {
     if (block && isOpen) {
       form.reset({
@@ -107,9 +109,12 @@ const EditPaymentBlockModal = ({ isOpen, onClose, onSubmit, block }: EditPayment
                 name="targetName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>
+                      {selectedType === "Student" ? "Student Name" : 
+                       selectedType === "School" ? "School Name" : "Principal Name"}
+                    </FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter name" />
+                      <Input {...field} placeholder={`Enter ${selectedType.toLowerCase()} name`} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -117,21 +122,55 @@ const EditPaymentBlockModal = ({ isOpen, onClose, onSubmit, block }: EditPayment
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="school"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>School</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter school name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
+            {selectedType === "Student" && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="school"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>School</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter school name" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="principal"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Principal</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter principal name" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="program"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Program</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Enter program name" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
+
+            {selectedType === "School" && (
               <FormField
                 control={form.control}
                 name="principal"
@@ -145,21 +184,7 @@ const EditPaymentBlockModal = ({ isOpen, onClose, onSubmit, block }: EditPayment
                   </FormItem>
                 )}
               />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="program"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Program</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter program name" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            )}
 
             <FormField
               control={form.control}

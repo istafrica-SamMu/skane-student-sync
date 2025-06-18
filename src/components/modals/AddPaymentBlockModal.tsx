@@ -42,6 +42,8 @@ const AddPaymentBlockModal = ({ isOpen, onClose, onSubmit }: AddPaymentBlockModa
     },
   });
 
+  const selectedType = form.watch("type");
+
   const handleSubmit = (data: PaymentBlockFormData) => {
     onSubmit(data);
     form.reset();
@@ -91,9 +93,12 @@ const AddPaymentBlockModal = ({ isOpen, onClose, onSubmit }: AddPaymentBlockModa
                 name="targetName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>
+                      {selectedType === "Student" ? "Student Name" : 
+                       selectedType === "School" ? "School Name" : "Principal Name"}
+                    </FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter name" />
+                      <Input {...field} placeholder={`Enter ${selectedType.toLowerCase()} name`} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -101,21 +106,55 @@ const AddPaymentBlockModal = ({ isOpen, onClose, onSubmit }: AddPaymentBlockModa
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="school"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>School</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter school name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
+            {selectedType === "Student" && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="school"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>School</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter school name" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="principal"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Principal</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter principal name" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="program"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Program</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Enter program name" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
+
+            {selectedType === "School" && (
               <FormField
                 control={form.control}
                 name="principal"
@@ -129,21 +168,7 @@ const AddPaymentBlockModal = ({ isOpen, onClose, onSubmit }: AddPaymentBlockModa
                   </FormItem>
                 )}
               />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="program"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Program</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter program name" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            )}
 
             <FormField
               control={form.control}
