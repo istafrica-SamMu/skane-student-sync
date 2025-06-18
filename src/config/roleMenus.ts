@@ -176,6 +176,11 @@ export const regionalAdminMenu: MenuItem[] = [
     icon: FileText,
     items: [
       {
+        title: "Statistics",
+        url: "/statistics",
+        icon: BarChart3,
+      },
+      {
         title: "Regional Statistics",
         url: "/reports/regional",
         icon: BarChart3,
@@ -194,6 +199,11 @@ export const regionalAdminMenu: MenuItem[] = [
         title: "Change Tracking",
         url: "/reports/changes",
         icon: Activity,
+      },
+      {
+        title: "Geographical Analysis",
+        url: "/analysis/geographical",
+        icon: MapPin,
       },
     ],
   },
@@ -386,6 +396,11 @@ export const municipalityAdminMenu: MenuItem[] = [
     icon: FileText,
     items: [
       {
+        title: "Statistics",
+        url: "/statistics",
+        icon: BarChart3,
+      },
+      {
         title: "Money to Receive",
         url: "/reports/money-to-receive",
         icon: TrendingUp,
@@ -404,6 +419,11 @@ export const municipalityAdminMenu: MenuItem[] = [
         title: "Financial System Export",
         url: "/reports/financial-export",
         icon: FileSpreadsheet,
+      },
+      {
+        title: "Geographical Analysis",
+        url: "/analysis/geographical",
+        icon: MapPin,
       },
     ],
   },
