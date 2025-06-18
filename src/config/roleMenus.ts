@@ -44,7 +44,8 @@ import {
   Building2,
   ClipboardList,
   CreditCard,
-  HelpCircle
+  HelpCircle,
+  Ban
 } from "lucide-react";
 
 export interface MenuItem {
@@ -278,6 +279,11 @@ export const municipalityAdminMenu: MenuItem[] = [
         title: "Additional Amounts",
         url: "/financial/additional-amounts",
         icon: DollarSign,
+      },
+      {
+        title: "Payment Blocks",
+        url: "/financial/payment-blocks",
+        icon: Ban,
       },
       {
         title: "Municipal Financial Reports",
