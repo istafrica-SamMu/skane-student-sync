@@ -66,12 +66,6 @@ const Dashboard = () => {
                 Export Student Data
               </Link>
             </Button>
-            <Button asChild variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-              <Link to="/reports/financial">
-                <FileText className="w-4 h-4 mr-2" />
-                Financial Reports
-              </Link>
-            </Button>
           </div>
         </div>
 
@@ -195,26 +189,6 @@ const Dashboard = () => {
                 <Link to="/students">
                   <Users className="w-4 h-4 mr-2" />
                   Student Management
-                </Link>
-              </Button>
-              <Button 
-                asChild
-                variant="outline" 
-                className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
-              >
-                <Link to="/students/classes">
-                  <GraduationCap className="w-4 h-4 mr-2" />
-                  Class Management
-                </Link>
-              </Button>
-              <Button 
-                asChild
-                variant="outline" 
-                className="w-full justify-start"
-              >
-                <Link to="/reports/financial">
-                  <FileText className="w-4 h-4 mr-2" />
-                  Financial Reports
                 </Link>
               </Button>
               <Button 
@@ -583,7 +557,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Regional Key Metrics - Adjusted to 3 columns */}
+        {/* Regional Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="border-l-4 border-l-ike-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
