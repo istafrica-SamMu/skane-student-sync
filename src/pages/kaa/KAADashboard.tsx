@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,9 +25,14 @@ import {
   Eye,
 } from "lucide-react";
 import { StatisticsReportModal } from "@/components/kaa/StatisticsReportModal";
+import { NewRegistrationModal } from "@/components/kaa/NewRegistrationModal";
+import { QuickActionModal } from "@/components/kaa/QuickActionModal";
 
 const KAADashboard = () => {
   const [showReportModal, setShowReportModal] = useState(false);
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [showQuickActionModal, setShowQuickActionModal] = useState(false);
+  const [selectedAction, setSelectedAction] = useState<'records' | 'measures' | 'contacts' | 'scb' | null>(null);
 
   // Mock data for dashboard
   const dashboardStats = {
@@ -120,6 +124,11 @@ const KAADashboard = () => {
     }
   };
 
+  const handleQuickAction = (actionType: 'records' | 'measures' | 'contacts' | 'scb') => {
+    setSelectedAction(actionType);
+    setShowQuickActionModal(true);
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -138,7 +147,10 @@ const KAADashboard = () => {
             <FileText className="w-4 h-4 mr-2" />
             Generate Report
           </Button>
-          <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+          <Button 
+            className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+            onClick={() => setShowRegistrationModal(true)}
+          >
             <Plus className="w-4 h-4 mr-2" />
             New Registration
           </Button>
@@ -277,19 +289,35 @@ const KAADashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
+            <Button 
+              variant="outline" 
+              className="h-20 flex flex-col items-center justify-center"
+              onClick={() => handleQuickAction('records')}
+            >
               <Users className="w-6 h-6 mb-2" />
               View All Records
             </Button>
-            <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
+            <Button 
+              variant="outline" 
+              className="h-20 flex flex-col items-center justify-center"
+              onClick={() => handleQuickAction('measures')}
+            >
               <Target className="w-6 h-6 mb-2" />
               Manage Measures
             </Button>
-            <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
+            <Button 
+              variant="outline" 
+              className="h-20 flex flex-col items-center justify-center"
+              onClick={() => handleQuickAction('contacts')}
+            >
               <Activity className="w-6 h-6 mb-2" />
               Contact Occasions
             </Button>
-            <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
+            <Button 
+              variant="outline" 
+              className="h-20 flex flex-col items-center justify-center"
+              onClick={() => handleQuickAction('scb')}
+            >
               <BarChart3 className="w-6 h-6 mb-2" />
               SCB Reports
             </Button>
@@ -297,10 +325,21 @@ const KAADashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Statistics Report Modal */}
+      {/* Modals */}
       <StatisticsReportModal 
         open={showReportModal} 
         onOpenChange={setShowReportModal}
+      />
+      
+      <NewRegistrationModal 
+        open={showRegistrationModal} 
+        onOpenChange={setShowRegistrationModal}
+      />
+      
+      <QuickActionModal 
+        open={showQuickActionModal} 
+        onOpenChange={setShowQuickActionModal}
+        actionType={selectedAction}
       />
     </div>
   );
