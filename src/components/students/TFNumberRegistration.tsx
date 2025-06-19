@@ -315,19 +315,19 @@ const TFNumberRegistration = () => {
   );
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden">
-      <div className="max-w-full px-4 sm:px-6 lg:px-8 space-y-6">
+    <div className="min-h-screen w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold text-ike-neutral-dark break-words">TF Number Registration</h1>
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-ike-neutral-dark truncate">TF Number Registration</h1>
             <p className="text-ike-neutral mt-2 text-sm sm:text-base">
               Manage students with temporary personal identity numbers (TF numbers)
             </p>
           </div>
           <Dialog open={showRegistrationForm} onOpenChange={setShowRegistrationForm}>
             <DialogTrigger asChild>
-              <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white whitespace-nowrap">
+              <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white whitespace-nowrap shrink-0">
                 <UserPlus className="w-4 h-4 mr-2" />
                 Register TF Student
               </Button>
@@ -492,7 +492,7 @@ const TFNumberRegistration = () => {
                   className="border-ike-primary/20 focus:border-ike-primary w-full"
                 />
               </div>
-              <Button variant="outline" className="whitespace-nowrap">
+              <Button variant="outline" className="whitespace-nowrap shrink-0">
                 <Search className="w-4 h-4 mr-2" />
                 Search
               </Button>
@@ -507,143 +507,144 @@ const TFNumberRegistration = () => {
             <CardDescription>Students with temporary personal identity numbers</CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <ScrollArea className="w-full">
-              <div className="min-w-[800px]">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="font-medium whitespace-nowrap">TF Number</TableHead>
-                      <TableHead className="font-medium whitespace-nowrap">Name</TableHead>
-                      <TableHead className="font-medium whitespace-nowrap">Birth Date</TableHead>
-                      <TableHead className="font-medium whitespace-nowrap">Municipal Code</TableHead>
-                      <TableHead className="font-medium whitespace-nowrap">Home Municipality</TableHead>
-                      <TableHead className="font-medium whitespace-nowrap">Study Path</TableHead>
-                      <TableHead className="font-medium whitespace-nowrap">Status</TableHead>
-                      <TableHead className="font-medium text-center whitespace-nowrap">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredStudents.map((student) => {
-                      const isProtected = privacyService.isStudentProtected(student.id);
-                      const privacyMark = privacyService.getPrivacyMark(student.id);
-                      
-                      return (
-                        <TableRow key={student.id}>
-                          <TableCell className="font-mono whitespace-nowrap">{student.tfNumber}</TableCell>
-                          <TableCell className="font-medium">
-                            <div className="flex items-center gap-2 min-w-0">
-                              {isProtected ? (
-                                <ProtectedDataDisplay 
-                                  studentId={student.id}
-                                  field="displayName"
-                                  fallbackValue={`${student.firstName} ${student.lastName}`}
-                                  userRole="principal"
-                                  showPrivacyIndicator={true}
-                                />
-                              ) : (
-                                <span className="truncate">{student.firstName} {student.lastName}</span>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell className="whitespace-nowrap">
+            <div className="overflow-x-auto">
+              <Table className="min-w-full">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="font-medium min-w-[120px]">TF Number</TableHead>
+                    <TableHead className="font-medium min-w-[150px]">Name</TableHead>
+                    <TableHead className="font-medium min-w-[100px]">Birth Date</TableHead>
+                    <TableHead className="font-medium min-w-[100px]">Municipal Code</TableHead>
+                    <TableHead className="font-medium min-w-[180px]">Home Municipality</TableHead>
+                    <TableHead className="font-medium min-w-[120px]">Study Path</TableHead>
+                    <TableHead className="font-medium min-w-[100px]">Status</TableHead>
+                    <TableHead className="font-medium text-center min-w-[200px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredStudents.map((student) => {
+                    const isProtected = privacyService.isStudentProtected(student.id);
+                    const privacyMark = privacyService.getPrivacyMark(student.id);
+                    
+                    return (
+                      <TableRow key={student.id}>
+                        <TableCell className="font-mono">{student.tfNumber}</TableCell>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2 min-w-0">
                             {isProtected ? (
                               <ProtectedDataDisplay 
                                 studentId={student.id}
-                                field="birthDate"
-                                fallbackValue={student.birthDate}
+                                field="displayName"
+                                fallbackValue={`${student.firstName} ${student.lastName}`}
                                 userRole="principal"
-                                showPrivacyIndicator={false}
+                                showPrivacyIndicator={true}
                               />
                             ) : (
-                              student.birthDate
+                              <span className="truncate max-w-[140px]">{student.firstName} {student.lastName}</span>
                             )}
-                          </TableCell>
-                          <TableCell className="font-mono whitespace-nowrap">{student.municipalCode}</TableCell>
-                          <TableCell>
-                            {student.needsHomeMunicipality ? (
-                              <div className="flex items-center gap-2 whitespace-nowrap">
-                                <AlertTriangle className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                                <span className="text-orange-600">Not Assigned</span>
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                                <span className="truncate">{student.homeMunicipality}</span>
-                              </div>
-                            )}
-                          </TableCell>
-                          <TableCell className="whitespace-nowrap">{student.studyPath}</TableCell>
-                          <TableCell>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {isProtected ? (
+                            <ProtectedDataDisplay 
+                              studentId={student.id}
+                              field="birthDate"
+                              fallbackValue={student.birthDate}
+                              userRole="principal"
+                              showPrivacyIndicator={false}
+                            />
+                          ) : (
+                            student.birthDate
+                          )}
+                        </TableCell>
+                        <TableCell className="font-mono">{student.municipalCode}</TableCell>
+                        <TableCell>
+                          {student.needsHomeMunicipality ? (
                             <div className="flex items-center gap-2">
-                              {getStatusBadge(student.status)}
-                              {isProtected && privacyMark && (
-                                <PrivacyIndicator privacyMark={privacyMark} showDetails={false} />
-                              )}
+                              <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0" />
+                              <span className="text-orange-600 truncate">Not Assigned</span>
                             </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2 justify-center">
-                              {student.needsHomeMunicipality && (
-                                <Select onValueChange={(value) => handleAssignMunicipality(student.id, value)}>
-                                  <SelectTrigger className="w-32 h-8">
-                                    <SelectValue placeholder="Assign" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {municipalities.map((municipality) => (
-                                      <SelectItem key={municipality} value={municipality}>
-                                        {municipality}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              )}
-                              
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleConvertTF(student)}
-                                    className="whitespace-nowrap"
-                                  >
-                                    <RefreshCw className="w-3 h-3 mr-1" />
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />
+                              <span className="truncate max-w-[160px]">{student.homeMunicipality}</span>
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <span className="truncate max-w-[110px] block">{student.studyPath}</span>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            {getStatusBadge(student.status)}
+                            {isProtected && privacyMark && (
+                              <PrivacyIndicator privacyMark={privacyMark} showDetails={false} />
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-1 justify-center flex-wrap">
+                            {student.needsHomeMunicipality && (
+                              <Select onValueChange={(value) => handleAssignMunicipality(student.id, value)}>
+                                <SelectTrigger className="w-24 h-8 text-xs">
+                                  <SelectValue placeholder="Assign" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {municipalities.map((municipality) => (
+                                    <SelectItem key={municipality} value={municipality}>
+                                      {municipality}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                            
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleConvertTF(student)}
+                                  className="text-xs px-2 py-1"
+                                >
+                                  <RefreshCw className="w-3 h-3 mr-1" />
+                                  Convert
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Convert TF Number</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to convert TF number "{studentToConvert?.tfNumber}" to a unique municipal code? This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel onClick={() => setStudentToConvert(null)}>
+                                    Cancel
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction onClick={confirmConvertTF}>
                                     Convert
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Convert TF Number</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Are you sure you want to convert TF number "{studentToConvert?.tfNumber}" to a unique municipal code? This action cannot be undone.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel onClick={() => setStudentToConvert(null)}>
-                                      Cancel
-                                    </AlertDialogCancel>
-                                    <AlertDialogAction onClick={confirmConvertTF}>
-                                      Convert
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
 
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setSelectedStudent(student)}
-                              >
-                                <Edit className="w-3 h-3" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            </ScrollArea>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setSelectedStudent(student)}
+                              className="px-2 py-1"
+                            >
+                              <Edit className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
 
