@@ -365,11 +365,6 @@ export const municipalityAdminMenu: MenuItem[] = [
     icon: FileText,
     items: [
       {
-        title: "Statistics",
-        url: "/statistics",
-        icon: BarChart3,
-      },
-      {
         title: "Money to Receive",
         url: "/reports/money-to-receive",
         icon: TrendingUp,
