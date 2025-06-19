@@ -150,31 +150,6 @@ export const regionalAdminMenu: MenuItem[] = [
     icon: FileText,
     items: [
       {
-        title: "Statistics",
-        url: "/statistics",
-        icon: BarChart3,
-      },
-      {
-        title: "Regional Statistics",
-        url: "/reports/regional",
-        icon: BarChart3,
-      },
-      {
-        title: "Monthly Compilation",
-        url: "/reports/monthly",
-        icon: Calendar,
-      },
-      {
-        title: "Financial Analysis",
-        url: "/reports/financial",
-        icon: DollarSign,
-      },
-      {
-        title: "Change Tracking",
-        url: "/reports/changes",
-        icon: Activity,
-      },
-      {
         title: "Geographical Analysis",
         url: "/analysis/geographical",
         icon: MapPin,
