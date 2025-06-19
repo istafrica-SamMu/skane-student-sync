@@ -52,6 +52,7 @@ import PopulationRegistry from "./pages/integration/PopulationRegistry";
 import IntegrationTesting from "./pages/integration/IntegrationTesting";
 import TaxAgencyHub from "./pages/integration/TaxAgencyHub";
 import UHRBEDAIntegration from "./pages/integration/UHRBEDAIntegration";
+import AdmissionIntegration from "./pages/integration/AdmissionIntegration";
 import StudentsByClass from "./pages/students/StudentsByClass";
 import MunicipalStudents from "./pages/students/MunicipalStudents";
 import ExternalStudents from "./pages/students/ExternalStudents";
@@ -467,6 +468,11 @@ const AppContent = () => {
               <Route path="/integration/uhr-beda" element={
                 <ProtectedRoute>
                   <UHRBEDAIntegration />
+                </ProtectedRoute>
+              } />
+              <Route path="/integration/admission" element={
+                <ProtectedRoute>
+                  <AdmissionIntegration />
                 </ProtectedRoute>
               } />
               <Route path="/integration/*" element={

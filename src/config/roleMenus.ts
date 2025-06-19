@@ -155,6 +155,11 @@ export const regionalAdminMenu: MenuItem[] = [
         icon: GraduationCap,
       },
       {
+        title: "Admission Integration",
+        url: "/integration/admission",
+        icon: UserPlus,
+      },
+      {
         title: "Integration Testing",
         url: "/integration/testing",
         icon: Activity,
@@ -326,6 +331,11 @@ export const municipalityAdminMenu: MenuItem[] = [
         title: "UHR BEDA Integration",
         url: "/integration/uhr-beda",
         icon: GraduationCap,
+      },
+      {
+        title: "Admission Integration",
+        url: "/integration/admission",
+        icon: UserPlus,
       },
       {
         title: "Integration Status",
