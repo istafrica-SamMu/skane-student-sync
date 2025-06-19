@@ -505,12 +505,6 @@ const Dashboard = () => {
                 </Link>
               </Button>
               <Button asChild className="w-full justify-start" variant="outline">
-                <Link to="/students/classes">
-                  <GraduationCap className="w-4 h-4 mr-2" />
-                  Students by Class & Study Path
-                </Link>
-              </Button>
-              <Button asChild className="w-full justify-start" variant="outline">
                 <Link to="/students/municipal">
                   <School className="w-4 h-4 mr-2" />
                   Municipal School Students
