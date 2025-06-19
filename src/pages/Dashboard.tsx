@@ -401,115 +401,7 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Municipal Integration Status */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center text-ike-neutral-dark">
-                <Database className="w-5 h-5 mr-2 text-ike-primary" />
-                Municipal Integration Status
-              </CardTitle>
-              <CardDescription>
-                System integration and data synchronization
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Schedule Integration</span>
-                  <Badge className="bg-ike-success text-white">
-                    <CheckCircle className="w-3 h-3 mr-1" />
-                    Connected
-                  </Badge>
-                </div>
-                <Progress value={100} className="h-2" />
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Student Data Import</span>
-                  <Badge className="bg-ike-warning text-white">
-                    <Clock className="w-3 h-3 mr-1" />
-                    Processing
-                  </Badge>
-                </div>
-                <Progress value={65} className="h-2" />
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Regional Sync</span>
-                  <Badge className="bg-ike-success text-white">
-                    <CheckCircle className="w-3 h-3 mr-1" />
-                    Up to date
-                  </Badge>
-                </div>
-                <Progress value={100} className="h-2" />
-              </div>
-
-              <div className="pt-4 border-t">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-ike-neutral">Last sync:</span>
-                  <span className="text-sm font-medium">5 minutes ago</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Municipal Operations */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-ike-neutral-dark">Municipal Operations</CardTitle>
-              <CardDescription>
-                Quick access to key functions
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button 
-                asChild
-                className="w-full justify-start bg-ike-primary hover:bg-ike-primary-dark text-white"
-              >
-                <Link to="/students">
-                  <Users className="w-4 h-4 mr-2" />
-                  Student Management
-                </Link>
-              </Button>
-              <Button 
-                asChild
-                variant="outline" 
-                className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
-              >
-                <Link to="/financial/reports">
-                  <Euro className="w-4 h-4 mr-2" />
-                  Financial Reports
-                </Link>
-              </Button>
-              <Button 
-                asChild
-                variant="outline" 
-                className="w-full justify-start"
-              >
-                <Link to="/operations/municipal-schools">
-                  <School className="w-4 h-4 mr-2" />
-                  Municipal Schools
-                </Link>
-              </Button>
-              <Button 
-                asChild
-                variant="outline" 
-                className="w-full justify-start"
-              >
-                <Link to="/integration/import">
-                  <Database className="w-4 h-4 mr-2" />
-                  Import Student Data
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Municipal Schools Overview */}
+        {/* Municipal Schools Overview - Full Width */}
         <Card>
           <CardHeader>
             <CardTitle className="text-ike-neutral-dark">Municipal Schools Overview</CardTitle>
@@ -583,7 +475,7 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Financial Summary & Quick Actions */}
+        {/* Financial Summary & Quick Actions - Side by side */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
@@ -626,12 +518,18 @@ const Dashboard = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-ike-neutral-dark">Municipal Quick Actions</CardTitle>
+              <CardTitle className="text-ike-neutral-dark">Municipal Management</CardTitle>
               <CardDescription>
-                Essential municipal management functions
+                Essential municipal functions
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
+              <Button asChild className="w-full justify-start bg-ike-primary hover:bg-ike-primary-dark text-white">
+                <Link to="/students">
+                  <Users className="w-4 h-4 mr-2" />
+                  Student Management
+                </Link>
+              </Button>
               <Button asChild className="w-full justify-start" variant="outline">
                 <Link to="/students/classes">
                   <GraduationCap className="w-4 h-4 mr-2" />
