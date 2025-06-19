@@ -59,7 +59,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import TravelCardSyncStatus from "@/components/students/TravelCardSyncStatus";
 import EligibilityDecisionTools from "@/components/students/EligibilityDecisionTools";
 
 interface TravelCardStudent {
@@ -306,13 +305,7 @@ const TravelCardDocuments = () => {
         </div>
       </div>
 
-      {/* Daily Data Update Status */}
-      <TravelCardSyncStatus />
-
-      {/* Enhanced Eligibility Decision Tools */}
-      <EligibilityDecisionTools />
-
-      {/* Statistics Cards */}
+      {/* Statistics Cards - Moved to top */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="border-l-4 border-l-ike-primary">
           <CardHeader className="pb-2">
@@ -362,6 +355,9 @@ const TravelCardDocuments = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Enhanced Eligibility Decision Tools */}
+      <EligibilityDecisionTools />
 
       {/* Search and Filter Section */}
       <Card>
