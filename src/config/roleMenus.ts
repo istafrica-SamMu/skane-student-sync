@@ -235,11 +235,6 @@ export const municipalityAdminMenu: MenuItem[] = [
         icon: IdCard,
       },
       {
-        title: "Conflict Resolution",
-        url: "/students/conflict-resolution",
-        icon: AlertTriangle,
-      },
-      {
         title: "Municipal School Students",
         url: "/students/municipal",
         icon: School,
@@ -448,11 +443,6 @@ export const schoolAdminMenu: MenuItem[] = [
         title: "TF Number Registration",
         url: "/students/tf-registration",
         icon: IdCard,
-      },
-      {
-        title: "Conflict Resolution",
-        url: "/students/conflict-resolution",
-        icon: AlertTriangle,
       },
       {
         title: "Travel Card Documents",

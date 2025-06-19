@@ -79,7 +79,6 @@ import StatisticsSwedenReports from "./pages/kaa/StatisticsSwedenReports";
 import MeasuresAndActions from "./pages/kaa/MeasuresAndActions";
 import KAADashboard from "./pages/kaa/KAADashboard";
 import TFRegistration from "@/pages/students/TFRegistration";
-import ConflictResolution from "./pages/students/ConflictResolution";
 import GeographicalAnalysis from "./pages/analysis/GeographicalAnalysis";
 
 const queryClient = new QueryClient();
@@ -256,11 +255,6 @@ const AppContent = () => {
                   <TFRegistration />
                 </ProtectedRoute>
               } />
-              <Route path="/students/conflict-resolution" element={
-                <ProtectedRoute>
-                  <ConflictResolution />
-                </ProtectedRoute>
-              } />
               <Route path="/students/classes" element={
                 <ProtectedRoute>
                   <StudentsByClass />
@@ -296,7 +290,6 @@ const AppContent = () => {
                   <StudentBulk />
                 </ProtectedRoute>
               } />
-              
               <Route path="/financial" element={
                 <ProtectedRoute>
                   <Financial />

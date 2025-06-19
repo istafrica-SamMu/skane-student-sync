@@ -43,11 +43,15 @@ import {
   UserPlus,
   Search,
   Edit,
+  MapPin,
   AlertTriangle,
   CheckCircle,
-  RefreshCw
+  RefreshCw,
+  RotateCcw
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import DualPlacementDetector from "./DualPlacementDetector";
+import GradeRepetitionDetector from "./GradeRepetitionDetector";
 import ProtectedDataDisplay from "./ProtectedDataDisplay";
 import PrivacyIndicator from "./PrivacyIndicator";
 import { privacyService } from "@/services/privacyService";
@@ -77,8 +81,10 @@ const TFNumberRegistration = () => {
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<TFStudent | null>(null);
   const [studentToConvert, setStudentToConvert] = useState<TFStudent | null>(null);
+  const [hasConflicts, setHasConflicts] = useState(false);
+  const [hasGradeRepetitions, setHasGradeRepetitions] = useState(false);
 
-  // Form state
+  // Form state - Fixed to include contactEmail
   const [formData, setFormData] = useState({
     tfNumber: "",
     firstName: "",
@@ -150,6 +156,23 @@ const TFNumberRegistration = () => {
     },
     {
       id: 4,
+      tfNumber: "TF240115003", // Same student, different school (dual placement)
+      originalTF: "TF345678",
+      firstName: "Erik",
+      lastName: "Johansson",
+      birthDate: "2008-05-10",
+      municipalCode: "SK03",
+      homeMunicipality: "Assigned: Helsingborg",
+      studyPath: "Teknik",
+      schoolYear: "1",
+      schoolUnit: "Kristianstad Gymnasium",
+      status: "payment_blocked",
+      needsHomeMunicipality: false,
+      contactEmail: "kristianstad.gym@education.se",
+      startDate: "2024-09-01",
+    },
+    {
+      id: 5,
       tfNumber: "TF240115004",
       originalTF: "TF456789",
       firstName: "Maria",
@@ -164,6 +187,31 @@ const TFNumberRegistration = () => {
       needsHomeMunicipality: false,
       contactEmail: "ystad.gym@education.se",
       startDate: "2024-08-15",
+    }
+  ]);
+
+  // Mock enrollment history for grade repetition testing
+  const [enrollmentHistory] = useState([
+    {
+      id: 1,
+      studentId: 5,
+      studentName: "Maria Svensson",
+      studyPath: "Ekonomi",
+      schoolYear: "2",
+      schoolUnit: "Malmö Gymnasium",
+      startDate: "2023-08-15",
+      endDate: "2024-06-15",
+      homeMunicipalityContact: "ystad.municipality@kommun.se"
+    },
+    {
+      id: 2,
+      studentId: 5,
+      studentName: "Maria Svensson",
+      studyPath: "Ekonomi",
+      schoolYear: "2", // Same grade repetition
+      schoolUnit: "Ystad Gymnasium",
+      startDate: "2024-08-15",
+      homeMunicipalityContact: "ystad.municipality@kommun.se"
     }
   ]);
 
@@ -296,6 +344,19 @@ const TFNumberRegistration = () => {
     student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     student.tfNumber.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Convert TF students to enrollment format for dual placement detection
+  const enrollments = tfStudents.map(student => ({
+    id: student.id,
+    studentId: student.id,
+    studentName: `${student.firstName} ${student.lastName}`,
+    schoolUnit: student.schoolUnit,
+    contactEmail: student.contactEmail || 'contact@school.se',
+    startDate: student.startDate || '2024-08-15',
+    endDate: student.endDate,
+    studyPath: student.studyPath,
+    schoolYear: student.schoolYear
+  }));
 
   return (
     <div className="space-y-6">
@@ -455,6 +516,46 @@ const TFNumberRegistration = () => {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Conflict Detection Systems */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <DualPlacementDetector 
+          enrollments={enrollments}
+          onDetectionChange={setHasConflicts}
+        />
+        <GradeRepetitionDetector 
+          enrollmentHistory={enrollmentHistory}
+          onDetectionChange={setHasGradeRepetitions}
+        />
+      </div>
+
+      {/* Alert Summary */}
+      {(hasConflicts || hasGradeRepetitions) && (
+        <Card className="border-l-4 border-l-yellow-500">
+          <CardHeader>
+            <CardTitle className="flex items-center text-yellow-700">
+              <AlertTriangle className="w-5 h-5 mr-2" />
+              Detection Summary
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {hasConflicts && (
+                <div className="flex items-center text-red-600">
+                  <AlertTriangle className="w-4 h-4 mr-2" />
+                  <span>Dual placement conflicts detected - Payments blocked</span>
+                </div>
+              )}
+              {hasGradeRepetitions && (
+                <div className="flex items-center text-orange-600">
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  <span>Grade repetitions detected - Municipalities notified</span>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Search and Filters */}
       <Card>
