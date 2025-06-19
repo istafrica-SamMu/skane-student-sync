@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -28,8 +29,8 @@ import RoleManagement from "./pages/system/RoleManagement";
 import MunicipalityManagement from "./pages/system/MunicipalityManagement";
 import GroupManagement from "./pages/system/GroupManagement";
 import SchoolUnits from "./pages/system/SchoolUnits";
-import SchoolYears from "./pages/SchoolYears";
-import Support from "./pages/Support";
+import SchoolYears from "./pages/system/SchoolYears";
+import Support from "./pages/system/Support";
 import StudyPaths from "./pages/study-paths/StudyPaths";
 import PriceCodes from "./pages/study-paths/PriceCodes";
 import NationalPrograms from "./pages/study-paths/NationalPrograms";
