@@ -16,23 +16,16 @@ import {
   Activity,
   Calendar,
   FileText,
-  Target,
-  AlertCircle,
   CheckCircle,
   Clock,
-  BarChart3,
   Plus,
-  Eye,
 } from "lucide-react";
 import { StatisticsReportModal } from "@/components/kaa/StatisticsReportModal";
 import { NewRegistrationModal } from "@/components/kaa/NewRegistrationModal";
-import { QuickActionModal } from "@/components/kaa/QuickActionModal";
 
 const KAADashboard = () => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
-  const [showQuickActionModal, setShowQuickActionModal] = useState(false);
-  const [selectedAction, setSelectedAction] = useState<'records' | 'measures' | 'contacts' | 'scb' | null>(null);
 
   // Mock data for dashboard
   const dashboardStats = {
@@ -122,11 +115,6 @@ const KAADashboard = () => {
       default:
         return <Badge variant="secondary">Unknown</Badge>;
     }
-  };
-
-  const handleQuickAction = (actionType: 'records' | 'measures' | 'contacts' | 'scb') => {
-    setSelectedAction(actionType);
-    setShowQuickActionModal(true);
   };
 
   return (
@@ -278,53 +266,6 @@ const KAADashboard = () => {
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center text-ike-neutral-dark">
-            <Target className="w-5 h-5 mr-2 text-ike-primary" />
-            Quick Actions
-          </CardTitle>
-          <CardDescription>Common tasks and shortcuts</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Button 
-              variant="outline" 
-              className="h-20 flex flex-col items-center justify-center"
-              onClick={() => handleQuickAction('records')}
-            >
-              <Users className="w-6 h-6 mb-2" />
-              View All Records
-            </Button>
-            <Button 
-              variant="outline" 
-              className="h-20 flex flex-col items-center justify-center"
-              onClick={() => handleQuickAction('measures')}
-            >
-              <Target className="w-6 h-6 mb-2" />
-              Manage Measures
-            </Button>
-            <Button 
-              variant="outline" 
-              className="h-20 flex flex-col items-center justify-center"
-              onClick={() => handleQuickAction('contacts')}
-            >
-              <Activity className="w-6 h-6 mb-2" />
-              Contact Occasions
-            </Button>
-            <Button 
-              variant="outline" 
-              className="h-20 flex flex-col items-center justify-center"
-              onClick={() => handleQuickAction('scb')}
-            >
-              <BarChart3 className="w-6 h-6 mb-2" />
-              SCB Reports
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Modals */}
       <StatisticsReportModal 
         open={showReportModal} 
@@ -334,12 +275,6 @@ const KAADashboard = () => {
       <NewRegistrationModal 
         open={showRegistrationModal} 
         onOpenChange={setShowRegistrationModal}
-      />
-      
-      <QuickActionModal 
-        open={showQuickActionModal} 
-        onOpenChange={setShowQuickActionModal}
-        actionType={selectedAction}
       />
     </div>
   );
