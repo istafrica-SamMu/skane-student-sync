@@ -60,7 +60,6 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import TravelCardSyncStatus from "@/components/students/TravelCardSyncStatus";
-import Grade1ImportSystem from "@/components/students/Grade1ImportSystem";
 import EligibilityDecisionTools from "@/components/students/EligibilityDecisionTools";
 
 interface TravelCardStudent {
@@ -309,9 +308,6 @@ const TravelCardDocuments = () => {
 
       {/* Daily Data Update Status */}
       <TravelCardSyncStatus />
-
-      {/* Grade 1 Import System */}
-      <Grade1ImportSystem />
 
       {/* Enhanced Eligibility Decision Tools */}
       <EligibilityDecisionTools />
