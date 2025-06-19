@@ -129,11 +129,6 @@ export const regionalAdminMenu: MenuItem[] = [
     icon: Workflow,
     items: [
       {
-        title: "Integration Overview",
-        url: "/integration",
-        icon: Monitor,
-      },
-      {
         title: "Tax Agency Hub",
         url: "/integration/tax-agency-hub",
         icon: Database,
