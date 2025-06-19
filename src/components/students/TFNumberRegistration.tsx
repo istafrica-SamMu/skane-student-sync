@@ -516,7 +516,7 @@ const TFNumberRegistration = () => {
                         {isProtected ? (
                           <ProtectedDataDisplay 
                             studentId={student.id}
-                            fiel="displayName"
+                            field="displayName"
                             fallbackValue={`${student.firstName} ${student.lastName}`}
                             userRole="principal"
                             showPrivacyIndicator={true}
