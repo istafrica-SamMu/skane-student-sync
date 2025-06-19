@@ -261,11 +261,6 @@ export const municipalityAdminMenu: MenuItem[] = [
         icon: IdCard,
       },
       {
-        title: "Students by Class & Study Path",
-        url: "/students/classes",
-        icon: GraduationCap,
-      },
-      {
         title: "Municipal School Students",
         url: "/students/municipal",
         icon: School,
