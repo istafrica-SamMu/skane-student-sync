@@ -486,11 +486,6 @@ export const schoolAdminMenu: MenuItem[] = [
         url: "/my-school/info",
         icon: Info,
       },
-      {
-        title: "Class Management",
-        url: "/students/classes",
-        icon: GraduationCap,
-      },
     ],
   },
   {
