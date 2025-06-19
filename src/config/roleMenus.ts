@@ -101,11 +101,6 @@ export const regionalAdminMenu: MenuItem[] = [
         url: "/system/school-years",
         icon: Calendar,
       },
-      {
-        title: "Support",
-        url: "/system/support",
-        icon: HelpCircle,
-      },
     ],
   },
   {
