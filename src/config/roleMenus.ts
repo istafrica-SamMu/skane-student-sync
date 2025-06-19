@@ -306,11 +306,6 @@ export const municipalityAdminMenu: MenuItem[] = [
         url: "/integration/admission",
         icon: UserPlus,
       },
-      {
-        title: "Integration Status",
-        url: "/integration/status",
-        icon: BarChart3,
-      },
     ],
   },
   {
