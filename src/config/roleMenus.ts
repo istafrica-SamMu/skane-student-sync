@@ -125,17 +125,6 @@ export const regionalAdminMenu: MenuItem[] = [
     ],
   },
   {
-    title: "Regional Operations",
-    icon: Database,
-    items: [
-      {
-        title: "Population Data",
-        url: "/operations/population",
-        icon: Users,
-      },
-    ],
-  },
-  {
     title: "Integration Management",
     icon: Workflow,
     items: [
