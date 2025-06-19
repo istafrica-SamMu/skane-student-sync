@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,6 +39,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   UserPlus,
   Search,
@@ -315,96 +315,366 @@ const TFNumberRegistration = () => {
   );
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-ike-neutral-dark">TF Number Registration</h1>
-          <p className="text-ike-neutral mt-2">
-            Manage students with temporary personal identity numbers (TF numbers)
-          </p>
+    <div className="min-h-screen w-full overflow-x-hidden">
+      <div className="max-w-full px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-ike-neutral-dark break-words">TF Number Registration</h1>
+            <p className="text-ike-neutral mt-2 text-sm sm:text-base">
+              Manage students with temporary personal identity numbers (TF numbers)
+            </p>
+          </div>
+          <Dialog open={showRegistrationForm} onOpenChange={setShowRegistrationForm}>
+            <DialogTrigger asChild>
+              <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white whitespace-nowrap">
+                <UserPlus className="w-4 h-4 mr-2" />
+                Register TF Student
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-ike-neutral-dark">Register TF Number Student</DialogTitle>
+                <DialogDescription>Register a new student with temporary personal identity number</DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleSubmitRegistration} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="tfNumber" className="text-ike-neutral">TF Number *</Label>
+                    <Input
+                      id="tfNumber"
+                      value={formData.tfNumber}
+                      onChange={(e) => setFormData({...formData, tfNumber: e.target.value})}
+                      placeholder="TF123456"
+                      className="border-ike-primary/20 focus:border-ike-primary"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="firstName" className="text-ike-neutral">First Name *</Label>
+                    <Input
+                      id="firstName"
+                      value={formData.firstName}
+                      onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                      className="border-ike-primary/20 focus:border-ike-primary"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="lastName" className="text-ike-neutral">Last Name *</Label>
+                    <Input
+                      id="lastName"
+                      value={formData.lastName}
+                      onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                      className="border-ike-primary/20 focus:border-ike-primary"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="birthDate" className="text-ike-neutral">Birth Date *</Label>
+                    <Input
+                      id="birthDate"
+                      type="date"
+                      value={formData.birthDate}
+                      onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
+                      className="border-ike-primary/20 focus:border-ike-primary"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="homeMunicipality" className="text-ike-neutral">Home Municipality</Label>
+                    <Select value={formData.homeMunicipality} onValueChange={(value) => setFormData({...formData, homeMunicipality: value})}>
+                      <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                        <SelectValue placeholder="Select municipality" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {municipalities.map((municipality) => (
+                          <SelectItem key={municipality} value={municipality}>
+                            {municipality}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="studyPath" className="text-ike-neutral">Study Path *</Label>
+                    <Select value={formData.studyPath} onValueChange={(value) => setFormData({...formData, studyPath: value})}>
+                      <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                        <SelectValue placeholder="Select study path" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {studyPaths.map((path) => (
+                          <SelectItem key={path} value={path}>
+                            {path}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="schoolYear" className="text-ike-neutral">School Year *</Label>
+                    <Select value={formData.schoolYear} onValueChange={(value) => setFormData({...formData, schoolYear: value})}>
+                      <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                        <SelectValue placeholder="Select year" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">Year 1</SelectItem>
+                        <SelectItem value="2">Year 2</SelectItem>
+                        <SelectItem value="3">Year 3</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="startDate" className="text-ike-neutral">Start Date *</Label>
+                    <Input
+                      id="startDate"
+                      type="date"
+                      value={formData.startDate}
+                      onChange={(e) => setFormData({...formData, startDate: e.target.value})}
+                      className="border-ike-primary/20 focus:border-ike-primary"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="contactEmail" className="text-ike-neutral">Contact Email</Label>
+                    <Input
+                      id="contactEmail"
+                      value={formData.contactEmail}
+                      onChange={(e) => setFormData({...formData, contactEmail: e.target.value})}
+                      className="border-ike-primary/20 focus:border-ike-primary"
+                    />
+                  </div>
+                </div>
+
+                <DialogFooter>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setShowRegistrationForm(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit"
+                    className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+                  >
+                    Register Student
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
-        <Dialog open={showRegistrationForm} onOpenChange={setShowRegistrationForm}>
-          <DialogTrigger asChild>
-            <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
-              <UserPlus className="w-4 h-4 mr-2" />
-              Register TF Student
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-ike-neutral-dark">Register TF Number Student</DialogTitle>
-              <DialogDescription>Register a new student with temporary personal identity number</DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmitRegistration} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="tfNumber" className="text-ike-neutral">TF Number *</Label>
-                  <Input
-                    id="tfNumber"
-                    value={formData.tfNumber}
-                    onChange={(e) => setFormData({...formData, tfNumber: e.target.value})}
-                    placeholder="TF123456"
-                    className="border-ike-primary/20 focus:border-ike-primary"
-                    required
-                  />
-                </div>
 
-                <div>
-                  <Label htmlFor="firstName" className="text-ike-neutral">First Name *</Label>
-                  <Input
-                    id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                    className="border-ike-primary/20 focus:border-ike-primary"
-                    required
-                  />
-                </div>
+        {/* Search and Filters */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center text-ike-neutral-dark">
+              <Search className="w-5 h-5 mr-2 text-ike-primary" />
+              Search TF Students
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1 min-w-0">
+                <Input
+                  placeholder="Search by name or TF number..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="border-ike-primary/20 focus:border-ike-primary w-full"
+                />
+              </div>
+              <Button variant="outline" className="whitespace-nowrap">
+                <Search className="w-4 h-4 mr-2" />
+                Search
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-                <div>
-                  <Label htmlFor="lastName" className="text-ike-neutral">Last Name *</Label>
-                  <Input
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                    className="border-ike-primary/20 focus:border-ike-primary"
-                    required
-                  />
-                </div>
+        {/* TF Students List */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-ike-neutral-dark">TF Number Students</CardTitle>
+            <CardDescription>Students with temporary personal identity numbers</CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <ScrollArea className="w-full">
+              <div className="min-w-[800px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="font-medium whitespace-nowrap">TF Number</TableHead>
+                      <TableHead className="font-medium whitespace-nowrap">Name</TableHead>
+                      <TableHead className="font-medium whitespace-nowrap">Birth Date</TableHead>
+                      <TableHead className="font-medium whitespace-nowrap">Municipal Code</TableHead>
+                      <TableHead className="font-medium whitespace-nowrap">Home Municipality</TableHead>
+                      <TableHead className="font-medium whitespace-nowrap">Study Path</TableHead>
+                      <TableHead className="font-medium whitespace-nowrap">Status</TableHead>
+                      <TableHead className="font-medium text-center whitespace-nowrap">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredStudents.map((student) => {
+                      const isProtected = privacyService.isStudentProtected(student.id);
+                      const privacyMark = privacyService.getPrivacyMark(student.id);
+                      
+                      return (
+                        <TableRow key={student.id}>
+                          <TableCell className="font-mono whitespace-nowrap">{student.tfNumber}</TableCell>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2 min-w-0">
+                              {isProtected ? (
+                                <ProtectedDataDisplay 
+                                  studentId={student.id}
+                                  field="displayName"
+                                  fallbackValue={`${student.firstName} ${student.lastName}`}
+                                  userRole="principal"
+                                  showPrivacyIndicator={true}
+                                />
+                              ) : (
+                                <span className="truncate">{student.firstName} {student.lastName}</span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap">
+                            {isProtected ? (
+                              <ProtectedDataDisplay 
+                                studentId={student.id}
+                                field="birthDate"
+                                fallbackValue={student.birthDate}
+                                userRole="principal"
+                                showPrivacyIndicator={false}
+                              />
+                            ) : (
+                              student.birthDate
+                            )}
+                          </TableCell>
+                          <TableCell className="font-mono whitespace-nowrap">{student.municipalCode}</TableCell>
+                          <TableCell>
+                            {student.needsHomeMunicipality ? (
+                              <div className="flex items-center gap-2 whitespace-nowrap">
+                                <AlertTriangle className="w-4 h-4 text-orange-500 flex-shrink-0" />
+                                <span className="text-orange-600">Not Assigned</span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                                <span className="truncate">{student.homeMunicipality}</span>
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap">{student.studyPath}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {getStatusBadge(student.status)}
+                              {isProtected && privacyMark && (
+                                <PrivacyIndicator privacyMark={privacyMark} showDetails={false} />
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2 justify-center">
+                              {student.needsHomeMunicipality && (
+                                <Select onValueChange={(value) => handleAssignMunicipality(student.id, value)}>
+                                  <SelectTrigger className="w-32 h-8">
+                                    <SelectValue placeholder="Assign" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {municipalities.map((municipality) => (
+                                      <SelectItem key={municipality} value={municipality}>
+                                        {municipality}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              )}
+                              
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleConvertTF(student)}
+                                    className="whitespace-nowrap"
+                                  >
+                                    <RefreshCw className="w-3 h-3 mr-1" />
+                                    Convert
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Convert TF Number</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to convert TF number "{studentToConvert?.tfNumber}" to a unique municipal code? This action cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel onClick={() => setStudentToConvert(null)}>
+                                      Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction onClick={confirmConvertTF}>
+                                      Convert
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
 
-                <div>
-                  <Label htmlFor="birthDate" className="text-ike-neutral">Birth Date *</Label>
-                  <Input
-                    id="birthDate"
-                    type="date"
-                    value={formData.birthDate}
-                    onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
-                    className="border-ike-primary/20 focus:border-ike-primary"
-                    required
-                  />
-                </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setSelectedStudent(student)}
+                              >
+                                <Edit className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
 
+        {/* Edit Student Dialog */}
+        {selectedStudent && (
+          <Dialog open={!!selectedStudent} onOpenChange={() => setSelectedStudent(null)}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Student: {selectedStudent.firstName} {selectedStudent.lastName}</DialogTitle>
+                <DialogDescription>Update student information</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
                 <div>
-                  <Label htmlFor="homeMunicipality" className="text-ike-neutral">Home Municipality</Label>
-                  <Select value={formData.homeMunicipality} onValueChange={(value) => setFormData({...formData, homeMunicipality: value})}>
-                    <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
-                      <SelectValue placeholder="Select municipality" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {municipalities.map((municipality) => (
-                        <SelectItem key={municipality} value={municipality}>
-                          {municipality}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label>TF Number</Label>
+                  <Input value={selectedStudent.tfNumber} disabled />
                 </div>
-
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>First Name</Label>
+                    <Input value={selectedStudent.firstName} />
+                  </div>
+                  <div>
+                    <Label>Last Name</Label>
+                    <Input value={selectedStudent.lastName} />
+                  </div>
+                </div>
                 <div>
-                  <Label htmlFor="studyPath" className="text-ike-neutral">Study Path *</Label>
-                  <Select value={formData.studyPath} onValueChange={(value) => setFormData({...formData, studyPath: value})}>
-                    <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
-                      <SelectValue placeholder="Select study path" />
+                  <Label>Study Path</Label>
+                  <Select value={selectedStudent.studyPath}>
+                    <SelectTrigger>
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       {studyPaths.map((path) => (
@@ -415,282 +685,19 @@ const TFNumberRegistration = () => {
                     </SelectContent>
                   </Select>
                 </div>
-
-                <div>
-                  <Label htmlFor="schoolYear" className="text-ike-neutral">School Year *</Label>
-                  <Select value={formData.schoolYear} onValueChange={(value) => setFormData({...formData, schoolYear: value})}>
-                    <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
-                      <SelectValue placeholder="Select year" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">Year 1</SelectItem>
-                      <SelectItem value="2">Year 2</SelectItem>
-                      <SelectItem value="3">Year 3</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="startDate" className="text-ike-neutral">Start Date *</Label>
-                  <Input
-                    id="startDate"
-                    type="date"
-                    value={formData.startDate}
-                    onChange={(e) => setFormData({...formData, startDate: e.target.value})}
-                    className="border-ike-primary/20 focus:border-ike-primary"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="contactEmail" className="text-ike-neutral">Contact Email</Label>
-                  <Input
-                    id="contactEmail"
-                    value={formData.contactEmail}
-                    onChange={(e) => setFormData({...formData, contactEmail: e.target.value})}
-                    className="border-ike-primary/20 focus:border-ike-primary"
-                  />
-                </div>
               </div>
-
               <DialogFooter>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setShowRegistrationForm(false)}
-                >
+                <Button variant="outline" onClick={() => setSelectedStudent(null)}>
                   Cancel
                 </Button>
-                <Button 
-                  type="submit"
-                  className="bg-ike-primary hover:bg-ike-primary-dark text-white"
-                >
-                  Register Student
+                <Button onClick={() => setSelectedStudent(null)}>
+                  Save Changes
                 </Button>
               </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
-
-      {/* Search and Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center text-ike-neutral-dark">
-            <Search className="w-5 h-5 mr-2 text-ike-primary" />
-            Search TF Students
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Search by name or TF number..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="border-ike-primary/20 focus:border-ike-primary"
-              />
-            </div>
-            <Button variant="outline">
-              <Search className="w-4 h-4 mr-2" />
-              Search
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* TF Students List */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-ike-neutral-dark">TF Number Students</CardTitle>
-          <CardDescription>Students with temporary personal identity numbers</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="font-medium">TF Number</TableHead>
-                <TableHead className="font-medium">Name</TableHead>
-                <TableHead className="font-medium">Birth Date</TableHead>
-                <TableHead className="font-medium">Municipal Code</TableHead>
-                <TableHead className="font-medium">Home Municipality</TableHead>
-                <TableHead className="font-medium">Study Path</TableHead>
-                <TableHead className="font-medium">Status</TableHead>
-                <TableHead className="font-medium text-center">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredStudents.map((student) => {
-                const isProtected = privacyService.isStudentProtected(student.id);
-                const privacyMark = privacyService.getPrivacyMark(student.id);
-                
-                return (
-                  <TableRow key={student.id}>
-                    <TableCell className="font-mono">{student.tfNumber}</TableCell>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        {isProtected ? (
-                          <ProtectedDataDisplay 
-                            studentId={student.id}
-                            field="displayName"
-                            fallbackValue={`${student.firstName} ${student.lastName}`}
-                            userRole="principal"
-                            showPrivacyIndicator={true}
-                          />
-                        ) : (
-                          <span>{student.firstName} {student.lastName}</span>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {isProtected ? (
-                        <ProtectedDataDisplay 
-                          studentId={student.id}
-                          field="birthDate"
-                          fallbackValue={student.birthDate}
-                          userRole="principal"
-                          showPrivacyIndicator={false}
-                        />
-                      ) : (
-                        student.birthDate
-                      )}
-                    </TableCell>
-                    <TableCell className="font-mono">{student.municipalCode}</TableCell>
-                    <TableCell>
-                      {student.needsHomeMunicipality ? (
-                        <div className="flex items-center gap-2">
-                          <AlertTriangle className="w-4 h-4 text-orange-500" />
-                          <span className="text-orange-600">Not Assigned</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-500" />
-                          <span>{student.homeMunicipality}</span>
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>{student.studyPath}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {getStatusBadge(student.status)}
-                        {isProtected && privacyMark && (
-                          <PrivacyIndicator privacyMark={privacyMark} showDetails={false} />
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2 justify-center">
-                        {student.needsHomeMunicipality && (
-                          <Select onValueChange={(value) => handleAssignMunicipality(student.id, value)}>
-                            <SelectTrigger className="w-32 h-8">
-                              <SelectValue placeholder="Assign" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {municipalities.map((municipality) => (
-                                <SelectItem key={municipality} value={municipality}>
-                                  {municipality}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                        
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleConvertTF(student)}
-                            >
-                              <RefreshCw className="w-3 h-3 mr-1" />
-                              Convert
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Convert TF Number</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to convert TF number "{studentToConvert?.tfNumber}" to a unique municipal code? This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel onClick={() => setStudentToConvert(null)}>
-                                Cancel
-                              </AlertDialogCancel>
-                              <AlertDialogAction onClick={confirmConvertTF}>
-                                Convert
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSelectedStudent(student)}
-                        >
-                          <Edit className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      {/* Edit Student Dialog */}
-      {selectedStudent && (
-        <Dialog open={!!selectedStudent} onOpenChange={() => setSelectedStudent(null)}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit Student: {selectedStudent.firstName} {selectedStudent.lastName}</DialogTitle>
-              <DialogDescription>Update student information</DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label>TF Number</Label>
-                <Input value={selectedStudent.tfNumber} disabled />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>First Name</Label>
-                  <Input value={selectedStudent.firstName} />
-                </div>
-                <div>
-                  <Label>Last Name</Label>
-                  <Input value={selectedStudent.lastName} />
-                </div>
-              </div>
-              <div>
-                <Label>Study Path</Label>
-                <Select value={selectedStudent.studyPath}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {studyPaths.map((path) => (
-                      <SelectItem key={path} value={path}>
-                        {path}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setSelectedStudent(null)}>
-                Cancel
-              </Button>
-              <Button onClick={() => setSelectedStudent(null)}>
-                Save Changes
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
 };
