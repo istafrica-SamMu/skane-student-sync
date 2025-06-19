@@ -80,6 +80,7 @@ import MeasuresAndActions from "./pages/kaa/MeasuresAndActions";
 import KAADashboard from "./pages/kaa/KAADashboard";
 import TFRegistration from "@/pages/students/TFRegistration";
 import GeographicalAnalysis from "./pages/analysis/GeographicalAnalysis";
+import ConflictResolution from "./pages/students/ConflictResolution";
 
 const queryClient = new QueryClient();
 
@@ -253,6 +254,11 @@ const AppContent = () => {
               <Route path="/students/tf-registration" element={
                 <ProtectedRoute>
                   <TFRegistration />
+                </ProtectedRoute>
+              } />
+              <Route path="/students/conflict-resolution" element={
+                <ProtectedRoute>
+                  <ConflictResolution />
                 </ProtectedRoute>
               } />
               <Route path="/students/classes" element={

@@ -43,15 +43,11 @@ import {
   UserPlus,
   Search,
   Edit,
-  MapPin,
   AlertTriangle,
   CheckCircle,
-  RefreshCw,
-  RotateCcw
+  RefreshCw
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import DualPlacementDetector from "./DualPlacementDetector";
-import GradeRepetitionDetector from "./GradeRepetitionDetector";
 import ProtectedDataDisplay from "./ProtectedDataDisplay";
 import PrivacyIndicator from "./PrivacyIndicator";
 import { privacyService } from "@/services/privacyService";
@@ -81,10 +77,8 @@ const TFNumberRegistration = () => {
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<TFStudent | null>(null);
   const [studentToConvert, setStudentToConvert] = useState<TFStudent | null>(null);
-  const [hasConflicts, setHasConflicts] = useState(false);
-  const [hasGradeRepetitions, setHasGradeRepetitions] = useState(false);
 
-  // Form state - Fixed to include contactEmail
+  // Form state
   const [formData, setFormData] = useState({
     tfNumber: "",
     firstName: "",
@@ -152,7 +146,6 @@ const TFNumberRegistration = () => {
       needsHomeMunicipality: false,
       contactEmail: "helsingborg.gym@education.se",
       startDate: "2024-08-15",
-      endDate: "2024-12-15",
     },
     {
       id: 4,
