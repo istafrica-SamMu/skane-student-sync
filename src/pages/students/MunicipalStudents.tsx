@@ -1,10 +1,17 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
   Users, 
   Search, 
@@ -13,14 +20,21 @@ import {
   MapPin,
   GraduationCap,
   Eye,
-  Download
+  Download,
+  User,
+  Calendar,
+  School
 } from "lucide-react";
 import ProtectedDataDisplay from "@/components/students/ProtectedDataDisplay";
 import PrivacyIndicator from "@/components/students/PrivacyIndicator";
 import { privacyService } from "@/services/privacyService";
+import { useToast } from "@/hooks/use-toast";
 
 const MunicipalStudents = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [showStudentDetails, setShowStudentDetails] = useState(false);
+  const { toast } = useToast();
 
   // Mock municipal students data
   const municipalStudents = [
@@ -92,6 +106,19 @@ const MunicipalStudents = () => {
     }
   };
 
+  const handleViewStudent = (student) => {
+    setSelectedStudent(student);
+    setShowStudentDetails(true);
+  };
+
+  const handleExportData = () => {
+    toast({
+      title: "Export Started",
+      description: "Municipal student data export has been initiated.",
+    });
+    console.log('Exporting municipal student data...');
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -107,7 +134,10 @@ const MunicipalStudents = () => {
             <Filter className="w-4 h-4 mr-2" />
             Filter
           </Button>
-          <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+          <Button 
+            className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+            onClick={handleExportData}
+          >
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
@@ -266,12 +296,15 @@ const MunicipalStudents = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          <Eye className="w-3 h-3 mr-1" />
-                          View
-                        </Button>
-                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleViewStudent(student)}
+                        className="hover:bg-ike-primary/10"
+                      >
+                        <Eye className="w-3 h-3 mr-1" />
+                        View
+                      </Button>
                     </TableCell>
                   </TableRow>
                 );
@@ -280,6 +313,79 @@ const MunicipalStudents = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Student Details Modal */}
+      <Dialog open={showStudentDetails} onOpenChange={setShowStudentDetails}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-ike-neutral-dark">
+              <User className="w-5 h-5 mr-2 text-ike-primary" />
+              Municipal Student Details
+            </DialogTitle>
+            <DialogDescription>
+              Complete information for the selected municipal student
+            </DialogDescription>
+          </DialogHeader>
+          {selectedStudent && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-ike-neutral">Full Name</label>
+                  <p className="text-ike-neutral-dark font-medium">{selectedStudent.firstName} {selectedStudent.lastName}</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-ike-neutral">Personal Number</label>
+                  <p className="text-ike-neutral-dark font-mono">{selectedStudent.personalNumber}</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-ike-neutral">Birth Date</label>
+                  <div className="flex items-center">
+                    <Calendar className="w-4 h-4 mr-2 text-ike-neutral" />
+                    <p className="text-ike-neutral-dark">{selectedStudent.birthDate}</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-ike-neutral">Study Path</label>
+                  <div className="flex items-center">
+                    <GraduationCap className="w-4 h-4 mr-2 text-ike-neutral" />
+                    <p className="text-ike-neutral-dark">{selectedStudent.studyPath}</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-ike-neutral">School Year</label>
+                  <p className="text-ike-neutral-dark">{selectedStudent.schoolYear}</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-ike-neutral">School Unit</label>
+                  <div className="flex items-center">
+                    <School className="w-4 h-4 mr-2 text-ike-neutral" />
+                    <p className="text-ike-neutral-dark">{selectedStudent.schoolUnit}</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-ike-neutral">Enrollment Date</label>
+                  <div className="flex items-center">
+                    <Calendar className="w-4 h-4 mr-2 text-ike-neutral" />
+                    <p className="text-ike-neutral-dark">{selectedStudent.enrollmentDate}</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-ike-neutral">Status</label>
+                  {getStatusBadge(selectedStudent.status)}
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowStudentDetails(false)}
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
