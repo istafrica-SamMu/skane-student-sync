@@ -583,8 +583,8 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Regional Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Regional Key Metrics - Adjusted to 3 columns */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="border-l-4 border-l-ike-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-ike-neutral">
@@ -631,91 +631,21 @@ const Dashboard = () => {
               </div>
             </CardContent>
           </Card>
-
-          <Card className="border-l-4 border-l-green-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-ike-neutral">
-                Regional Budget
-              </CardTitle>
-              <Euro className="h-4 w-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-ike-neutral-dark">1.2B SEK</div>
-              <div className="text-xs text-ike-neutral mt-1">
-                November 2024 calculation
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Regional System Status */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center text-ike-neutral-dark">
-                <Database className="w-5 h-5 mr-2 text-ike-primary" />
-                Regional System Status
-              </CardTitle>
-              <CardDescription>
-                Monthly calculation and system health overview
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Regional Data Synchronization</span>
-                  <Badge className="bg-ike-success text-white">
-                    <CheckCircle className="w-3 h-3 mr-1" />
-                    Active
-                  </Badge>
-                </div>
-                <Progress value={100} className="h-2" />
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Municipal Integration Health</span>
-                  <Badge className="bg-ike-success text-white">
-                    <CheckCircle className="w-3 h-3 mr-1" />
-                    98% Connected
-                  </Badge>
-                </div>
-                <Progress value={98} className="h-2" />
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Regional Calculation Processing</span>
-                  <Badge className="bg-ike-warning text-white">
-                    <Clock className="w-3 h-3 mr-1" />
-                    In Progress
-                  </Badge>
-                </div>
-                <Progress value={75} className="h-2" />
-              </div>
-
-              <div className="pt-4 border-t">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-ike-neutral">Next regional sync:</span>
-                  <span className="text-sm font-medium">Tomorrow 03:00</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Regional Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-ike-neutral-dark">Regional Operations</CardTitle>
-              <CardDescription>
-                System administration and oversight
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
+        {/* Regional Operations - Full Width */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-ike-neutral-dark">Regional Operations</CardTitle>
+            <CardDescription>
+              System administration and oversight
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <Button 
                 asChild
-                className="w-full justify-start bg-ike-primary hover:bg-ike-primary-dark text-white"
+                className="justify-start bg-ike-primary hover:bg-ike-primary-dark text-white"
               >
                 <Link to="/system/municipalities">
                   <Building className="w-4 h-4 mr-2" />
@@ -725,7 +655,7 @@ const Dashboard = () => {
               <Button 
                 asChild
                 variant="outline" 
-                className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
+                className="justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
               >
                 <Link to="/system/schools">
                   <School className="w-4 h-4 mr-2" />
@@ -735,7 +665,7 @@ const Dashboard = () => {
               <Button 
                 asChild
                 variant="outline" 
-                className="w-full justify-start"
+                className="justify-start"
               >
                 <Link to="/system/users">
                   <Users className="w-4 h-4 mr-2" />
@@ -745,16 +675,16 @@ const Dashboard = () => {
               <Button 
                 asChild
                 variant="outline" 
-                className="w-full justify-start"
+                className="justify-start"
               >
                 <Link to="/settings">
                   <Shield className="w-4 h-4 mr-2" />
                   System Settings
                 </Link>
               </Button>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Municipality Overview */}
         <Card>
