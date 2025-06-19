@@ -1,5 +1,3 @@
-
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -81,7 +79,6 @@ import StatisticsSwedenReports from "./pages/kaa/StatisticsSwedenReports";
 import MeasuresAndActions from "./pages/kaa/MeasuresAndActions";
 import KAADashboard from "./pages/kaa/KAADashboard";
 import TFRegistration from "@/pages/students/TFRegistration";
-import ConflictResolution from "./pages/students/ConflictResolution";
 import GeographicalAnalysis from "./pages/analysis/GeographicalAnalysis";
 
 const queryClient = new QueryClient();
@@ -256,11 +253,6 @@ const AppContent = () => {
               <Route path="/students/tf-registration" element={
                 <ProtectedRoute>
                   <TFRegistration />
-                </ProtectedRoute>
-              } />
-              <Route path="/students/conflict-resolution" element={
-                <ProtectedRoute>
-                  <ConflictResolution />
                 </ProtectedRoute>
               } />
               <Route path="/students/classes" element={
