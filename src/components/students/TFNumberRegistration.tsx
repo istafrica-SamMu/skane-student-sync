@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -516,7 +515,7 @@ const TFNumberRegistration = () => {
                         {isProtected ? (
                           <ProtectedDataDisplay 
                             studentId={student.id}
-                            fiel="displayName"
+                            field="displayName"
                             fallbackValue={`${student.firstName} ${student.lastName}`}
                             userRole="principal"
                             showPrivacyIndicator={true}
