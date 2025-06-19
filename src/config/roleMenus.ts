@@ -333,11 +333,6 @@ export const municipalityAdminMenu: MenuItem[] = [
         icon: Ban,
       },
       {
-        title: "Municipal Financial Reports",
-        url: "/financial/reports",
-        icon: FileText,
-      },
-      {
         title: "Inter-Municipal Compensation",
         url: "/financial/compensation",
         icon: TrendingUp,
