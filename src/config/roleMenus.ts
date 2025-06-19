@@ -143,16 +143,6 @@ export const regionalAdminMenu: MenuItem[] = [
         url: "/integration/admission",
         icon: UserPlus,
       },
-      {
-        title: "Integration Testing",
-        url: "/integration/testing",
-        icon: Activity,
-      },
-      {
-        title: "Integration Status",
-        url: "/integration/status",
-        icon: BarChart3,
-      },
     ],
   },
   {
