@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import {
   CheckCircle,
   Clock,
   Plus,
+  Target,
 } from "lucide-react";
 import { StatisticsReportModal } from "@/components/kaa/StatisticsReportModal";
 import { NewRegistrationModal } from "@/components/kaa/NewRegistrationModal";
