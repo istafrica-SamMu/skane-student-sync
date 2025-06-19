@@ -28,8 +28,8 @@ import RoleManagement from "./pages/system/RoleManagement";
 import MunicipalityManagement from "./pages/system/MunicipalityManagement";
 import GroupManagement from "./pages/system/GroupManagement";
 import SchoolUnits from "./pages/system/SchoolUnits";
-import SchoolYears from "./pages/system/SchoolYears";
-import Support from "./pages/system/Support";
+import SchoolYears from "./pages/SchoolYears";
+import Support from "./pages/Support";
 import StudyPaths from "./pages/study-paths/StudyPaths";
 import PriceCodes from "./pages/study-paths/PriceCodes";
 import NationalPrograms from "./pages/study-paths/NationalPrograms";
@@ -43,7 +43,7 @@ import FinancialAnalysis from "./pages/reports/FinancialAnalysis";
 import ChangeTracking from "./pages/reports/ChangeTracking";
 import StudentLists from "./pages/reports/StudentLists";
 import SchoolFinancialReports from "./pages/reports/SchoolFinancialReports";
-import SchoolStatistics from "./pages/reports/SchoolStatistics";
+import SchoolStatistics from "./pages/SchoolStatistics";
 import Messages from "./pages/my-page/Messages";
 import EnrollmentSettings from "./pages/my-page/EnrollmentSettings";
 import ActivityLogs from "./pages/my-page/ActivityLogs";
@@ -77,8 +77,9 @@ import ContactOccasions from "./pages/kaa/ContactOccasions";
 import KAARegistry from "./pages/KAARegistry";
 import StatisticsSwedenReports from "./pages/kaa/StatisticsSwedenReports";
 import MeasuresAndActions from "./pages/kaa/MeasuresAndActions";
-import KAADashboard from "./pages/kaa/KAADashboard";
+import KAADashboard from "./pages/KAADashboard";
 import TFRegistration from "@/pages/students/TFRegistration";
+import ConflictResolution from "./pages/students/ConflictResolution";
 import GeographicalAnalysis from "./pages/analysis/GeographicalAnalysis";
 
 const queryClient = new QueryClient();
@@ -253,6 +254,11 @@ const AppContent = () => {
               <Route path="/students/tf-registration" element={
                 <ProtectedRoute>
                   <TFRegistration />
+                </ProtectedRoute>
+              } />
+              <Route path="/students/conflict-resolution" element={
+                <ProtectedRoute>
+                  <ConflictResolution />
                 </ProtectedRoute>
               } />
               <Route path="/students/classes" element={
