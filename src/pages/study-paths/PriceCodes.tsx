@@ -19,15 +19,18 @@ interface PriceCode {
   status: "Active" | "Updated" | "Inactive";
   lastUpdated: string;
   description?: string;
+  municipality: string;
 }
 
 export default function PriceCodes() {
   const { toast } = useToast();
+  const municipalities = ["Malmö", "Lund", "Helsingborg", "Kristianstad", "Växjö"];
+  
   const [priceCodes, setPriceCodes] = useState<PriceCode[]>([
-    { id: "1", code: "PC001", name: "Natural Science", price: 98500, studyPaths: 8, status: "Active", lastUpdated: "2024-01-15", description: "Science and mathematics programs" },
-    { id: "2", code: "PC002", name: "Social Science", price: 92300, studyPaths: 12, status: "Active", lastUpdated: "2024-01-10", description: "Social studies and humanities" },
-    { id: "3", code: "PC003", name: "Technology", price: 105200, studyPaths: 6, status: "Updated", lastUpdated: "2024-01-20", description: "Technical and engineering programs" },
-    { id: "4", code: "PC004", name: "Arts", price: 89750, studyPaths: 4, status: "Active", lastUpdated: "2024-01-05", description: "Creative and artistic programs" },
+    { id: "1", code: "PC001", name: "Natural Science", price: 98500, studyPaths: 8, status: "Active", lastUpdated: "2024-01-15", description: "Science and mathematics programs", municipality: "Malmö" },
+    { id: "2", code: "PC002", name: "Social Science", price: 92300, studyPaths: 12, status: "Active", lastUpdated: "2024-01-10", description: "Social studies and humanities", municipality: "Lund" },
+    { id: "3", code: "PC003", name: "Technology", price: 105200, studyPaths: 6, status: "Updated", lastUpdated: "2024-01-20", description: "Technical and engineering programs", municipality: "Helsingborg" },
+    { id: "4", code: "PC004", name: "Arts", price: 89750, studyPaths: 4, status: "Active", lastUpdated: "2024-01-05", description: "Creative and artistic programs", municipality: "Kristianstad" },
   ]);
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -40,6 +43,7 @@ export default function PriceCodes() {
     name: "",
     price: "",
     description: "",
+    municipality: "",
     status: "Active" as PriceCode["status"]
   });
 
@@ -49,15 +53,16 @@ export default function PriceCodes() {
       name: "",
       price: "",
       description: "",
+      municipality: "",
       status: "Active"
     });
   };
 
   const handleAdd = () => {
-    if (!formData.code || !formData.name || !formData.price) {
+    if (!formData.code || !formData.name || !formData.price || !formData.municipality) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields.",
+        description: "Please fill in all required fields including municipality.",
         variant: "destructive",
       });
       return;
@@ -78,6 +83,7 @@ export default function PriceCodes() {
       name: formData.name,
       price: Number(formData.price),
       description: formData.description,
+      municipality: formData.municipality,
       status: formData.status,
       studyPaths: 0,
       lastUpdated: new Date().toISOString().split('T')[0]
@@ -100,16 +106,17 @@ export default function PriceCodes() {
       name: priceCode.name,
       price: priceCode.price.toString(),
       description: priceCode.description || "",
+      municipality: priceCode.municipality,
       status: priceCode.status
     });
     setIsEditDialogOpen(true);
   };
 
   const handleUpdate = () => {
-    if (!formData.code || !formData.name || !formData.price || !editingPriceCode) {
+    if (!formData.code || !formData.name || !formData.price || !formData.municipality || !editingPriceCode) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields.",
+        description: "Please fill in all required fields including municipality.",
         variant: "destructive",
       });
       return;
@@ -132,6 +139,7 @@ export default function PriceCodes() {
             name: formData.name,
             price: Number(formData.price),
             description: formData.description,
+            municipality: formData.municipality,
             status: formData.status,
             lastUpdated: new Date().toISOString().split('T')[0]
           }
@@ -267,6 +275,21 @@ export default function PriceCodes() {
                   />
                 </div>
                 <div className="grid gap-2">
+                  <Label htmlFor="municipality">Municipality *</Label>
+                  <Select value={formData.municipality} onValueChange={(value) => setFormData({ ...formData, municipality: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select municipality" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {municipalities.map((municipality) => (
+                        <SelectItem key={municipality} value={municipality}>
+                          {municipality}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
                   <Label htmlFor="price">Price (SEK) *</Label>
                   <Input
                     id="price"
@@ -352,7 +375,7 @@ export default function PriceCodes() {
                 <div className="flex-1">
                   <h3 className="font-medium">{priceCode.name}</h3>
                   <p className="text-sm text-ike-neutral">
-                    {priceCode.code} • {formatPrice(priceCode.price)} • {priceCode.studyPaths} study paths
+                    {priceCode.code} • {formatPrice(priceCode.price)} • {priceCode.municipality} • {priceCode.studyPaths} study paths
                     {priceCode.description && ` • ${priceCode.description}`}
                   </p>
                   <p className="text-xs text-muted-foreground">
@@ -448,6 +471,21 @@ export default function PriceCodes() {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g., Computer Science"
               />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-municipality">Municipality *</Label>
+              <Select value={formData.municipality} onValueChange={(value) => setFormData({ ...formData, municipality: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select municipality" />
+                </SelectTrigger>
+                <SelectContent>
+                  {municipalities.map((municipality) => (
+                    <SelectItem key={municipality} value={municipality}>
+                      {municipality}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="edit-price">Price (SEK) *</Label>
