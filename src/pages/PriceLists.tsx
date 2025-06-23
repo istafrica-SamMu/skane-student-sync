@@ -34,6 +34,7 @@ interface PriceCode {
   specialization: string;
   normalPrice: number;
   internalPrice: number;
+  municipality: string;
   status: "active" | "inactive";
   lastUpdated: string;
 }
@@ -44,6 +45,7 @@ interface PriceCodeFormData {
   specialization: string;
   normalPrice: number;
   internalPrice: number;
+  municipality: string;
 }
 
 interface ImportFormData {
@@ -73,6 +75,7 @@ const PriceLists = () => {
       specialization: "Naturvetenskap och samhälle",
       normalPrice: 125000,
       internalPrice: 118000,
+      municipality: "Malmö",
       status: "active",
       lastUpdated: "2024-06-15"
     },
@@ -83,6 +86,7 @@ const PriceLists = () => {
       specialization: "Samhällsvetenskap",
       normalPrice: 122000,
       internalPrice: 115000,
+      municipality: "Malmö",
       status: "active",
       lastUpdated: "2024-06-15"
     },
@@ -93,6 +97,7 @@ const PriceLists = () => {
       specialization: "Teknik",
       normalPrice: 135000,
       internalPrice: 128000,
+      municipality: "Lund",
       status: "active",
       lastUpdated: "2024-06-15"
     },
@@ -103,6 +108,7 @@ const PriceLists = () => {
       specialization: "Ekonomi",
       normalPrice: 120000,
       internalPrice: 113000,
+      municipality: "Helsingborg",
       status: "inactive",
       lastUpdated: "2024-05-20"
     }
@@ -111,7 +117,8 @@ const PriceLists = () => {
   const filteredPriceCodes = priceCodes.filter(priceCode =>
     priceCode.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
     priceCode.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    priceCode.specialization.toLowerCase().includes(searchTerm.toLowerCase())
+    priceCode.specialization.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    priceCode.municipality.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleAddPriceCode = (data: PriceCodeFormData) => {
@@ -211,10 +218,10 @@ const PriceLists = () => {
         <div>
           <h1 className="text-3xl font-bold text-ike-neutral-dark flex items-center">
             <Building className="w-8 h-8 mr-3 text-ike-primary" />
-            {municipalityName} Pricelists
+            Regional Pricelists
           </h1>
           <p className="text-ike-neutral mt-2">
-            Manage program pricing and price codes for your municipality
+            Manage program pricing and price codes across municipalities
           </p>
         </div>
         <div className="flex space-x-3">
@@ -294,10 +301,10 @@ const PriceLists = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <Euro className="w-5 h-5 mr-2 text-ike-primary" />
-            {municipalityName} Price Codes
+            Regional Price Codes
           </CardTitle>
           <CardDescription>
-            Manage program pricing for your municipality's educational programs
+            Manage program pricing across different municipalities
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -305,7 +312,7 @@ const PriceLists = () => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ike-neutral" />
               <Input
-                placeholder="Search by code, program name, or specialization..."
+                placeholder="Search by code, program name, specialization, or municipality..."
                 className="pl-10 border-ike-primary/20 focus:border-ike-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -317,6 +324,7 @@ const PriceLists = () => {
                 <TableRow>
                   <TableHead className="font-medium">Code</TableHead>
                   <TableHead className="font-medium">Program Name</TableHead>
+                  <TableHead className="font-medium">Municipality</TableHead>
                   <TableHead className="font-medium">Specialization</TableHead>
                   <TableHead className="font-medium text-right">Normal Price</TableHead>
                   <TableHead className="font-medium text-right">Internal Price</TableHead>
@@ -333,6 +341,9 @@ const PriceLists = () => {
                     </TableCell>
                     <TableCell className="font-medium text-ike-neutral-dark">
                       {priceCode.name}
+                    </TableCell>
+                    <TableCell className="font-medium text-ike-primary">
+                      {priceCode.municipality}
                     </TableCell>
                     <TableCell>{priceCode.specialization}</TableCell>
                     <TableCell className="text-right font-medium">

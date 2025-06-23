@@ -16,6 +16,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
@@ -27,6 +34,7 @@ interface PriceCodeFormData {
   specialization: string;
   normalPrice: number;
   internalPrice: number;
+  municipality: string;
 }
 
 interface PriceCodeModalProps {
@@ -48,6 +56,8 @@ const PriceCodeModal = ({
 }: PriceCodeModalProps) => {
   const { toast } = useToast();
 
+  const municipalities = ["Malmö", "Lund", "Helsingborg", "Kristianstad", "Växjö"];
+
   const form = useForm<PriceCodeFormData>({
     defaultValues: {
       code: "",
@@ -55,6 +65,7 @@ const PriceCodeModal = ({
       specialization: "",
       normalPrice: 0,
       internalPrice: 0,
+      municipality: "",
     },
   });
 
@@ -67,6 +78,7 @@ const PriceCodeModal = ({
         specialization: initialData?.specialization || "",
         normalPrice: initialData?.normalPrice || 0,
         internalPrice: initialData?.internalPrice || 0,
+        municipality: initialData?.municipality || "",
       });
     }
   }, [isOpen, initialData, form]);
@@ -92,7 +104,7 @@ const PriceCodeModal = ({
         <DialogHeader>
           <DialogTitle className="text-ike-neutral-dark">{title}</DialogTitle>
           <DialogDescription>
-            Manage program pricing for your municipality
+            Manage program pricing for municipalities
           </DialogDescription>
         </DialogHeader>
         
@@ -115,13 +127,24 @@ const PriceCodeModal = ({
               
               <FormField
                 control={form.control}
-                name="specialization"
+                name="municipality"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Specialization</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Program specialization" />
-                    </FormControl>
+                    <FormLabel>Municipality</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select municipality" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {municipalities.map((municipality) => (
+                          <SelectItem key={municipality} value={municipality}>
+                            {municipality}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -136,6 +159,20 @@ const PriceCodeModal = ({
                   <FormLabel>Program Name</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Full program name" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="specialization"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Specialization</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Program specialization" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
