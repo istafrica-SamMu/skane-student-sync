@@ -46,7 +46,8 @@ import {
   CreditCard,
   HelpCircle,
   Ban,
-  IdCard
+  IdCard,
+  Receipt
 } from "lucide-react";
 
 export interface MenuItem {
@@ -311,6 +312,11 @@ export const municipalityAdminMenu: MenuItem[] = [
         title: "Payment Blocks",
         url: "/financial/payment-blocks",
         icon: Ban,
+      },
+      {
+        title: "Payment Documents",
+        url: "/financial/payment-documents",
+        icon: Receipt,
       },
       {
         title: "Inter-Municipal Compensation",
