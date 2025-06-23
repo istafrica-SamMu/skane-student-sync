@@ -45,7 +45,6 @@ import { CategoryManagement } from "@/components/CategoryManagement";
 import { BulkAmountOperations } from "@/components/BulkAmountOperations";
 import { AutomaticTransferHandler } from "@/components/AutomaticTransferHandler";
 import PostingTemplatesManagement from "@/components/financial/PostingTemplatesManagement";
-import FinancialIntegrationManagement from "@/components/financial/FinancialIntegrationManagement";
 import PostingManagement from "@/components/financial/PostingManagement";
 import type { AdditionalAmount, AmountCategory, AmountFormData, BulkAmountOperation } from "@/types/additionalAmounts";
 import type { PostingTemplate, FinancialIntegration, PostingEntry } from "@/types/posting";
@@ -791,7 +790,6 @@ const AdditionalAmounts = () => {
           <TabsTrigger value="amounts">Additional Amounts</TabsTrigger>
           <TabsTrigger value="posting">Posting Management</TabsTrigger>
           <TabsTrigger value="templates">Posting Templates</TabsTrigger>
-          <TabsTrigger value="integration">Financial Integration</TabsTrigger>
           <TabsTrigger value="bulk">Bulk Operations</TabsTrigger>
           <TabsTrigger value="transfers">Municipality Transfers</TabsTrigger>
           <TabsTrigger value="categories">Manage Categories</TabsTrigger>
@@ -910,12 +908,6 @@ const AdditionalAmounts = () => {
           <PostingTemplatesManagement 
             templates={postingTemplates}
             onUpdateTemplates={setPostingTemplates}
-          />
-        </TabsContent>
-
-        <TabsContent value="integration" className="space-y-4">
-          <FinancialIntegrationManagement 
-            integrations={financialIntegrations}
           />
         </TabsContent>
 
