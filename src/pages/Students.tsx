@@ -57,6 +57,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import ProtectedDataDisplay from "@/components/students/ProtectedDataDisplay";
 import PrivacyIndicator from "@/components/students/PrivacyIndicator";
 import BulkStudyPathChange from "@/components/students/BulkStudyPathChange";
+import BulkSchoolUnitTransfer from "@/components/students/BulkSchoolUnitTransfer";
 import { privacyService } from "@/services/privacyService";
 import { useToast } from "@/hooks/use-toast";
 
@@ -70,6 +71,7 @@ const Students = () => {
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showBulkStudyPathChange, setShowBulkStudyPathChange] = useState(false);
+  const [showBulkSchoolUnitTransfer, setShowBulkSchoolUnitTransfer] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
 
   // Form state for add student
@@ -342,6 +344,14 @@ const Students = () => {
           >
             <Users2 className="w-4 h-4 mr-2" />
             Bulk Study Path Change
+          </Button>
+          <Button 
+            variant="outline"
+            className="border-ike-warning text-ike-warning hover:bg-ike-warning/10"
+            onClick={() => setShowBulkSchoolUnitTransfer(true)}
+          >
+            <Building className="w-4 h-4 mr-2" />
+            School Unit Transfer
           </Button>
           <Button 
             className="bg-ike-primary hover:bg-ike-primary-dark text-white"
@@ -983,6 +993,13 @@ const Students = () => {
         students={allStudents}
         isOpen={showBulkStudyPathChange}
         onClose={() => setShowBulkStudyPathChange(false)}
+      />
+
+      {/* Bulk School Unit Transfer Modal */}
+      <BulkSchoolUnitTransfer
+        students={allStudents}
+        isOpen={showBulkSchoolUnitTransfer}
+        onClose={() => setShowBulkSchoolUnitTransfer(false)}
       />
     </div>
   );
