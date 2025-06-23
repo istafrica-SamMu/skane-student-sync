@@ -5,6 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -59,6 +66,40 @@ const Students = () => {
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
+
+  // Form state for add student
+  const [addStudentForm, setAddStudentForm] = useState({
+    firstName: "",
+    lastName: "",
+    personalNumber: "",
+    birthDate: "",
+    homeMunicipality: "",
+    studyPath: "",
+    schoolYear: "",
+    schoolUnit: ""
+  });
+
+  // Dropdown options
+  const municipalities = [
+    "Stockholm", "Göteborg", "Malmö", "Uppsala", "Linköping", "Västerås", 
+    "Örebro", "Norrköping", "Helsingborg", "Jönköping", "Lund", "Umeå",
+    "Gävle", "Borås", "Eskilstuna", "Södertälje", "Karlstad", "Täby"
+  ];
+
+  const studyPaths = [
+    "Naturvetenskap", "Samhällsvetenskap", "Ekonomi", "Teknik", "Estetik", 
+    "Hantverksprogrammet", "Vård och omsorg", "Barn- och fritidsprogrammet",
+    "El- och energiprogrammet", "Fordon- och transportprogrammet"
+  ];
+
+  const schoolYears = ["1", "2", "3"];
+
+  const schoolUnits = [
+    "Stockholm Gymnasium", "Göteborg Tekniska", "Malmö Gymnasium", 
+    "Uppsala Naturvetenskap", "Linköping Teknik", "Västerås Gymnasium",
+    "Örebro Samhälle", "Norrköping Estetik", "Helsingborg Ekonomi",
+    "Jönköping Gymnasium", "Lund Gymnasium", "Umeå Teknik"
+  ];
 
   // Mock student data including some protected students
   const allStudents = [
@@ -169,9 +210,31 @@ const Students = () => {
   };
 
   const handleAddStudent = () => {
+    if (!addStudentForm.firstName || !addStudentForm.lastName || !addStudentForm.personalNumber) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     toast({
       title: "Student Added",
       description: "New student has been successfully added to the system.",
+    });
+    console.log('Adding student:', addStudentForm);
+    
+    // Reset form
+    setAddStudentForm({
+      firstName: "",
+      lastName: "",
+      personalNumber: "",
+      birthDate: "",
+      homeMunicipality: "",
+      studyPath: "",
+      schoolYear: "",
+      schoolUnit: ""
     });
     setShowAddStudent(false);
   };
@@ -481,35 +544,107 @@ const Students = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-ike-neutral">First Name</label>
-                <Input placeholder="Enter first name" />
+                <Input 
+                  placeholder="Enter first name" 
+                  value={addStudentForm.firstName}
+                  onChange={(e) => setAddStudentForm({...addStudentForm, firstName: e.target.value})}
+                />
               </div>
               <div>
                 <label className="text-sm font-medium text-ike-neutral">Last Name</label>
-                <Input placeholder="Enter last name" />
+                <Input 
+                  placeholder="Enter last name" 
+                  value={addStudentForm.lastName}
+                  onChange={(e) => setAddStudentForm({...addStudentForm, lastName: e.target.value})}
+                />
               </div>
               <div>
                 <label className="text-sm font-medium text-ike-neutral">Personal Number</label>
-                <Input placeholder="YYYYMMDD-XXXX" />
+                <Input 
+                  placeholder="YYYYMMDD-XXXX" 
+                  value={addStudentForm.personalNumber}
+                  onChange={(e) => setAddStudentForm({...addStudentForm, personalNumber: e.target.value})}
+                />
               </div>
               <div>
                 <label className="text-sm font-medium text-ike-neutral">Birth Date</label>
-                <Input type="date" />
+                <Input 
+                  type="date" 
+                  value={addStudentForm.birthDate}
+                  onChange={(e) => setAddStudentForm({...addStudentForm, birthDate: e.target.value})}
+                />
               </div>
               <div>
                 <label className="text-sm font-medium text-ike-neutral">Home Municipality</label>
-                <Input placeholder="Enter municipality" />
+                <Select 
+                  value={addStudentForm.homeMunicipality} 
+                  onValueChange={(value) => setAddStudentForm({...addStudentForm, homeMunicipality: value})}
+                >
+                  <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                    <SelectValue placeholder="Select municipality" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {municipalities.map((municipality) => (
+                      <SelectItem key={municipality} value={municipality}>
+                        {municipality}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="text-sm font-medium text-ike-neutral">Study Path</label>
-                <Input placeholder="Enter study path" />
+                <Select 
+                  value={addStudentForm.studyPath} 
+                  onValueChange={(value) => setAddStudentForm({...addStudentForm, studyPath: value})}
+                >
+                  <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                    <SelectValue placeholder="Select study path" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {studyPaths.map((path) => (
+                      <SelectItem key={path} value={path}>
+                        {path}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="text-sm font-medium text-ike-neutral">School Year</label>
-                <Input placeholder="Enter school year" />
+                <Select 
+                  value={addStudentForm.schoolYear} 
+                  onValueChange={(value) => setAddStudentForm({...addStudentForm, schoolYear: value})}
+                >
+                  <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                    <SelectValue placeholder="Select school year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {schoolYears.map((year) => (
+                      <SelectItem key={year} value={year}>
+                        Year {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="text-sm font-medium text-ike-neutral">School Unit</label>
-                <Input placeholder="Enter school unit" />
+                <Select 
+                  value={addStudentForm.schoolUnit} 
+                  onValueChange={(value) => setAddStudentForm({...addStudentForm, schoolUnit: value})}
+                >
+                  <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                    <SelectValue placeholder="Select school unit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {schoolUnits.map((unit) => (
+                      <SelectItem key={unit} value={unit}>
+                        {unit}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
