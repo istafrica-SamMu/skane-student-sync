@@ -64,9 +64,9 @@ const BulkStudyPathChange = ({ students, isOpen, onClose }: BulkStudyPathChangeP
 
   const filteredStudents = students.filter(student => {
     return (
-      (!filters.schoolYear || student.schoolYear === filters.schoolYear) &&
-      (!filters.currentStudyPath || student.studyPath === filters.currentStudyPath) &&
-      (!filters.schoolUnit || student.schoolUnit === filters.schoolUnit)
+      (!filters.schoolYear || filters.schoolYear === "all" || student.schoolYear === filters.schoolYear) &&
+      (!filters.currentStudyPath || filters.currentStudyPath === "all" || student.studyPath === filters.currentStudyPath) &&
+      (!filters.schoolUnit || filters.schoolUnit === "all" || student.schoolUnit === filters.schoolUnit)
     );
   });
 
@@ -151,7 +151,7 @@ const BulkStudyPathChange = ({ students, isOpen, onClose }: BulkStudyPathChangeP
                       <SelectValue placeholder="All years" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All years</SelectItem>
+                      <SelectItem value="all">All years</SelectItem>
                       {schoolYears.map((year) => (
                         <SelectItem key={year} value={year}>Year {year}</SelectItem>
                       ))}
@@ -165,7 +165,7 @@ const BulkStudyPathChange = ({ students, isOpen, onClose }: BulkStudyPathChangeP
                       <SelectValue placeholder="All study paths" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All study paths</SelectItem>
+                      <SelectItem value="all">All study paths</SelectItem>
                       {studyPaths.map((path) => (
                         <SelectItem key={path} value={path}>{path}</SelectItem>
                       ))}
@@ -179,7 +179,7 @@ const BulkStudyPathChange = ({ students, isOpen, onClose }: BulkStudyPathChangeP
                       <SelectValue placeholder="All school units" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All school units</SelectItem>
+                      <SelectItem value="all">All school units</SelectItem>
                       {schoolUnits.map((unit) => (
                         <SelectItem key={unit} value={unit}>{unit}</SelectItem>
                       ))}
