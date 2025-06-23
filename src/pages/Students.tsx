@@ -79,6 +79,18 @@ const Students = () => {
     schoolUnit: ""
   });
 
+  // Form state for edit student
+  const [editStudentForm, setEditStudentForm] = useState({
+    firstName: "",
+    lastName: "",
+    personalNumber: "",
+    birthDate: "",
+    homeMunicipality: "",
+    studyPath: "",
+    schoolYear: "",
+    schoolUnit: ""
+  });
+
   // Dropdown options
   const municipalities = [
     "Stockholm", "Göteborg", "Malmö", "Uppsala", "Linköping", "Västerås", 
@@ -189,6 +201,17 @@ const Students = () => {
 
   const handleEditStudent = (student) => {
     setSelectedStudent(student);
+    // Initialize edit form with selected student data
+    setEditStudentForm({
+      firstName: student.firstName,
+      lastName: student.lastName,
+      personalNumber: student.personalNumber,
+      birthDate: student.birthDate,
+      homeMunicipality: student.homeMunicipality,
+      studyPath: student.studyPath,
+      schoolYear: student.schoolYear,
+      schoolUnit: student.schoolUnit
+    });
     setShowEditStudent(true);
   };
 
@@ -243,11 +266,23 @@ const Students = () => {
     if (selectedStudent) {
       toast({
         title: "Student Updated",
-        description: `${selectedStudent.firstName} ${selectedStudent.lastName} information has been updated.`,
+        description: `${editStudentForm.firstName} ${editStudentForm.lastName} information has been updated.`,
       });
+      console.log('Updating student:', selectedStudent.id, editStudentForm);
     }
     setShowEditStudent(false);
     setSelectedStudent(null);
+    // Reset edit form
+    setEditStudentForm({
+      firstName: "",
+      lastName: "",
+      personalNumber: "",
+      birthDate: "",
+      homeMunicipality: "",
+      studyPath: "",
+      schoolYear: "",
+      schoolUnit: ""
+    });
   };
 
   return (
@@ -675,44 +710,111 @@ const Students = () => {
               Update student information
             </DialogDescription>
           </DialogHeader>
-          {selectedStudent && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">First Name</label>
-                  <Input defaultValue={selectedStudent.firstName} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Last Name</label>
-                  <Input defaultValue={selectedStudent.lastName} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Personal Number</label>
-                  <Input defaultValue={selectedStudent.personalNumber} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Birth Date</label>
-                  <Input type="date" defaultValue={selectedStudent.birthDate} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Home Municipality</label>
-                  <Input defaultValue={selectedStudent.homeMunicipality} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">Study Path</label>
-                  <Input defaultValue={selectedStudent.studyPath} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">School Year</label>
-                  <Input defaultValue={selectedStudent.schoolYear} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-ike-neutral">School Unit</label>
-                  <Input defaultValue={selectedStudent.schoolUnit} />
-                </div>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">First Name</label>
+                <Input 
+                  value={editStudentForm.firstName}
+                  onChange={(e) => setEditStudentForm({...editStudentForm, firstName: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">Last Name</label>
+                <Input 
+                  value={editStudentForm.lastName}
+                  onChange={(e) => setEditStudentForm({...editStudentForm, lastName: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">Personal Number</label>
+                <Input 
+                  value={editStudentForm.personalNumber}
+                  onChange={(e) => setEditStudentForm({...editStudentForm, personalNumber: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">Birth Date</label>
+                <Input 
+                  type="date" 
+                  value={editStudentForm.birthDate}
+                  onChange={(e) => setEditStudentForm({...editStudentForm, birthDate: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">Home Municipality</label>
+                <Select 
+                  value={editStudentForm.homeMunicipality} 
+                  onValueChange={(value) => setEditStudentForm({...editStudentForm, homeMunicipality: value})}
+                >
+                  <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                    <SelectValue placeholder="Select municipality" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {municipalities.map((municipality) => (
+                      <SelectItem key={municipality} value={municipality}>
+                        {municipality}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">Study Path</label>
+                <Select 
+                  value={editStudentForm.studyPath} 
+                  onValueChange={(value) => setEditStudentForm({...editStudentForm, studyPath: value})}
+                >
+                  <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                    <SelectValue placeholder="Select study path" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {studyPaths.map((path) => (
+                      <SelectItem key={path} value={path}>
+                        {path}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">School Year</label>
+                <Select 
+                  value={editStudentForm.schoolYear} 
+                  onValueChange={(value) => setEditStudentForm({...editStudentForm, schoolYear: value})}
+                >
+                  <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                    <SelectValue placeholder="Select school year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {schoolYears.map((year) => (
+                      <SelectItem key={year} value={year}>
+                        Year {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-ike-neutral">School Unit</label>
+                <Select 
+                  value={editStudentForm.schoolUnit} 
+                  onValueChange={(value) => setEditStudentForm({...editStudentForm, schoolUnit: value})}
+                >
+                  <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                    <SelectValue placeholder="Select school unit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {schoolUnits.map((unit) => (
+                      <SelectItem key={unit} value={unit}>
+                        {unit}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-          )}
+          </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowEditStudent(false)}>
               Cancel
