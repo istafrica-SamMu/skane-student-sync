@@ -62,6 +62,7 @@ import ImportStudentData from "./pages/integration/ImportStudentData";
 import IntegrationStatus from "./pages/integration/IntegrationStatus";
 import AdditionalAmounts from "./pages/financial/AdditionalAmounts";
 import PaymentBlocks from "./pages/financial/PaymentBlocks";
+import PaymentDocuments from "./pages/financial/PaymentDocuments";
 import MunicipalFinancialReports from "./pages/financial/MunicipalFinancialReports";
 import InterMunicipalCompensation from "./pages/financial/InterMunicipalCompensation";
 import AccountingConfiguration from "./pages/financial/AccountingConfiguration";
@@ -324,6 +325,11 @@ const AppContent = () => {
               <Route path="/financial/payment-blocks" element={
                 <ProtectedRoute>
                   <PaymentBlocks />
+                </ProtectedRoute>
+              } />
+              <Route path="/financial/payment-documents" element={
+                <ProtectedRoute>
+                  <PaymentDocuments />
                 </ProtectedRoute>
               } />
               <Route path="/financial/reports" element={
