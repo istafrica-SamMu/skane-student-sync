@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,7 +44,11 @@ import { DollarSign, Search, Plus, Edit, User, School, Trash2, Users } from "luc
 import { CategoryManagement } from "@/components/CategoryManagement";
 import { BulkAmountOperations } from "@/components/BulkAmountOperations";
 import { AutomaticTransferHandler } from "@/components/AutomaticTransferHandler";
+import PostingTemplatesManagement from "@/components/financial/PostingTemplatesManagement";
+import FinancialIntegrationManagement from "@/components/financial/FinancialIntegrationManagement";
+import PostingManagement from "@/components/financial/PostingManagement";
 import type { AdditionalAmount, AmountCategory, AmountFormData, BulkAmountOperation } from "@/types/additionalAmounts";
+import type { PostingTemplate, FinancialIntegration, PostingEntry } from "@/types/posting";
 
 const AdditionalAmounts = () => {
   const { toast } = useToast();
@@ -73,6 +76,98 @@ const AdditionalAmounts = () => {
       validTo: "",
     },
   });
+
+  // New state for posting functionality
+  const [postingTemplates, setPostingTemplates] = useState<PostingTemplate[]>([
+    {
+      id: "template-1",
+      municipalityId: "mun-001",
+      municipalityName: "Malmö Municipality",
+      name: "Student Basic Posting",
+      description: "Standard posting template for student additional amounts",
+      accountingCode: "4510",
+      costCenter: "5001",
+      project: "EDU2024",
+      applicableFor: "student",
+      isDefault: true,
+      createdBy: "admin",
+      createdAt: "2024-01-01T00:00:00Z",
+      updatedAt: "2024-01-01T00:00:00Z"
+    },
+    {
+      id: "template-2", 
+      municipalityId: "mun-001",
+      municipalityName: "Malmö Municipality",
+      name: "School Unit Posting",
+      description: "Posting template for school unit adjustments",
+      accountingCode: "4520",
+      costCenter: "5002",
+      applicableFor: "school",
+      isDefault: false,
+      createdBy: "admin",
+      createdAt: "2024-01-01T00:00:00Z",
+      updatedAt: "2024-01-01T00:00:00Z"
+    }
+  ]);
+
+  const [financialIntegrations, setFinancialIntegrations] = useState<FinancialIntegration[]>([
+    {
+      municipalityId: "mun-001",
+      municipalityName: "Malmö Municipality",
+      isEnabled: true,
+      integrationSystem: "agresso",
+      connectionStatus: "connected",
+      lastSync: "2024-12-23T10:00:00Z",
+      configuration: {
+        autoPostingEnabled: true,
+        requiresApproval: false,
+        batchProcessing: true
+      }
+    },
+    {
+      municipalityId: "mun-002",
+      municipalityName: "Lund Municipality",
+      isEnabled: false,
+      integrationSystem: "unit4",
+      connectionStatus: "disconnected",
+      configuration: {
+        autoPostingEnabled: false,
+        requiresApproval: true,
+        batchProcessing: false
+      }
+    }
+  ]);
+
+  const [postingEntries, setPostingEntries] = useState<PostingEntry[]>([
+    {
+      id: "posting-1",
+      additionalAmountId: 1,
+      templateId: "template-1",
+      templateName: "Student Basic Posting",
+      accountingCode: "4510",
+      costCenter: "5001",
+      project: "EDU2024",
+      amount: 5000,
+      postingDate: "2024-12-23",
+      status: "pending",
+      postedBy: "system",
+      createdAt: "2024-12-23T09:00:00Z"
+    },
+    {
+      id: "posting-2",
+      additionalAmountId: 2,
+      templateId: "template-2",
+      templateName: "School Unit Posting",
+      accountingCode: "4520",
+      costCenter: "5002",
+      amount: -2000,
+      postingDate: "2024-12-22",
+      status: "posted",
+      postedBy: "admin",
+      postedAt: "2024-12-22T15:30:00Z",
+      createdAt: "2024-12-22T14:00:00Z"
+    }
+  ]);
 
   const [categories, setCategories] = useState<AmountCategory[]>([
     { id: "1", name: "Basic amount", isDefault: true, canDelete: false },
@@ -180,7 +275,78 @@ const AdditionalAmounts = () => {
     }
   };
 
-  const handleAddAmount = (data: AmountFormData) => {
+  const checkPostingRequirements = (amount: AdditionalAmount) => {
+    // Find municipality integration
+    const integration = financialIntegrations.find(
+      int => int.municipalityName.includes("Malmö") // Mock logic - in real app would be based on actual municipality
+    );
+
+    if (!integration) {
+      console.log("No financial integration found for municipality");
+      return false;
+    }
+
+    if (!integration.isEnabled || integration.connectionStatus !== "connected") {
+      console.log("Financial integration not enabled or not connected");
+      return false;
+    }
+
+    // Check if posting is mandatory for this entity type
+    const isMandatoryForSchool = amount.type === "School" && integration.isEnabled;
+    const isMandatoryForPrincipal = amount.type === "Principal" && integration.isEnabled;
+    const requiresStudentPosting = amount.type === "Student"; // Should use municipality posting settings
+
+    if (isMandatoryForSchool || isMandatoryForPrincipal || requiresStudentPosting) {
+      // Find appropriate template
+      const template = postingTemplates.find(
+        t => t.applicableFor === amount.type.toLowerCase() || t.applicableFor === "all"
+      );
+
+      if (template) {
+        // Create posting entry
+        const newPostingEntry: PostingEntry = {
+          id: `posting-${Date.now()}`,
+          additionalAmountId: amount.id,
+          templateId: template.id,
+          templateName: template.name,
+          accountingCode: template.accountingCode,
+          costCenter: template.costCenter,
+          project: template.project,
+          department: template.department,
+          activity: template.activity,
+          amount: amount.amount * amount.multiplier,
+          postingDate: new Date().toISOString().split('T')[0],
+          status: integration.configuration.autoPostingEnabled ? "posted" : "pending",
+          postedBy: "system",
+          createdAt: new Date().toISOString()
+        };
+
+        if (integration.configuration.autoPostingEnabled) {
+          newPostingEntry.postedAt = new Date().toISOString();
+        }
+
+        setPostingEntries(prev => [...prev, newPostingEntry]);
+
+        toast({
+          title: "Posting Created",
+          description: `${integration.configuration.autoPostingEnabled ? 'Automatically posted' : 'Created posting entry for'} ${amount.targetName}`,
+        });
+
+        return true;
+      } else {
+        toast({
+          title: "No Posting Template",
+          description: `No posting template found for ${amount.type}. Please create a template first.`,
+          variant: "destructive"
+        });
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const enhancedHandleAddAmount = (data: AmountFormData) => {
     const newAmount: AdditionalAmount = {
       id: Math.max(...additionalAmounts.map(a => a.id)) + 1,
       ...data,
@@ -190,12 +356,16 @@ const AdditionalAmounts = () => {
     };
     
     setAdditionalAmounts([...additionalAmounts, newAmount]);
+    
+    // Check posting requirements
+    const postingSuccessful = checkPostingRequirements(newAmount);
+    
     setIsAddModalOpen(false);
     form.reset();
     
     toast({
       title: "Additional Amount Added",
-      description: `Successfully added ${data.type.toLowerCase()} amount for ${data.targetName}`,
+      description: `Successfully added ${data.type.toLowerCase()} amount for ${data.targetName}${postingSuccessful ? ' with posting' : ''}`,
     });
   };
 
@@ -540,7 +710,7 @@ const AdditionalAmounts = () => {
         <div>
           <h1 className="text-3xl font-bold text-ike-neutral-dark">Additional Amounts</h1>
           <p className="text-ike-neutral mt-2">
-            Manage additional amounts and deductions for students, schools, and principals
+            Manage additional amounts and deductions with automatic posting integration
           </p>
         </div>
         <Button 
@@ -553,7 +723,7 @@ const AdditionalAmounts = () => {
       </div>
 
       {/* Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <Card className="border-l-4 border-l-ike-success">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
@@ -601,12 +771,27 @@ const AdditionalAmounts = () => {
             <div className="text-xs text-ike-neutral">Awaiting approval</div>
           </CardContent>
         </Card>
+
+        <Card className="border-l-4 border-l-green-500">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-ike-neutral">
+              Pending Postings
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-ike-neutral-dark">{postingEntries.filter(p => p.status === 'pending').length}</div>
+            <div className="text-xs text-ike-neutral">Awaiting posting</div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="amounts">Additional Amounts</TabsTrigger>
+          <TabsTrigger value="posting">Posting Management</TabsTrigger>
+          <TabsTrigger value="templates">Posting Templates</TabsTrigger>
+          <TabsTrigger value="integration">Financial Integration</TabsTrigger>
           <TabsTrigger value="bulk">Bulk Operations</TabsTrigger>
           <TabsTrigger value="transfers">Municipality Transfers</TabsTrigger>
           <TabsTrigger value="categories">Manage Categories</TabsTrigger>
@@ -713,6 +898,27 @@ const AdditionalAmounts = () => {
           </Card>
         </TabsContent>
 
+        <TabsContent value="posting" className="space-y-4">
+          <PostingManagement 
+            postingEntries={postingEntries}
+            templates={postingTemplates}
+            onUpdatePostingEntries={setPostingEntries}
+          />
+        </TabsContent>
+
+        <TabsContent value="templates" className="space-y-4">
+          <PostingTemplatesManagement 
+            templates={postingTemplates}
+            onUpdateTemplates={setPostingTemplates}
+          />
+        </TabsContent>
+
+        <TabsContent value="integration" className="space-y-4">
+          <FinancialIntegrationManagement 
+            integrations={financialIntegrations}
+          />
+        </TabsContent>
+
         <TabsContent value="bulk" className="space-y-4">
           <BulkAmountOperations 
             categories={categories}
@@ -744,7 +950,7 @@ const AdditionalAmounts = () => {
       <AmountModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        onSubmit={handleAddAmount}
+        onSubmit={enhancedHandleAddAmount}
         title="Add New Additional Amount"
         submitText="Add Amount"
       />
