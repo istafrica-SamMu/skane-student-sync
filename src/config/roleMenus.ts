@@ -346,6 +346,11 @@ export const municipalityAdminMenu: MenuItem[] = [
     icon: FileText,
     items: [
       {
+        title: "Reports Dashboard",
+        url: "/reports/dashboard",
+        icon: BarChart3,
+      },
+      {
         title: "Money to Receive",
         url: "/reports/money-to-receive",
         icon: TrendingUp,
@@ -473,6 +478,11 @@ export const schoolAdminMenu: MenuItem[] = [
     title: "Reports",
     icon: FileText,
     items: [
+      {
+        title: "Reports Dashboard",
+        url: "/reports/dashboard",
+        icon: BarChart3,
+      },
       {
         title: "Student Lists",
         url: "/reports/students",
