@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import PrincipalTransitionModal from "@/components/system/PrincipalTransitionModal";
 import { 
   Building2, 
   Edit, 
@@ -24,7 +25,8 @@ import {
   Unlink,
   GraduationCap,
   DollarSign,
-  Hash
+  Hash,
+  ArrowRightLeft
 } from "lucide-react";
 
 interface SchoolUnit {
@@ -84,6 +86,7 @@ const SchoolUnits = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isLinkGroupDialogOpen, setIsLinkGroupDialogOpen] = useState(false);
   const [isAssignPrincipalDialogOpen, setIsAssignPrincipalDialogOpen] = useState(false);
+  const [isPrincipalTransitionDialogOpen, setIsPrincipalTransitionDialogOpen] = useState(false);
   const [selectedSchoolUnit, setSelectedSchoolUnit] = useState<SchoolUnit | null>(null);
 
   // Mock data
@@ -279,6 +282,45 @@ const SchoolUnits = () => {
   const openAssignPrincipalDialog = (schoolUnit: SchoolUnit) => {
     setSelectedSchoolUnit(schoolUnit);
     setIsAssignPrincipalDialogOpen(true);
+  };
+
+  const handlePrincipalTransition = (
+    schoolUnitId: string, 
+    currentPrincipalEndDate: string, 
+    newPrincipalId: string, 
+    newPrincipalStartDate: string, 
+    notes: string
+  ) => {
+    const newPrincipal = availablePrincipals.find(p => p.id === newPrincipalId);
+    if (!newPrincipal) return;
+
+    setSchoolUnits(prev => prev.map(unit => 
+      unit.id === schoolUnitId
+        ? {
+            ...unit,
+            principalId: newPrincipal.id,
+            principalName: newPrincipal.name
+          }
+        : unit
+    ));
+
+    toast({
+      title: "Principal Transition Completed",
+      description: `${newPrincipal.name} has been assigned as the new principal starting ${newPrincipalStartDate}. Previous principal assignment ended on ${currentPrincipalEndDate}.`,
+    });
+
+    console.log('Principal transition:', {
+      schoolUnitId,
+      currentPrincipalEndDate,
+      newPrincipalId,
+      newPrincipalStartDate,
+      notes
+    });
+  };
+
+  const openPrincipalTransitionDialog = (schoolUnit: SchoolUnit) => {
+    setSelectedSchoolUnit(schoolUnit);
+    setIsPrincipalTransitionDialogOpen(true);
   };
 
   return (
@@ -522,25 +564,38 @@ const SchoolUnits = () => {
                       <GraduationCap className="w-4 h-4 mr-2" />
                       Principal
                     </h5>
-                    {schoolUnit.principalName ? (
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => handleRemovePrincipal(schoolUnit.id)}
-                      >
-                        <Unlink className="w-4 h-4 mr-1" />
-                        Remove
-                      </Button>
-                    ) : (
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => openAssignPrincipalDialog(schoolUnit)}
-                      >
-                        <Plus className="w-4 h-4 mr-1" />
-                        Assign
-                      </Button>
-                    )}
+                    <div className="flex space-x-1">
+                      {schoolUnit.principalName ? (
+                        <>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => openPrincipalTransitionDialog(schoolUnit)}
+                            title="Manage Principal Transition"
+                          >
+                            <ArrowRightLeft className="w-4 h-4 mr-1" />
+                            Transition
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleRemovePrincipal(schoolUnit.id)}
+                          >
+                            <Unlink className="w-4 h-4 mr-1" />
+                            Remove
+                          </Button>
+                        </>
+                      ) : (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => openAssignPrincipalDialog(schoolUnit)}
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Assign
+                        </Button>
+                      )}
+                    </div>
                   </div>
                   
                   {schoolUnit.principalName ? (
@@ -780,6 +835,15 @@ const SchoolUnits = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Principal Transition Modal */}
+      <PrincipalTransitionModal
+        isOpen={isPrincipalTransitionDialogOpen}
+        onClose={() => setIsPrincipalTransitionDialogOpen(false)}
+        schoolUnit={selectedSchoolUnit}
+        availablePrincipals={availablePrincipals}
+        onTransition={handlePrincipalTransition}
+      />
     </div>
   );
 };
