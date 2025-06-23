@@ -82,6 +82,7 @@ import KAADashboard from "./pages/kaa/KAADashboard";
 import TFRegistration from "@/pages/students/TFRegistration";
 import GeographicalAnalysis from "./pages/analysis/GeographicalAnalysis";
 import ConflictResolution from "./pages/students/ConflictResolution";
+import ReportsDashboard from "./pages/reports/ReportsDashboard";
 
 const queryClient = new QueryClient();
 
@@ -344,7 +345,12 @@ const AppContent = () => {
               } />
               <Route path="/reports" element={
                 <ProtectedRoute>
-                  <Reports />
+                  <ReportsDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/dashboard" element={
+                <ProtectedRoute>
+                  <ReportsDashboard />
                 </ProtectedRoute>
               } />
               <Route path="/reports/standard" element={
