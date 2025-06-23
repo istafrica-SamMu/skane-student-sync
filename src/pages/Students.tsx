@@ -48,11 +48,14 @@ import {
   MoreHorizontal,
   User,
   School,
-  FileText
+  FileText,
+  Users2,
+  ClockIcon
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ProtectedDataDisplay from "@/components/students/ProtectedDataDisplay";
 import PrivacyIndicator from "@/components/students/PrivacyIndicator";
+import BulkStudyPathChange from "@/components/students/BulkStudyPathChange";
 import { privacyService } from "@/services/privacyService";
 import { useToast } from "@/hooks/use-toast";
 
@@ -65,6 +68,7 @@ const Students = () => {
   const [showEditStudent, setShowEditStudent] = useState(false);
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showBulkStudyPathChange, setShowBulkStudyPathChange] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
 
   // Form state for add student
@@ -76,7 +80,10 @@ const Students = () => {
     homeMunicipality: "",
     studyPath: "",
     schoolYear: "",
-    schoolUnit: ""
+    schoolUnit: "",
+    studyPathStartDate: "",
+    studyPathEndDate: "",
+    studentEndDate: ""
   });
 
   // Form state for edit student
@@ -88,7 +95,10 @@ const Students = () => {
     homeMunicipality: "",
     studyPath: "",
     schoolYear: "",
-    schoolUnit: ""
+    schoolUnit: "",
+    studyPathStartDate: "",
+    studyPathEndDate: "",
+    studentEndDate: ""
   });
 
   // Dropdown options
@@ -125,7 +135,10 @@ const Students = () => {
       studyPath: "Naturvetenskap",
       schoolYear: "2",
       schoolUnit: "Stockholm Gymnasium",
-      status: "active"
+      status: "active",
+      studyPathStartDate: "2023-08-15",
+      studyPathEndDate: "",
+      studentEndDate: ""
     },
     {
       id: 2, // This is a protected student (matches privacyService data)
@@ -137,7 +150,10 @@ const Students = () => {
       studyPath: "Samhällsvetenskap",
       schoolYear: "2",
       schoolUnit: "Malmö Gymnasium",
-      status: "active"
+      status: "active",
+      studyPathStartDate: "2023-08-15",
+      studyPathEndDate: "",
+      studentEndDate: ""
     },
     {
       id: 3,
@@ -149,7 +165,10 @@ const Students = () => {
       studyPath: "Teknik",
       schoolYear: "3",
       schoolUnit: "Göteborg Tekniska",
-      status: "active"
+      status: "active",
+      studyPathStartDate: "2022-08-15",
+      studyPathEndDate: "",
+      studentEndDate: ""
     },
     {
       id: 4,
@@ -161,7 +180,10 @@ const Students = () => {
       studyPath: "Ekonomi",
       schoolYear: "1",
       schoolUnit: "Lund Gymnasium",
-      status: "active"
+      status: "active",
+      studyPathStartDate: "2024-08-15",
+      studyPathEndDate: "",
+      studentEndDate: ""
     },
     {
       id: 5, // This is a protected student (matches privacyService data)
@@ -173,7 +195,10 @@ const Students = () => {
       studyPath: "Ekonomi",
       schoolYear: "2",
       schoolUnit: "Ystad Gymnasium",
-      status: "active"
+      status: "active",
+      studyPathStartDate: "2023-08-15",
+      studyPathEndDate: "",
+      studentEndDate: ""
     }
   ];
 
@@ -210,7 +235,10 @@ const Students = () => {
       homeMunicipality: student.homeMunicipality,
       studyPath: student.studyPath,
       schoolYear: student.schoolYear,
-      schoolUnit: student.schoolUnit
+      schoolUnit: student.schoolUnit,
+      studyPathStartDate: student.studyPathStartDate || "",
+      studyPathEndDate: student.studyPathEndDate || "",
+      studentEndDate: student.studentEndDate || ""
     });
     setShowEditStudent(true);
   };
@@ -257,7 +285,10 @@ const Students = () => {
       homeMunicipality: "",
       studyPath: "",
       schoolYear: "",
-      schoolUnit: ""
+      schoolUnit: "",
+      studyPathStartDate: "",
+      studyPathEndDate: "",
+      studentEndDate: ""
     });
     setShowAddStudent(false);
   };
@@ -281,7 +312,10 @@ const Students = () => {
       homeMunicipality: "",
       studyPath: "",
       schoolYear: "",
-      schoolUnit: ""
+      schoolUnit: "",
+      studyPathStartDate: "",
+      studyPathEndDate: "",
+      studentEndDate: ""
     });
   };
 
@@ -299,6 +333,14 @@ const Students = () => {
           <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
             <Filter className="w-4 h-4 mr-2" />
             Filter
+          </Button>
+          <Button 
+            variant="outline"
+            className="border-ike-success text-ike-success hover:bg-ike-success/10"
+            onClick={() => setShowBulkStudyPathChange(true)}
+          >
+            <Users2 className="w-4 h-4 mr-2" />
+            Bulk Study Path Change
           </Button>
           <Button 
             className="bg-ike-primary hover:bg-ike-primary-dark text-white"
@@ -542,6 +584,18 @@ const Students = () => {
                   <label className="text-sm font-medium text-ike-neutral">Status</label>
                   {getStatusBadge(selectedStudent.status)}
                 </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-ike-neutral">Study Path Start Date</label>
+                  <p className="text-ike-neutral-dark">{selectedStudent.studyPathStartDate || "Not set"}</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-ike-neutral">Study Path End Date</label>
+                  <p className="text-ike-neutral-dark">{selectedStudent.studyPathEndDate || "Not set"}</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-ike-neutral">Student End Date</label>
+                  <p className="text-ike-neutral-dark">{selectedStudent.studentEndDate || "Active"}</p>
+                </div>
               </div>
             </div>
           )}
@@ -565,7 +619,7 @@ const Students = () => {
 
       {/* Add Student Modal */}
       <Dialog open={showAddStudent} onOpenChange={setShowAddStudent}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle className="flex items-center text-ike-neutral-dark">
               <UserCheck className="w-5 h-5 mr-2 text-ike-primary" />
@@ -682,6 +736,40 @@ const Students = () => {
                 </Select>
               </div>
             </div>
+            
+            {/* Date Fields Section */}
+            <div className="border-t pt-4">
+              <h4 className="font-medium text-ike-neutral-dark mb-3 flex items-center">
+                <Calendar className="w-4 h-4 mr-2 text-ike-primary" />
+                Date Information
+              </h4>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Study Path Start Date</label>
+                  <Input 
+                    type="date" 
+                    value={addStudentForm.studyPathStartDate}
+                    onChange={(e) => setAddStudentForm({...addStudentForm, studyPathStartDate: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Study Path End Date</label>
+                  <Input 
+                    type="date" 
+                    value={addStudentForm.studyPathEndDate}
+                    onChange={(e) => setAddStudentForm({...addStudentForm, studyPathEndDate: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Student End Date</label>
+                  <Input 
+                    type="date" 
+                    value={addStudentForm.studentEndDate}
+                    onChange={(e) => setAddStudentForm({...addStudentForm, studentEndDate: e.target.value})}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddStudent(false)}>
@@ -700,14 +788,14 @@ const Students = () => {
 
       {/* Edit Student Modal */}
       <Dialog open={showEditStudent} onOpenChange={setShowEditStudent}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle className="flex items-center text-ike-neutral-dark">
               <Edit className="w-5 h-5 mr-2 text-ike-primary" />
               Edit Student
             </DialogTitle>
             <DialogDescription>
-              Update student information
+              Update student information including dates
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -814,6 +902,40 @@ const Students = () => {
                 </Select>
               </div>
             </div>
+            
+            {/* Date Fields Section */}
+            <div className="border-t pt-4">
+              <h4 className="font-medium text-ike-neutral-dark mb-3 flex items-center">
+                <Calendar className="w-4 h-4 mr-2 text-ike-primary" />
+                Date Management
+              </h4>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Study Path Start Date</label>
+                  <Input 
+                    type="date" 
+                    value={editStudentForm.studyPathStartDate}
+                    onChange={(e) => setEditStudentForm({...editStudentForm, studyPathStartDate: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Study Path End Date</label>
+                  <Input 
+                    type="date" 
+                    value={editStudentForm.studyPathEndDate}
+                    onChange={(e) => setEditStudentForm({...editStudentForm, studyPathEndDate: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-ike-neutral">Student End Date</label>
+                  <Input 
+                    type="date" 
+                    value={editStudentForm.studentEndDate}
+                    onChange={(e) => setEditStudentForm({...editStudentForm, studentEndDate: e.target.value})}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowEditStudent(false)}>
@@ -854,6 +976,13 @@ const Students = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Bulk Study Path Change Modal */}
+      <BulkStudyPathChange
+        students={allStudents}
+        isOpen={showBulkStudyPathChange}
+        onClose={() => setShowBulkStudyPathChange(false)}
+      />
     </div>
   );
 };
