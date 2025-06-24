@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,7 +20,9 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { PaymentError, ErrorListFilters } from "@/types/errorLists";
+import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
 import { ErrorDetailsModal } from "@/components/reports/ErrorDetailsModal";
+import { ErrorListsViewManagement } from "@/components/reports/ErrorListsViewManagement";
 
 const ErrorLists = () => {
   const { user } = useAuth();
@@ -38,6 +39,22 @@ const ErrorLists = () => {
   // Modal states
   const [selectedError, setSelectedError] = useState<PaymentError | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+
+  // View management state
+  const [savedViews, setSavedViews] = useState<SavedView[]>([]);
+  const [currentView, setCurrentView] = useState<SavedView>();
+  const [viewColumns, setViewColumns] = useState<ViewColumn[]>([
+    { key: 'errorId', label: 'Error ID', visible: true },
+    { key: 'student', label: 'Student', visible: true },
+    { key: 'errorType', label: 'Error Type', visible: true },
+    { key: 'severity', label: 'Severity', visible: true },
+    { key: 'status', label: 'Status', visible: true },
+    { key: 'municipality', label: 'Municipality', visible: true },
+    { key: 'impact', label: 'Impact', visible: true },
+    { key: 'detected', label: 'Detected', visible: true },
+    { key: 'actions', label: 'Actions', visible: true }
+  ]);
+  const [viewFilters, setViewFilters] = useState<ViewFilter[]>([]);
 
   // Mock data for payment errors
   const mockPaymentErrors: PaymentError[] = [
@@ -197,6 +214,7 @@ const ErrorLists = () => {
   const getFilteredErrors = () => {
     let filtered = mockPaymentErrors;
 
+    // Apply existing filters
     if (selectedErrorType !== "all") {
       filtered = filtered.filter(error => error.errorType === selectedErrorType);
     }
@@ -216,6 +234,27 @@ const ErrorLists = () => {
         error.personalId.includes(searchTerm)
       );
     }
+
+    // Apply view filters
+    viewFilters.forEach(filter => {
+      filtered = filtered.filter(error => {
+        const fieldValue = error[filter.field as keyof PaymentError]?.toString().toLowerCase() || '';
+        const filterValue = filter.value.toString().toLowerCase();
+        
+        switch (filter.operator) {
+          case 'equals':
+            return fieldValue === filterValue;
+          case 'contains':
+            return fieldValue.includes(filterValue);
+          case 'startsWith':
+            return fieldValue.startsWith(filterValue);
+          case 'endsWith':
+            return fieldValue.endsWith(filterValue);
+          default:
+            return true;
+        }
+      });
+    });
 
     return filtered;
   };
@@ -277,6 +316,38 @@ const ErrorLists = () => {
     setIsDetailsModalOpen(true);
   };
 
+  // View management handlers
+  const handleSaveView = (view: Omit<SavedView, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newView: SavedView = {
+      ...view,
+      id: `view-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    setSavedViews([...savedViews, newView]);
+  };
+
+  const handleLoadView = (view: SavedView) => {
+    setCurrentView(view);
+    setViewColumns(view.columns);
+    setViewFilters(view.filters);
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    setSavedViews(savedViews.filter(view => view.id !== viewId));
+    if (currentView?.id === viewId) {
+      setCurrentView(undefined);
+    }
+  };
+
+  const handleColumnsChange = (columns: ViewColumn[]) => {
+    setViewColumns(columns);
+  };
+
+  const handleFiltersChange = (filters: ViewFilter[]) => {
+    setViewFilters(filters);
+  };
+
   const filteredErrors = getFilteredErrors();
   const paginatedErrors = getPaginatedErrors();
   const totalPages = getTotalPages();
@@ -298,7 +369,12 @@ const ErrorLists = () => {
     setSelectedSeverity("all");
     setSelectedStatus("all");
     setSearchTerm("");
+    setViewFilters([]);
     setCurrentPage(1);
+  };
+
+  const getVisibleColumns = () => {
+    return viewColumns.filter(col => col.visible);
   };
 
   return (
@@ -318,6 +394,19 @@ const ErrorLists = () => {
           Export Error Report
         </Button>
       </div>
+
+      {/* View Management */}
+      <ErrorListsViewManagement
+        views={savedViews}
+        currentView={currentView}
+        onSaveView={handleSaveView}
+        onLoadView={handleLoadView}
+        onDeleteView={handleDeleteView}
+        columns={viewColumns}
+        filters={viewFilters}
+        onColumnsChange={handleColumnsChange}
+        onFiltersChange={handleFiltersChange}
+      />
 
       {/* Filters */}
       <Card>
@@ -486,75 +575,87 @@ const ErrorLists = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Error ID</TableHead>
-                <TableHead>Student</TableHead>
-                <TableHead>Error Type</TableHead>
-                <TableHead>Severity</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Municipality</TableHead>
-                <TableHead>Impact</TableHead>
-                <TableHead>Detected</TableHead>
-                <TableHead>Actions</TableHead>
+                {getVisibleColumns().map((column) => (
+                  <TableHead key={column.key}>{column.label}</TableHead>
+                ))}
               </TableRow>
             </TableHeader>
             <TableBody>
               {paginatedErrors.map((error) => (
                 <TableRow key={error.id}>
-                  <TableCell className="font-mono text-sm">{error.id}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-ike-neutral" />
-                      <div>
-                        <div className="font-medium">{error.studentName}</div>
-                        <div className="text-sm text-ike-neutral">{error.personalId}</div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {getErrorTypeLabel(error.errorType)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{getSeverityBadge(error.severity)}</TableCell>
-                  <TableCell>{getStatusBadge(error.status)}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-ike-neutral" />
-                      {error.municipality}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {error.paymentImpact?.blockedAmount ? (
-                      <div className="text-sm">
-                        <div className="font-medium text-red-600">
-                          {error.paymentImpact.blockedAmount.toLocaleString()} SEK
-                        </div>
-                        <div className="text-ike-neutral">
-                          {error.paymentImpact.affectedPeriods.length} periods
+                  {viewColumns.find(col => col.key === 'errorId' && col.visible) && (
+                    <TableCell className="font-mono text-sm">{error.id}</TableCell>
+                  )}
+                  {viewColumns.find(col => col.key === 'student' && col.visible) && (
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4 text-ike-neutral" />
+                        <div>
+                          <div className="font-medium">{error.studentName}</div>
+                          <div className="text-sm text-ike-neutral">{error.personalId}</div>
                         </div>
                       </div>
-                    ) : (
-                      <span className="text-ike-neutral">No impact</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-sm text-ike-neutral">
-                    {new Date(error.detectedDate).toLocaleDateString('sv-SE')}
-                  </TableCell>
-                  <TableCell>
-                    <Button 
-                      size="sm" 
-                      variant="ghost"
-                      onClick={() => handleViewDetails(error)}
-                      className="text-ike-primary hover:text-ike-primary-dark"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Button>
-                  </TableCell>
+                    </TableCell>
+                  )}
+                  {viewColumns.find(col => col.key === 'errorType' && col.visible) && (
+                    <TableCell>
+                      <Badge variant="outline">
+                        {getErrorTypeLabel(error.errorType)}
+                      </Badge>
+                    </TableCell>
+                  )}
+                  {viewColumns.find(col => col.key === 'severity' && col.visible) && (
+                    <TableCell>{getSeverityBadge(error.severity)}</TableCell>
+                  )}
+                  {viewColumns.find(col => col.key === 'status' && col.visible) && (
+                    <TableCell>{getStatusBadge(error.status)}</TableCell>
+                  )}
+                  {viewColumns.find(col => col.key === 'municipality' && col.visible) && (
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-ike-neutral" />
+                        {error.municipality}
+                      </div>
+                    </TableCell>
+                  )}
+                  {viewColumns.find(col => col.key === 'impact' && col.visible) && (
+                    <TableCell>
+                      {error.paymentImpact?.blockedAmount ? (
+                        <div className="text-sm">
+                          <div className="font-medium text-red-600">
+                            {error.paymentImpact.blockedAmount.toLocaleString()} SEK
+                          </div>
+                          <div className="text-ike-neutral">
+                            {error.paymentImpact.affectedPeriods.length} periods
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-ike-neutral">No impact</span>
+                      )}
+                    </TableCell>
+                  )}
+                  {viewColumns.find(col => col.key === 'detected' && col.visible) && (
+                    <TableCell className="text-sm text-ike-neutral">
+                      {new Date(error.detectedDate).toLocaleDateString('sv-SE')}
+                    </TableCell>
+                  )}
+                  {viewColumns.find(col => col.key === 'actions' && col.visible) && (
+                    <TableCell>
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        onClick={() => handleViewDetails(error)}
+                        className="text-ike-primary hover:text-ike-primary-dark"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
               {paginatedErrors.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 text-ike-neutral">
+                  <TableCell colSpan={getVisibleColumns().length} className="text-center py-8 text-ike-neutral">
                     No errors found for the selected filters.
                   </TableCell>
                 </TableRow>
