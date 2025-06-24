@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -60,6 +59,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
+import { MeasuresViewManagement } from "@/components/kaa/MeasuresViewManagement";
+import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
 
 interface MeasureAction {
   id: number;
@@ -191,7 +192,21 @@ const MeasuresAndActions = () => {
     notes: ""
   });
 
-  const filteredMeasures = measures.filter(measure => {
+  // View Management State
+  const [savedViews, setSavedViews] = useState<SavedView[]>([]);
+  const [currentView, setCurrentView] = useState<SavedView | undefined>(undefined);
+  const [viewColumns, setViewColumns] = useState<ViewColumn[]>([
+    { key: 'youngPersonName', label: 'Young Person', visible: true },
+    { key: 'measureType', label: 'Measure Type', visible: true },
+    { key: 'actionPlan', label: 'Action Plan', visible: true },
+    { key: 'period', label: 'Period', visible: true },
+    { key: 'progress', label: 'Progress', visible: true },
+    { key: 'status', label: 'Status', visible: true },
+    { key: 'actions', label: 'Actions', visible: true }
+  ]);
+  const [viewFilters, setViewFilters] = useState<ViewFilter[]>([]);
+
+  const filteredMeasuresBase = measures.filter(measure => {
     const matchesSearch = 
       measure.youngPersonName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       measure.personalNumber.includes(searchTerm) ||
@@ -202,6 +217,61 @@ const MeasuresAndActions = () => {
     
     return matchesSearch && matchesStatus && matchesType;
   });
+
+  // View Management Handlers
+  const handleSaveView = (view: Omit<SavedView, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newView: SavedView = {
+      ...view,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    setSavedViews([...savedViews, newView]);
+  };
+
+  const handleLoadView = (view: SavedView) => {
+    setCurrentView(view);
+    setViewColumns(view.columns);
+    setViewFilters(view.filters);
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    setSavedViews(savedViews.filter(v => v.id !== viewId));
+    if (currentView?.id === viewId) {
+      setCurrentView(undefined);
+    }
+  };
+
+  // Apply view filters to the existing filteredMeasures logic
+  const applyViewFilters = (measures: MeasureAction[]) => {
+    return measures.filter(measure => {
+      return viewFilters.every(filter => {
+        const fieldValue = String(measure[filter.field as keyof MeasureAction] || '').toLowerCase();
+        const filterValue = String(filter.value).toLowerCase();
+        
+        switch (filter.operator) {
+          case 'equals':
+            return fieldValue === filterValue;
+          case 'contains':
+            return fieldValue.includes(filterValue);
+          case 'startsWith':
+            return fieldValue.startsWith(filterValue);
+          case 'endsWith':
+            return fieldValue.endsWith(filterValue);
+          default:
+            return true;
+        }
+      });
+    });
+  };
+
+  const filteredMeasures = applyViewFilters(filteredMeasuresBase);
+
+  // Helper function to check if column should be visible
+  const isColumnVisible = (columnKey: string) => {
+    const column = viewColumns.find(col => col.key === columnKey);
+    return column ? column.visible : true;
+  };
 
   const handleViewDetails = (measure: MeasureAction) => {
     setSelectedMeasure(measure);
@@ -294,6 +364,19 @@ const MeasuresAndActions = () => {
           New Measure
         </Button>
       </div>
+
+      {/* View Management */}
+      <MeasuresViewManagement
+        views={savedViews}
+        currentView={currentView}
+        onSaveView={handleSaveView}
+        onLoadView={handleLoadView}
+        onDeleteView={handleDeleteView}
+        columns={viewColumns}
+        filters={viewFilters}
+        onColumnsChange={setViewColumns}
+        onFiltersChange={setViewFilters}
+      />
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -410,77 +493,91 @@ const MeasuresAndActions = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="font-medium">Young Person</TableHead>
-                <TableHead className="font-medium">Measure Type</TableHead>
-                <TableHead className="font-medium">Action Plan</TableHead>
-                <TableHead className="font-medium">Period</TableHead>
-                <TableHead className="font-medium">Progress</TableHead>
-                <TableHead className="font-medium">Status</TableHead>
-                <TableHead className="font-medium text-center">Actions</TableHead>
+                {isColumnVisible('youngPersonName') && <TableHead className="font-medium">Young Person</TableHead>}
+                {isColumnVisible('measureType') && <TableHead className="font-medium">Measure Type</TableHead>}
+                {isColumnVisible('actionPlan') && <TableHead className="font-medium">Action Plan</TableHead>}
+                {isColumnVisible('period') && <TableHead className="font-medium">Period</TableHead>}
+                {isColumnVisible('progress') && <TableHead className="font-medium">Progress</TableHead>}
+                {isColumnVisible('status') && <TableHead className="font-medium">Status</TableHead>}
+                {isColumnVisible('actions') && <TableHead className="font-medium text-center">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredMeasures.map((measure) => (
                 <TableRow key={measure.id} className="hover:bg-ike-neutral-light/50">
-                  <TableCell className="font-medium text-ike-neutral-dark">
-                    <div>
-                      <div>{measure.youngPersonName}</div>
-                      <div className="text-xs text-ike-neutral font-mono">{measure.personalNumber}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-xs">
-                      {measure.measureType}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="max-w-xs truncate">
-                    {measure.actionPlan}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {measure.startDate}
-                    </div>
-                    <div className="flex items-center gap-1 text-ike-neutral">
-                      <Clock className="w-3 h-3" />
-                      {measure.endDate}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div className="w-16 bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-ike-primary h-2 rounded-full" 
-                          style={{ width: `${measure.progress}%` }}
-                        ></div>
+                  {isColumnVisible('youngPersonName') && (
+                    <TableCell className="font-medium text-ike-neutral-dark">
+                      <div>
+                        <div>{measure.youngPersonName}</div>
+                        <div className="text-xs text-ike-neutral font-mono">{measure.personalNumber}</div>
                       </div>
-                      <span className="text-xs">{measure.progress}%</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{getStatusBadge(measure.status)}</TableCell>
-                  <TableCell className="text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-white border shadow-lg z-50">
-                        <DropdownMenuItem onClick={() => handleViewDetails(measure)}>
-                          <Eye className="mr-2 h-4 w-4" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleEdit(measure)}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit Measure
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(measure.id)}>
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete Measure
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                    </TableCell>
+                  )}
+                  {isColumnVisible('measureType') && (
+                    <TableCell>
+                      <Badge variant="outline" className="text-xs">
+                        {measure.measureType}
+                      </Badge>
+                    </TableCell>
+                  )}
+                  {isColumnVisible('actionPlan') && (
+                    <TableCell className="max-w-xs truncate">
+                      {measure.actionPlan}
+                    </TableCell>
+                  )}
+                  {isColumnVisible('period') && (
+                    <TableCell className="text-sm">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {measure.startDate}
+                      </div>
+                      <div className="flex items-center gap-1 text-ike-neutral">
+                        <Clock className="w-3 h-3" />
+                        {measure.endDate}
+                      </div>
+                    </TableCell>
+                  )}
+                  {isColumnVisible('progress') && (
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="bg-ike-primary h-2 rounded-full" 
+                            style={{ width: `${measure.progress}%` }}
+                          ></div>
+                        </div>
+                        <span className="text-xs">{measure.progress}%</span>
+                      </div>
+                    </TableCell>
+                  )}
+                  {isColumnVisible('status') && (
+                    <TableCell>{getStatusBadge(measure.status)}</TableCell>
+                  )}
+                  {isColumnVisible('actions') && (
+                    <TableCell className="text-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-white border shadow-lg z-50">
+                          <DropdownMenuItem onClick={() => handleViewDetails(measure)}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEdit(measure)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit Measure
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDelete(measure.id)}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete Measure
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
