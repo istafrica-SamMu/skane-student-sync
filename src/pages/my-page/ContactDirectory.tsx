@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,11 +23,16 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { ContactDetailsModal } from "@/components/ContactDetailsModal";
+import { SendMessageModal } from "@/components/SendMessageModal";
 
 const ContactDirectory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterRegion, setFilterRegion] = useState("all");
+  const [selectedContact, setSelectedContact] = useState<any>(null);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const { user } = useAuth();
 
   // Mock contact data
@@ -162,6 +166,32 @@ const ContactDirectory = () => {
     }
   };
 
+  const handleContactClick = (contact: any) => {
+    setSelectedContact(contact);
+    setIsContactModalOpen(true);
+  };
+
+  const handleSendMessage = (contact: any) => {
+    setSelectedContact(contact);
+    setIsContactModalOpen(false);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleExportContacts = () => {
+    // Simulate export functionality
+    const csvContent = filteredContacts.map(contact => 
+      `${contact.name},${contact.role},${contact.organization},${contact.email},${contact.phone}`
+    ).join('\n');
+    
+    const blob = new Blob([`Name,Role,Organization,Email,Phone\n${csvContent}`], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'contacts.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -172,7 +202,7 @@ const ContactDirectory = () => {
             Access contact information for municipalities and principals in the system
           </p>
         </div>
-        <Button variant="outline" className="flex items-center gap-2">
+        <Button variant="outline" className="flex items-center gap-2" onClick={handleExportContacts}>
           <Download className="w-4 h-4" />
           Export Contacts
         </Button>
@@ -247,7 +277,11 @@ const ContactDirectory = () => {
       {/* Contact Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredContacts.map((contact) => (
-          <Card key={contact.id} className="hover:shadow-lg transition-shadow duration-200">
+          <Card 
+            key={contact.id} 
+            className="hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+            onClick={() => handleContactClick(contact)}
+          >
             <CardHeader className="pb-4">
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-3">
@@ -290,22 +324,16 @@ const ContactDirectory = () => {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <Mail className="w-4 h-4 text-ike-neutral" />
-                  <a 
-                    href={`mailto:${contact.email}`}
-                    className="text-ike-primary hover:underline truncate"
-                  >
+                  <span className="text-ike-primary truncate">
                     {contact.email}
-                  </a>
+                  </span>
                 </div>
                 
                 <div className="flex items-center gap-2 text-sm">
                   <Phone className="w-4 h-4 text-ike-neutral" />
-                  <a 
-                    href={`tel:${contact.phone}`}
-                    className="text-ike-primary hover:underline"
-                  >
+                  <span className="text-ike-primary">
                     {contact.phone}
-                  </a>
+                  </span>
                 </div>
                 
                 <div className="flex items-start gap-2 text-sm">
@@ -316,14 +344,17 @@ const ContactDirectory = () => {
                 </div>
               </div>
 
-              <div className="flex gap-2 pt-2">
-                <Button size="sm" className="bg-ike-primary hover:bg-ike-primary-dark text-white flex-1">
+              <div className="pt-2">
+                <Button 
+                  size="sm" 
+                  className="bg-ike-primary hover:bg-ike-primary-dark text-white w-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSendMessage(contact);
+                  }}
+                >
                   <MessageSquare className="w-4 h-4 mr-1" />
-                  Message
-                </Button>
-                <Button size="sm" variant="outline" className="flex-1">
-                  <Phone className="w-4 h-4 mr-1" />
-                  Call
+                  Send Message
                 </Button>
               </div>
             </CardContent>
