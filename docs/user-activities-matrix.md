@@ -1,4 +1,5 @@
 
+
 # User Activities Matrix
 
 This document describes the activities that each user role can perform within the IKE 2.0 system.
@@ -7,37 +8,37 @@ This document describes the activities that each user role can perform within th
 
 | Users | Activities |
 |-------|------------|
-| **Regional Administrator** | • Manage all system users, roles, municipalities, groups, principals, and school units<br/>• Configure school years and study paths<br/>• Manage price codes and study path pricing<br/>• Configure integration with Tax Agency Hub, UHR BEDA, and Admission systems<br/>• Access calculation engine for payment processing<br/>• Generate geographical analysis reports<br/>• View system logs and manage enrollment settings<br/>• Access comprehensive system support<br/>• Full system administration capabilities |
-| **Municipality Administrator** | • Manage municipal students (TF registration, conflict resolution, travel cards)<br/>• Oversee KAA management (dashboard, registry, measures, contact occasions, SCB reports)<br/>• Import student data and manage integrations (Tax Agency Hub, UHR BEDA, Admission)<br/>• Configure accounting settings and municipal price lists<br/>• Manage additional amounts and payment blocks<br/>• Generate payment documents and handle inter-municipal compensation<br/>• Manage municipal school units and users<br/>• Generate financial reports (money to receive/pay, municipal statistics, financial exports)<br/>• Access reports dashboard for comprehensive reporting<br/>• Create geographical analysis reports<br/>• Manage messages, enrollment settings, and activity logs |
-| **School Administrator** | • Manage student roster, classes, and TF number registration<br/>• Handle conflict resolution and travel card documents<br/>• Manage KAA dashboard, registry, and contact occasions<br/>• Access school unit information<br/>• Generate reports dashboard, student lists, and financial reports<br/>• Manage messages, activity logs, and personal settings<br/>• Access system support |
-| **Organization Administrator** | • Manage customer accounts and group management<br/>• Oversee account hierarchy and billing/subscriptions<br/>• Configure organization settings<br/>• Manage global users, roles, and permissions<br/>• Control access and security settings<br/>• Monitor system health and usage analytics<br/>• Review audit logs<br/>• Provide customer support and manage announcements<br/>• Maintain knowledge base<br/>• Access system support |
-| **Development Administrator** | • Configure API integrations and customer integrations<br/>• Perform integration testing and maintain API documentation<br/>• Manage translation systems and language settings<br/>• Operate translation tools<br/>• Manage development environments and databases<br/>• Configure system settings and feature flags<br/>• Monitor system logs and performance<br/>• Track errors and use debug tools<br/>• Manage code repository and development documentation<br/>• Run testing suites<br/>• Access system support |
+| **Regional Administrator** | • Manage all system users, roles, municipalities, groups, principals, and school units  <br>• Configure school years and study paths  <br>• Manage price codes and study path pricing  <br>• Configure integration with Tax Agency Hub, UHR BEDA, and Admission systems  <br>• Access calculation engine for payment processing  <br>• Generate geographical analysis reports  <br>• View system logs and manage enrollment settings  <br>• Access comprehensive system support  <br>• Full system administration capabilities |
+| **Municipality Administrator** | • Manage municipal students (TF registration, conflict resolution, travel cards)  <br>• Oversee KAA management (dashboard, registry, measures, contact occasions, SCB reports)  <br>• Import student data and manage integrations (Tax Agency Hub, UHR BEDA, Admission)  <br>• Configure accounting settings and municipal price lists  <br>• Manage additional amounts and payment blocks  <br>• Generate payment documents and handle inter-municipal compensation  <br>• Manage municipal school units and users  <br>• Generate financial reports (money to receive/pay, municipal statistics, financial exports)  <br>• Access reports dashboard for comprehensive reporting  <br>• Create geographical analysis reports  <br>• Manage messages, enrollment settings, and activity logs |
+| **School Administrator** | • Manage student roster, classes, and TF number registration  <br>• Handle conflict resolution and travel card documents  <br>• Manage KAA dashboard, registry, and contact occasions  <br>• Access school unit information  <br>• Generate reports dashboard, student lists, and financial reports  <br>• Manage messages, activity logs, and personal settings  <br>• Access system support |
+| **Organization Administrator** | • Manage customer accounts and group management  <br>• Oversee account hierarchy and billing/subscriptions  <br>• Configure organization settings  <br>• Manage global users, roles, and permissions  <br>• Control access and security settings  <br>• Monitor system health and usage analytics  <br>• Review audit logs  <br>• Provide customer support and manage announcements  <br>• Maintain knowledge base  <br>• Access system support |
+| **Development Administrator** | • Configure API integrations and customer integrations  <br>• Perform integration testing and maintain API documentation  <br>• Manage translation systems and language settings  <br>• Operate translation tools  <br>• Manage development environments and databases  <br>• Configure system settings and feature flags  <br>• Monitor system logs and performance  <br>• Track errors and use debug tools  <br>• Manage code repository and development documentation  <br>• Run testing suites  <br>• Access system support |
 
 ## Specific Report Generation Capabilities by Role
 
 ### Municipality Administrator Report Generation
 | Report Category | Available Reports |
 |-----------------|-------------------|
-| **Income Reports** | • Income Information for Principal (PDF, CSV)<br/>• Individual Principal Income (CSV, Excel) |
-| **Payment Documents** | • Payment Documents for Municipality (PDF)<br/>• Internal Debit Documents (PDF) |
-| **Error Lists** | • Error List for Principal (PDF)<br/>• Error List for Municipality (PDF) |
-| **Change Lists** | • Change List for Principal (PDF)<br/>• Change List for Municipality (PDF) |
-| **Accounting Documents** | • Accounting Documents for Municipality (PDF, CSV)<br/>• Financial Integration Files (CSV, Excel) |
-| **Invoice Documents** | • Invoice Documents for Principal (PDF)<br/>• Address Labels (PDF) |
+| **Income Reports** | • Income Information for Principal (PDF, CSV)  <br>• Individual Principal Income (CSV, Excel) |
+| **Payment Documents** | • Payment Documents for Municipality (PDF)  <br>• Internal Debit Documents (PDF) |
+| **Error Lists** | • Error List for Principal (PDF)  <br>• Error List for Municipality (PDF) |
+| **Change Lists** | • Change List for Principal (PDF)  <br>• Change List for Municipality (PDF) |
+| **Accounting Documents** | • Accounting Documents for Municipality (PDF, CSV)  <br>• Financial Integration Files (CSV, Excel) |
+| **Invoice Documents** | • Invoice Documents for Principal (PDF)  <br>• Address Labels (PDF) |
 
 ### School Administrator Report Generation
 | Report Category | Available Reports |
 |-----------------|-------------------|
-| **Student Reports** | • Student Lists<br/>• Class rosters and enrollment reports |
-| **Financial Reports** | • School-specific financial reports<br/>• Budget and expense tracking |
-| **KAA Reports** | • Contact occasions reports<br/>• Student support documentation |
+| **Student Reports** | • Student Lists  <br>• Class rosters and enrollment reports |
+| **Financial Reports** | • School-specific financial reports  <br>• Budget and expense tracking |
+| **KAA Reports** | • Contact occasions reports  <br>• Student support documentation |
 
 ### Regional Administrator Report Generation
 | Report Category | Available Reports |
 |-----------------|-------------------|
-| **System Reports** | • Regional statistics and analytics<br/>• Cross-municipal data analysis |
-| **Geographical Analysis** | • Geographic distribution reports<br/>• Regional trend analysis |
-| **Administrative Reports** | • User activity and system usage<br/>• Integration status and performance |
+| **System Reports** | • Regional statistics and analytics  <br>• Cross-municipal data analysis |
+| **Geographical Analysis** | • Geographic distribution reports  <br>• Regional trend analysis |
+| **Administrative Reports** | • User activity and system usage  <br>• Integration status and performance |
 
 ## Payment Document Management Activities
 
@@ -101,3 +102,4 @@ This document describes the activities that each user role can perform within th
 - **Financial Integration**: Ensure proper connection with municipal financial systems
 
 This matrix ensures that each user role has appropriate access to system functions based on their organizational responsibility and authority level.
+
