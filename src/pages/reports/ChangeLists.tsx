@@ -16,9 +16,13 @@ import {
   MapPin,
   Clock,
   Euro,
-  DollarSign
+  DollarSign,
+  Eye
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { ChangeDetailsModal } from "@/components/reports/ChangeDetailsModal";
+import { ExportChangesModal } from "@/components/reports/ExportChangesModal";
+import { ConfidentialContactModal } from "@/components/reports/ConfidentialContactModal";
 
 interface ChangeRecord {
   id: string;
@@ -46,6 +50,13 @@ const ChangeLists = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<string>("2024-11");
   const [selectedChangeType, setSelectedChangeType] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Modal states
+  const [selectedRecord, setSelectedRecord] = useState<ChangeRecord | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isConfidentialModalOpen, setIsConfidentialModalOpen] = useState(false);
+  const [confidentialRecordId, setConfidentialRecordId] = useState<string>("");
 
   // Sample data for all change types including municipality registration with additional amounts
   const mockChangeRecords: ChangeRecord[] = [
@@ -349,6 +360,20 @@ const ChangeLists = () => {
            new Date(dateString).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' });
   };
 
+  const handleViewDetails = (record: ChangeRecord) => {
+    setSelectedRecord(record);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleConfidentialContact = (recordId: string) => {
+    setConfidentialRecordId(recordId);
+    setIsConfidentialModalOpen(true);
+  };
+
+  const handleExportClick = () => {
+    setIsExportModalOpen(true);
+  };
+
   const filteredRecords = getFilteredRecords();
 
   return (
@@ -361,7 +386,10 @@ const ChangeLists = () => {
             Track changes since previous measurement date with comprehensive change tracking
           </p>
         </div>
-        <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+        <Button 
+          className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+          onClick={handleExportClick}
+        >
           <Download className="w-4 h-4 mr-2" />
           Export Changes
         </Button>
@@ -565,20 +593,27 @@ const ChangeLists = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {record.isConfidential ? (
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        className="text-xs"
-                        onClick={() => alert("Contact Skåne Municipality system administrator for more information about this confidential student record.")}
-                      >
-                        Contact Admin
-                      </Button>
-                    ) : (
-                      <Button size="sm" variant="ghost">
-                        <FileText className="w-4 h-4" />
-                      </Button>
-                    )}
+                    <div className="flex gap-1">
+                      {record.isConfidential ? (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="text-xs"
+                          onClick={() => handleConfidentialContact(record.id)}
+                        >
+                          Contact Admin
+                        </Button>
+                      ) : (
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          onClick={() => handleViewDetails(record)}
+                          className="text-ike-primary hover:text-ike-primary-dark"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -643,6 +678,27 @@ const ChangeLists = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Modals */}
+      <ChangeDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={() => setIsDetailsModalOpen(false)}
+        record={selectedRecord}
+      />
+
+      <ExportChangesModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        totalRecords={filteredRecords.length}
+        selectedPeriod={selectedPeriod}
+        selectedChangeType={selectedChangeType}
+      />
+
+      <ConfidentialContactModal
+        isOpen={isConfidentialModalOpen}
+        onClose={() => setIsConfidentialModalOpen(false)}
+        recordId={confidentialRecordId}
+      />
     </div>
   );
 };
