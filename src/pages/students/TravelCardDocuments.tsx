@@ -60,6 +60,8 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import EligibilityDecisionTools from "@/components/students/EligibilityDecisionTools";
+import { TravelCardDocumentsViewManagement } from "@/components/students/TravelCardDocumentsViewManagement";
+import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
 
 interface TravelCardStudent {
   id: number;
@@ -91,6 +93,58 @@ const TravelCardDocuments = () => {
   const [selectedStudent, setSelectedStudent] = useState<TravelCardStudent | null>(null);
   const [showStudentDetails, setShowStudentDetails] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+
+  // View Management State
+  const [savedViews, setSavedViews] = useState<SavedView[]>([]);
+  const [currentView, setCurrentView] = useState<SavedView | undefined>();
+  const [columns, setColumns] = useState<ViewColumn[]>([
+    { key: 'firstName', label: 'First Name', visible: true },
+    { key: 'lastName', label: 'Last Name', visible: true },
+    { key: 'personalNumber', label: 'Personal Number', visible: true },
+    { key: 'grade', label: 'Grade', visible: true },
+    { key: 'schoolUnit', label: 'School Unit', visible: true },
+    { key: 'studentAddress', label: 'Student Address', visible: true },
+    { key: 'eligibilityStatus', label: 'Eligibility Status', visible: true },
+    { key: 'lastUpdated', label: 'Last Updated', visible: true }
+  ]);
+  const [filters, setFilters] = useState<ViewFilter[]>([]);
+
+  // View Management Handlers
+  const handleSaveView = (view: Omit<SavedView, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newView: SavedView = {
+      ...view,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    setSavedViews([...savedViews, newView]);
+    setCurrentView(newView);
+  };
+
+  const handleLoadView = (view: SavedView) => {
+    setCurrentView(view);
+    setColumns(view.columns);
+    setFilters(view.filters);
+    toast({
+      title: "View Loaded",
+      description: `View "${view.name}" has been applied successfully.`,
+    });
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    setSavedViews(savedViews.filter(view => view.id !== viewId));
+    if (currentView?.id === viewId) {
+      setCurrentView(undefined);
+    }
+  };
+
+  const handleColumnsChange = (newColumns: ViewColumn[]) => {
+    setColumns(newColumns);
+  };
+
+  const handleFiltersChange = (newFilters: ViewFilter[]) => {
+    setFilters(newFilters);
+  };
 
   // Mock data for travel card students
   const travelCardStudents: TravelCardStudent[] = [
@@ -172,7 +226,26 @@ const TravelCardDocuments = () => {
     const matchesGrade = gradeFilter === "all" || student.grade === gradeFilter;
     const matchesEligibility = eligibilityFilter === "all" || student.eligibilityStatus === eligibilityFilter;
     
-    return matchesSearch && matchesGrade && matchesEligibility;
+    // Apply view filters
+    const matchesViewFilters = filters.every(filter => {
+      const fieldValue = (student as any)[filter.field]?.toString().toLowerCase() || '';
+      const filterValue = filter.value.toString().toLowerCase();
+      
+      switch (filter.operator) {
+        case 'equals':
+          return fieldValue === filterValue;
+        case 'contains':
+          return fieldValue.includes(filterValue);
+        case 'startsWith':
+          return fieldValue.startsWith(filterValue);
+        case 'endsWith':
+          return fieldValue.endsWith(filterValue);
+        default:
+          return true;
+      }
+    });
+    
+    return matchesSearch && matchesGrade && matchesEligibility && matchesViewFilters;
   });
 
   const handleViewDetails = (student: TravelCardStudent) => {
@@ -359,6 +432,19 @@ const TravelCardDocuments = () => {
       {/* Enhanced Eligibility Decision Tools */}
       <EligibilityDecisionTools />
 
+      {/* View Management */}
+      <TravelCardDocumentsViewManagement
+        views={savedViews}
+        currentView={currentView}
+        onSaveView={handleSaveView}
+        onLoadView={handleLoadView}
+        onDeleteView={handleDeleteView}
+        columns={columns}
+        filters={filters}
+        onColumnsChange={handleColumnsChange}
+        onFiltersChange={handleFiltersChange}
+      />
+
       {/* Search and Filter Section */}
       <Card>
         <CardHeader>
@@ -422,45 +508,58 @@ const TravelCardDocuments = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="font-medium">Name</TableHead>
-                <TableHead className="font-medium">Personal Number</TableHead>
-                <TableHead className="font-medium">Grade</TableHead>
-                <TableHead className="font-medium">School Unit</TableHead>
-                <TableHead className="font-medium">Student Address</TableHead>
-                <TableHead className="font-medium">Eligibility</TableHead>
-                <TableHead className="font-medium">Last Updated</TableHead>
+                {columns.filter(col => col.visible).map((column) => (
+                  <TableHead key={column.key} className="font-medium">
+                    {column.label}
+                  </TableHead>
+                ))}
                 <TableHead className="font-medium text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredStudents.map((student) => (
                 <TableRow key={student.id} className="hover:bg-ike-neutral-light/50">
-                  <TableCell className="font-medium text-ike-neutral-dark">
-                    {student.firstName} {student.lastName}
-                  </TableCell>
-                  <TableCell className="font-mono text-sm">
-                    {student.personalNumber}
-                  </TableCell>
-                  <TableCell>{student.grade}</TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{student.schoolUnit}</div>
-                      <div className="text-sm text-ike-neutral">{student.schoolUnitCode}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <MapPin className="w-4 h-4 mr-1 text-ike-neutral" />
-                      <div>
-                        <div className="text-sm">{student.studentStreetAddress}</div>
-                        <div className="text-xs text-ike-neutral">{student.studentPostalCode} {student.studentCity}</div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{getEligibilityBadge(student.eligibilityStatus)}</TableCell>
-                  <TableCell className="text-sm text-ike-neutral">
-                    {student.lastUpdated}
-                  </TableCell>
+                  {columns.filter(col => col.visible).map((column) => (
+                    <TableCell key={column.key}>
+                      {column.key === 'firstName' && (
+                        <span className="font-medium text-ike-neutral-dark">
+                          {student.firstName}
+                        </span>
+                      )}
+                      {column.key === 'lastName' && (
+                        <span className="font-medium text-ike-neutral-dark">
+                          {student.lastName}
+                        </span>
+                      )}
+                      {column.key === 'personalNumber' && (
+                        <span className="font-mono text-sm">
+                          {student.personalNumber}
+                        </span>
+                      )}
+                      {column.key === 'grade' && student.grade}
+                      {column.key === 'schoolUnit' && (
+                        <div>
+                          <div className="font-medium">{student.schoolUnit}</div>
+                          <div className="text-sm text-ike-neutral">{student.schoolUnitCode}</div>
+                        </div>
+                      )}
+                      {column.key === 'studentAddress' && (
+                        <div className="flex items-center">
+                          <MapPin className="w-4 h-4 mr-1 text-ike-neutral" />
+                          <div>
+                            <div className="text-sm">{student.studentStreetAddress}</div>
+                            <div className="text-xs text-ike-neutral">{student.studentPostalCode} {student.studentCity}</div>
+                          </div>
+                        </div>
+                      )}
+                      {column.key === 'eligibilityStatus' && getEligibilityBadge(student.eligibilityStatus)}
+                      {column.key === 'lastUpdated' && (
+                        <span className="text-sm text-ike-neutral">
+                          {student.lastUpdated}
+                        </span>
+                      )}
+                    </TableCell>
+                  ))}
                   <TableCell className="text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
