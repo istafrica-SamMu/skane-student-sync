@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -20,12 +19,70 @@ import {
 import { ArrowUpDown, FileText, CheckCircle, Clock, Download, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { CompensationViewManagement } from "@/components/financial/CompensationViewManagement";
+import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
 
 const InterMunicipalCompensation = () => {
   const { toast } = useToast();
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedMunicipality, setSelectedMunicipality] = useState<any>(null);
+
+  // View management state
+  const [savedViews, setSavedViews] = useState<SavedView[]>([
+    {
+      id: '1',
+      name: 'Default Compensation View',
+      description: 'Standard view showing all compensation data',
+      columns: [
+        { key: 'municipality', label: 'Municipality', visible: true },
+        { key: 'type', label: 'Type', visible: true },
+        { key: 'students', label: 'Students', visible: true },
+        { key: 'totalAmount', label: 'Total Amount', visible: true },
+        { key: 'period', label: 'Period', visible: true }
+      ],
+      filters: [],
+      isDefault: true,
+      isSystemView: true,
+      createdBy: 'system',
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01'
+    }
+  ]);
+
+  const [currentColumns, setCurrentColumns] = useState<ViewColumn[]>([
+    { key: 'municipality', label: 'Municipality', visible: true },
+    { key: 'type', label: 'Type', visible: true },
+    { key: 'students', label: 'Students', visible: true },
+    { key: 'totalAmount', label: 'Total Amount', visible: true },
+    { key: 'period', label: 'Period', visible: true }
+  ]);
+
+  const [currentFilters, setCurrentFilters] = useState<ViewFilter[]>([]);
+  const [currentView, setCurrentView] = useState<SavedView | undefined>(savedViews[0]);
+
+  const handleSaveView = (view: Omit<SavedView, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newView: SavedView = {
+      ...view,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setSavedViews([...savedViews, newView]);
+  };
+
+  const handleLoadView = (view: SavedView) => {
+    setCurrentView(view);
+    setCurrentColumns(view.columns);
+    setCurrentFilters(view.filters);
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    setSavedViews(savedViews.filter(view => view.id !== viewId));
+    if (currentView?.id === viewId) {
+      setCurrentView(savedViews[0]);
+    }
+  };
 
   const compensationData = [
     {
@@ -127,6 +184,8 @@ const InterMunicipalCompensation = () => {
     }, 2000);
   };
 
+  const visibleColumns = currentColumns.filter(col => col.visible);
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -180,6 +239,19 @@ const InterMunicipalCompensation = () => {
         </Card>
       </div>
 
+      {/* View Management */}
+      <CompensationViewManagement
+        views={savedViews}
+        currentView={currentView}
+        onSaveView={handleSaveView}
+        onLoadView={handleLoadView}
+        onDeleteView={handleDeleteView}
+        columns={currentColumns}
+        filters={currentFilters}
+        onColumnsChange={setCurrentColumns}
+        onFiltersChange={setCurrentFilters}
+      />
+
       {/* Compensation Tracking */}
       <Card className="hover:shadow-md transition-shadow">
         <CardHeader>
@@ -196,31 +268,44 @@ const InterMunicipalCompensation = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="font-medium">Municipality</TableHead>
-                  <TableHead className="font-medium">Type</TableHead>
-                  <TableHead className="font-medium">Students</TableHead>
-                  <TableHead className="font-medium text-right">Total Amount</TableHead>
-                  <TableHead className="font-medium">Period</TableHead>
+                  {visibleColumns.map((column) => (
+                    <TableHead key={column.key} className="font-medium">
+                      {column.key === 'totalAmount' 
+                        ? <span className="text-right">{column.label}</span>
+                        : column.label
+                      }
+                    </TableHead>
+                  ))}
                   <TableHead className="font-medium text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {compensationData.map((item) => (
                   <TableRow key={item.id} className="hover:bg-ike-neutral-light/50 transition-colors">
-                    <TableCell className="font-medium text-ike-neutral-dark">
-                      {item.municipality}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        {getStatusIcon(item.type)}
-                        <span className={getTypeColor(item.type)}>{item.type}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-medium">{item.students}</TableCell>
-                    <TableCell className={`text-right font-medium ${getTypeColor(item.type)}`}>
-                      {item.type === "Incoming" ? "+" : "-"}{item.totalAmount.toLocaleString('sv-SE')} SEK
-                    </TableCell>
-                    <TableCell className="text-ike-neutral">{item.period}</TableCell>
+                    {visibleColumns.map((column) => (
+                      <TableCell key={column.key}>
+                        {column.key === 'municipality' && (
+                          <span className="font-medium text-ike-neutral-dark">{item.municipality}</span>
+                        )}
+                        {column.key === 'type' && (
+                          <div className="flex items-center space-x-2">
+                            {getStatusIcon(item.type)}
+                            <span className={getTypeColor(item.type)}>{item.type}</span>
+                          </div>
+                        )}
+                        {column.key === 'students' && (
+                          <span className="font-medium">{item.students}</span>
+                        )}
+                        {column.key === 'totalAmount' && (
+                          <span className={`text-right font-medium block ${getTypeColor(item.type)}`}>
+                            {item.type === "Incoming" ? "+" : "-"}{item.totalAmount.toLocaleString('sv-SE')} SEK
+                          </span>
+                        )}
+                        {column.key === 'period' && (
+                          <span className="text-ike-neutral">{item.period}</span>
+                        )}
+                      </TableCell>
+                    ))}
                     <TableCell className="text-center">
                       <Button 
                         variant="ghost" 
