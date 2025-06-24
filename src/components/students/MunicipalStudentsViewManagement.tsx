@@ -30,7 +30,8 @@ import {
   Trash2, 
   Plus,
   Filter,
-  X
+  X,
+  FolderOpen
 } from "lucide-react";
 import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
 
@@ -59,6 +60,7 @@ export const MunicipalStudentsViewManagement = ({
 }: MunicipalStudentsViewManagementProps) => {
   const { toast } = useToast();
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showLoadDialog, setShowLoadDialog] = useState(false);
   const [showColumnDialog, setShowColumnDialog] = useState(false);
   const [showFilterDialog, setShowFilterDialog] = useState(false);
   const [newViewName, setNewViewName] = useState("");
@@ -98,6 +100,19 @@ export const MunicipalStudentsViewManagement = ({
     toast({
       title: "View Saved",
       description: `View "${newViewName}" has been saved successfully.`,
+    });
+  };
+
+  const handleLoadView = (view: SavedView) => {
+    onLoadView(view);
+    setShowLoadDialog(false);
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    onDeleteView(viewId);
+    toast({
+      title: "View Deleted",
+      description: "View has been removed.",
     });
   };
 
@@ -186,6 +201,15 @@ export const MunicipalStudentsViewManagement = ({
             <Button
               variant="outline"
               size="sm"
+              onClick={() => setShowLoadDialog(true)}
+              className="border-ike-primary/20 text-ike-primary hover:bg-ike-primary/10"
+            >
+              <FolderOpen className="w-4 h-4 mr-1" />
+              Load Views
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setShowSaveDialog(true)}
               className="border-ike-primary/20 text-ike-primary hover:bg-ike-primary/10"
             >
@@ -230,38 +254,74 @@ export const MunicipalStudentsViewManagement = ({
               </div>
             </div>
           )}
+        </div>
+      </CardContent>
 
-          {/* Saved Views */}
-          {userViews.length > 0 && (
-            <div>
-              <Label className="text-sm font-medium text-ike-neutral">Saved Views:</Label>
-              <div className="flex flex-wrap gap-2 mt-2">
+      {/* Load Views Dialog */}
+      <Dialog open={showLoadDialog} onOpenChange={setShowLoadDialog}>
+        <DialogContent className="bg-white border border-gray-200 shadow-lg">
+          <DialogHeader>
+            <DialogTitle>Load Saved View</DialogTitle>
+            <DialogDescription>
+              Select a saved view to apply its configuration.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {userViews.length > 0 ? (
+              <div className="space-y-2">
                 {userViews.map((view) => (
-                  <div key={view.id} className="flex items-center space-x-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onLoadView(view)}
-                      className="border-ike-neutral/20 hover:bg-ike-primary/10"
-                    >
-                      <Eye className="w-3 h-3 mr-1" />
-                      {view.name}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onDeleteView(view.id)}
-                      className="text-ike-error hover:text-ike-error/80 hover:bg-ike-error/10 p-1"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
+                  <div key={view.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-ike-neutral-light/30">
+                    <div className="flex-1">
+                      <h4 className="font-medium">{view.name}</h4>
+                      {view.description && (
+                        <p className="text-sm text-ike-neutral">{view.description}</p>
+                      )}
+                      <div className="flex items-center space-x-2 mt-1">
+                        <Badge variant="outline" className="text-xs">
+                          {view.columns.filter(c => c.visible).length} columns
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          {view.filters.length} filters
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleLoadView(view)}
+                        className="border-ike-primary/20 text-ike-primary hover:bg-ike-primary/10"
+                      >
+                        <Eye className="w-3 h-3 mr-1" />
+                        Load
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteView(view.id)}
+                        className="text-ike-error hover:text-ike-error/80 hover:bg-ike-error/10"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-        </div>
-      </CardContent>
+            ) : (
+              <div className="text-center py-8 text-ike-neutral">
+                <FolderOpen className="w-12 h-12 mx-auto mb-2 text-ike-neutral/50" />
+                <p>No saved views available</p>
+                <p className="text-sm">Create and save a view to see it here</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowLoadDialog(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Save View Dialog */}
       <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
