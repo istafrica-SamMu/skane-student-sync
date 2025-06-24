@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,6 +57,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
+import { ContactOccasionsViewManagement } from "@/components/kaa/ContactOccasionsViewManagement";
+import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
 
 interface ContactOccasion {
   id: number;
@@ -150,6 +151,23 @@ const ContactOccasions = () => {
     }
   ]);
   
+  // View management state
+  const [savedViews, setSavedViews] = useState<SavedView[]>([]);
+  const [currentView, setCurrentView] = useState<SavedView | undefined>();
+  const [viewColumns, setViewColumns] = useState<ViewColumn[]>([
+    { key: 'youngPersonName', label: 'Young Person', visible: true },
+    { key: 'personalNumber', label: 'Personal Number', visible: true },
+    { key: 'type', label: 'Type', visible: true },
+    { key: 'description', label: 'Description', visible: true },
+    { key: 'date', label: 'Date', visible: true },
+    { key: 'time', label: 'Time', visible: true },
+    { key: 'duration', label: 'Duration', visible: true },
+    { key: 'outcome', label: 'Outcome', visible: false },
+    { key: 'contactedBy', label: 'Contacted By', visible: false },
+    { key: 'status', label: 'Status', visible: true }
+  ]);
+  const [viewFilters, setViewFilters] = useState<ViewFilter[]>([]);
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -176,7 +194,53 @@ const ContactOccasions = () => {
     status: "scheduled"
   });
 
-  const filteredContacts = contactOccasions.filter(contact => {
+  // View management handlers
+  const handleSaveView = (view: Omit<SavedView, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newView: SavedView = {
+      ...view,
+      id: `view-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    setSavedViews([...savedViews, newView]);
+  };
+
+  const handleLoadView = (view: SavedView) => {
+    setCurrentView(view);
+    setViewColumns(view.columns);
+    setViewFilters(view.filters);
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    setSavedViews(savedViews.filter(v => v.id !== viewId));
+    if (currentView?.id === viewId) {
+      setCurrentView(undefined);
+    }
+  };
+
+  const applyViewFilters = (contacts: ContactOccasion[]) => {
+    return contacts.filter(contact => {
+      return viewFilters.every(filter => {
+        const fieldValue = (contact as any)[filter.field]?.toString().toLowerCase() || '';
+        const filterValue = filter.value.toString().toLowerCase();
+        
+        switch (filter.operator) {
+          case 'equals':
+            return fieldValue === filterValue;
+          case 'contains':
+            return fieldValue.includes(filterValue);
+          case 'startsWith':
+            return fieldValue.startsWith(filterValue);
+          case 'endsWith':
+            return fieldValue.endsWith(filterValue);
+          default:
+            return true;
+        }
+      });
+    });
+  };
+
+  const filteredContacts = applyViewFilters(contactOccasions.filter(contact => {
     const matchesSearch = 
       contact.youngPersonName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.personalNumber.includes(searchTerm) ||
@@ -186,7 +250,9 @@ const ContactOccasions = () => {
     const matchesType = typeFilter === "all" || contact.type === typeFilter;
     
     return matchesSearch && matchesStatus && matchesType;
-  });
+  }));
+
+  const visibleColumns = viewColumns.filter(col => col.visible);
 
   const handleViewDetails = (contact: ContactOccasion) => {
     setSelectedContact(contact);
@@ -279,6 +345,19 @@ const ContactOccasions = () => {
           New Contact
         </Button>
       </div>
+
+      {/* View Management */}
+      <ContactOccasionsViewManagement
+        views={savedViews}
+        currentView={currentView}
+        onSaveView={handleSaveView}
+        onLoadView={handleLoadView}
+        onDeleteView={handleDeleteView}
+        columns={viewColumns}
+        filters={viewFilters}
+        onColumnsChange={setViewColumns}
+        onFiltersChange={setViewFilters}
+      />
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -394,46 +473,62 @@ const ContactOccasions = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="font-medium">Young Person</TableHead>
-                <TableHead className="font-medium">Type</TableHead>
-                <TableHead className="font-medium">Description</TableHead>
-                <TableHead className="font-medium">Date & Time</TableHead>
-                <TableHead className="font-medium">Duration</TableHead>
-                <TableHead className="font-medium">Status</TableHead>
+                {visibleColumns.map((column) => (
+                  <TableHead key={column.key} className="font-medium">
+                    {column.label}
+                  </TableHead>
+                ))}
                 <TableHead className="font-medium text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredContacts.map((contact) => (
                 <TableRow key={contact.id} className="hover:bg-ike-neutral-light/50">
-                  <TableCell className="font-medium text-ike-neutral-dark">
-                    <div>
-                      <div>{contact.youngPersonName}</div>
-                      <div className="text-xs text-ike-neutral font-mono">{contact.personalNumber}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-xs">
-                      {contact.type}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="max-w-xs truncate">
-                    {contact.description}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {contact.date}
-                    </div>
-                    <div className="flex items-center gap-1 text-ike-neutral">
-                      <Clock className="w-3 h-3" />
-                      {contact.time}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {contact.duration} min
-                  </TableCell>
-                  <TableCell>{getStatusBadge(contact.status)}</TableCell>
+                  {visibleColumns.map((column) => (
+                    <TableCell key={column.key}>
+                      {column.key === 'youngPersonName' && (
+                        <div className="font-medium text-ike-neutral-dark">
+                          <div>{contact.youngPersonName}</div>
+                          {viewColumns.find(col => col.key === 'personalNumber' && !col.visible) && (
+                            <div className="text-xs text-ike-neutral font-mono">{contact.personalNumber}</div>
+                          )}
+                        </div>
+                      )}
+                      {column.key === 'personalNumber' && (
+                        <div className="text-xs text-ike-neutral font-mono">{contact.personalNumber}</div>
+                      )}
+                      {column.key === 'type' && (
+                        <Badge variant="outline" className="text-xs">
+                          {contact.type}
+                        </Badge>
+                      )}
+                      {column.key === 'description' && (
+                        <div className="max-w-xs truncate">{contact.description}</div>
+                      )}
+                      {column.key === 'date' && (
+                        <div className="flex items-center gap-1 text-sm">
+                          <Calendar className="w-3 h-3" />
+                          {contact.date}
+                        </div>
+                      )}
+                      {column.key === 'time' && (
+                        <div className="flex items-center gap-1 text-sm text-ike-neutral">
+                          <Clock className="w-3 h-3" />
+                          {contact.time}
+                        </div>
+                      )}
+                      {column.key === 'duration' && (
+                        <div className="text-sm">{contact.duration} min</div>
+                      )}
+                      {column.key === 'outcome' && (
+                        <div className="text-sm">{contact.outcome}</div>
+                      )}
+                      {column.key === 'contactedBy' && (
+                        <div className="text-sm">{contact.contactedBy}</div>
+                      )}
+                      {column.key === 'status' && getStatusBadge(contact.status)}
+                    </TableCell>
+                  ))}
                   <TableCell className="text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
