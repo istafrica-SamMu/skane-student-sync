@@ -60,6 +60,8 @@ import BulkStudyPathChange from "@/components/students/BulkStudyPathChange";
 import BulkSchoolUnitTransfer from "@/components/students/BulkSchoolUnitTransfer";
 import { privacyService } from "@/services/privacyService";
 import { useToast } from "@/hooks/use-toast";
+import { StudentsViewManagement } from "@/components/students/StudentsViewManagement";
+import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
 
 const Students = () => {
   const { t } = useLanguage();
@@ -205,11 +207,123 @@ const Students = () => {
     }
   ];
 
-  const filteredStudents = allStudents.filter(student =>
-    student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.personalNumber.includes(searchTerm)
-  );
+  // View management state
+  const [savedViews, setSavedViews] = useState<SavedView[]>([
+    {
+      id: '1',
+      name: 'Default Students View',
+      description: 'Standard view showing all student data',
+      columns: [
+        { key: 'name', label: 'Name', visible: true },
+        { key: 'personalNumber', label: 'Personal Number', visible: true },
+        { key: 'birthDate', label: 'Birth Date', visible: true },
+        { key: 'homeMunicipality', label: 'Home Municipality', visible: true },
+        { key: 'studyPath', label: 'Study Path', visible: true },
+        { key: 'schoolYear', label: 'Year', visible: true },
+        { key: 'schoolUnit', label: 'School Unit', visible: true },
+        { key: 'status', label: 'Status', visible: true }
+      ],
+      filters: [],
+      isDefault: true,
+      isSystemView: true,
+      createdBy: 'system',
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01'
+    }
+  ]);
+
+  const [currentColumns, setCurrentColumns] = useState<ViewColumn[]>([
+    { key: 'name', label: 'Name', visible: true },
+    { key: 'personalNumber', label: 'Personal Number', visible: true },
+    { key: 'birthDate', label: 'Birth Date', visible: true },
+    { key: 'homeMunicipality', label: 'Home Municipality', visible: true },
+    { key: 'studyPath', label: 'Study Path', visible: true },
+    { key: 'schoolYear', label: 'Year', visible: true },
+    { key: 'schoolUnit', label: 'School Unit', visible: true },
+    { key: 'status', label: 'Status', visible: true }
+  ]);
+
+  const [currentFilters, setCurrentFilters] = useState<ViewFilter[]>([]);
+  const [currentView, setCurrentView] = useState<SavedView | undefined>(savedViews[0]);
+
+  const handleSaveView = (view: Omit<SavedView, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newView: SavedView = {
+      ...view,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setSavedViews([...savedViews, newView]);
+  };
+
+  const handleLoadView = (view: SavedView) => {
+    setCurrentView(view);
+    setCurrentColumns(view.columns);
+    setCurrentFilters(view.filters);
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    setSavedViews(savedViews.filter(view => view.id !== viewId));
+    if (currentView?.id === viewId) {
+      setCurrentView(savedViews[0]);
+    }
+  };
+
+  // Apply filters to students
+  const applyFilters = (students: any[]) => {
+    return students.filter(student => {
+      return currentFilters.every(filter => {
+        let value: string;
+        
+        // Handle different field mappings
+        switch (filter.field) {
+          case 'name':
+            value = `${student.firstName} ${student.lastName}`;
+            break;
+          case 'personalNumber':
+            value = student.personalNumber;
+            break;
+          case 'birthDate':
+            value = student.birthDate;
+            break;
+          case 'homeMunicipality':
+            value = student.homeMunicipality;
+            break;
+          case 'studyPath':
+            value = student.studyPath;
+            break;
+          case 'schoolYear':
+            value = student.schoolYear;
+            break;
+          case 'schoolUnit':
+            value = student.schoolUnit;
+            break;
+          case 'status':
+            value = student.status;
+            break;
+          default:
+            return true;
+        }
+        
+        const filterValue = filter.value as string;
+        
+        if (!value) return false;
+        
+        switch (filter.operator) {
+          case 'equals':
+            return value.toString().toLowerCase() === filterValue.toLowerCase();
+          case 'contains':
+            return value.toString().toLowerCase().includes(filterValue.toLowerCase());
+          case 'startsWith':
+            return value.toString().toLowerCase().startsWith(filterValue.toLowerCase());
+          case 'endsWith':
+            return value.toString().toLowerCase().endsWith(filterValue.toLowerCase());
+          default:
+            return true;
+        }
+      });
+    });
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -322,6 +436,16 @@ const Students = () => {
     });
   };
 
+  const visibleColumns = currentColumns.filter(col => col.visible);
+
+  const filteredStudents = applyFilters(
+    allStudents.filter(student =>
+      student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.personalNumber.includes(searchTerm)
+    )
+  );
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -394,6 +518,19 @@ const Students = () => {
         </Card>
       </div>
 
+      {/* View Management */}
+      <StudentsViewManagement
+        views={savedViews}
+        currentView={currentView}
+        onSaveView={handleSaveView}
+        onLoadView={handleLoadView}
+        onDeleteView={handleDeleteView}
+        columns={currentColumns}
+        filters={currentFilters}
+        onColumnsChange={setCurrentColumns}
+        onFiltersChange={setCurrentFilters}
+      />
+
       {/* Search */}
       <Card>
         <CardHeader>
@@ -433,14 +570,9 @@ const Students = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Personal Number</TableHead>
-                <TableHead>Birth Date</TableHead>
-                <TableHead>Home Municipality</TableHead>
-                <TableHead>Study Path</TableHead>
-                <TableHead>Year</TableHead>
-                <TableHead>School Unit</TableHead>
-                <TableHead>Status</TableHead>
+                {visibleColumns.map((column) => (
+                  <TableHead key={column.key}>{column.label}</TableHead>
+                ))}
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -451,69 +583,79 @@ const Students = () => {
                 
                 return (
                   <TableRow key={student.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        {isProtected ? (
-                          <ProtectedDataDisplay 
-                            studentId={student.id}
-                            field="displayName"
-                            fallbackValue={`${student.firstName} ${student.lastName}`}
-                            userRole="principal"
-                            showPrivacyIndicator={true}
-                          />
-                        ) : (
-                          <span>{student.firstName} {student.lastName}</span>
+                    {visibleColumns.map((column) => (
+                      <TableCell key={column.key}>
+                        {column.key === 'name' && (
+                          <div className="font-medium">
+                            <div className="flex items-center gap-2">
+                              {isProtected ? (
+                                <ProtectedDataDisplay 
+                                  studentId={student.id}
+                                  field="displayName"
+                                  fallbackValue={`${student.firstName} ${student.lastName}`}
+                                  userRole="principal"
+                                  showPrivacyIndicator={true}
+                                />
+                              ) : (
+                                <span>{student.firstName} {student.lastName}</span>
+                              )}
+                            </div>
+                          </div>
                         )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-mono">
-                      {isProtected ? (
-                        <ProtectedDataDisplay 
-                          studentId={student.id}
-                          field="personalNumber"
-                          fallbackValue={student.personalNumber}
-                          userRole="principal"
-                          showPrivacyIndicator={false}
-                        />
-                      ) : (
-                        student.personalNumber
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {isProtected ? (
-                        <ProtectedDataDisplay 
-                          studentId={student.id}
-                          field="birthDate"
-                          fallbackValue={student.birthDate}
-                          userRole="principal"
-                          showPrivacyIndicator={false}
-                        />
-                      ) : (
-                        student.birthDate
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <MapPin className="w-4 h-4 mr-2 text-ike-neutral" />
-                        <span>{student.homeMunicipality}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <GraduationCap className="w-4 h-4 mr-2 text-ike-neutral" />
-                        <span>{student.studyPath}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>{student.schoolYear}</TableCell>
-                    <TableCell>{student.schoolUnit}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {getStatusBadge(student.status)}
-                        {isProtected && privacyMark && (
-                          <PrivacyIndicator privacyMark={privacyMark} showDetails={false} />
+                        {column.key === 'personalNumber' && (
+                          <div className="font-mono">
+                            {isProtected ? (
+                              <ProtectedDataDisplay 
+                                studentId={student.id}
+                                field="personalNumber"
+                                fallbackValue={student.personalNumber}
+                                userRole="principal"
+                                showPrivacyIndicator={false}
+                              />
+                            ) : (
+                              student.personalNumber
+                            )}
+                          </div>
                         )}
-                      </div>
-                    </TableCell>
+                        {column.key === 'birthDate' && (
+                          <div>
+                            {isProtected ? (
+                              <ProtectedDataDisplay 
+                                studentId={student.id}
+                                field="birthDate"
+                                fallbackValue={student.birthDate}
+                                userRole="principal"
+                                showPrivacyIndicator={false}
+                              />
+                            ) : (
+                              student.birthDate
+                            )}
+                          </div>
+                        )}
+                        {column.key === 'homeMunicipality' && (
+                          <div className="flex items-center">
+                            <MapPin className="w-4 h-4 mr-2 text-ike-neutral" />
+                            <span>{student.homeMunicipality}</span>
+                          </div>
+                        )}
+                        {column.key === 'studyPath' && (
+                          <div className="flex items-center">
+                            <GraduationCap className="w-4 h-4 mr-2 text-ike-neutral" />
+                            <span>{student.studyPath}</span>
+                          </div>
+                        )}
+                        {column.key === 'schoolYear' && student.schoolYear}
+                        {column.key === 'schoolUnit' && student.schoolUnit}
+                        {column.key === 'status' && (
+                          <div className="flex items-center gap-2">
+                            {getStatusBadge(student.status)}
+                            {isProtected && privacyMark && (
+                              <PrivacyIndicator privacyMark={privacyMark} showDetails={false} />
+                            )}
+                          </div>
+                        )}
+                      </TableCell>
+                    ))}
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
