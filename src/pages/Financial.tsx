@@ -2,338 +2,283 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { 
   Calculator, 
-  Euro, 
-  Calendar, 
   TrendingUp, 
+  AlertCircle, 
   CheckCircle, 
   Clock,
-  AlertTriangle,
-  Download,
-  Play
+  Building,
+  Euro,
+  Calendar
 } from "lucide-react";
+import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { FinancialViewManagement } from "@/components/financial/FinancialViewManagement";
+import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
 
 const Financial = () => {
   const { t } = useLanguage();
-  
-  const calculations = [
+
+  // Mock data for financial calculations
+  const calculationHistory = [
     {
       id: 1,
-      month: "November 2024",
-      status: "running",
-      progress: 75,
-      totalAmount: 3755000,
-      studentCount: 2847,
-      avgPerStudent: 1319,
-      startDate: "2024-11-15",
-      estimatedCompletion: "2024-11-15 16:00"
+      period: "2024-09",
+      municipality: "Stockholm",
+      totalAmount: 2450000,
+      status: "completed",
+      calculatedDate: "2024-10-15",
+      studentsCount: 156
     },
     {
       id: 2,
-      month: "Oktober 2024",
-      status: "completed",
-      progress: 100,
-      totalAmount: 3698000,
-      studentCount: 2789,
-      avgPerStudent: 1326,
-      startDate: "2024-10-15",
-      completionDate: "2024-10-15 15:45"
+      period: "2024-08", 
+      municipality: "Göteborg",
+      totalAmount: 1890000,
+      status: "pending",
+      calculatedDate: "2024-09-20",
+      studentsCount: 123
     },
     {
       id: 3,
-      month: "September 2024",
-      status: "completed",
-      progress: 100,
-      totalAmount: 3542000,
-      studentCount: 2654,
-      avgPerStudent: 1335,
-      startDate: "2024-09-15",
-      completionDate: "2024-09-15 14:30"
+      period: "2024-09",
+      municipality: "Malmö",
+      totalAmount: 3200000,
+      status: "error",
+      calculatedDate: "2024-10-10",
+      studentsCount: 201
     }
   ];
 
-  const municipalities = [
-    { name: "Malmö", students: 567, amount: 742000, avgCost: 1309 },
-    { name: "Lund", students: 342, amount: 451000, avgCost: 1319 },
-    { name: "Helsingborg", students: 456, amount: 612000, avgCost: 1342 },
-    { name: "Kristianstad", students: 289, amount: 385000, avgCost: 1332 },
-    { name: "Landskrona", students: 178, amount: 234000, avgCost: 1315 }
-  ];
+  // View management state
+  const [savedViews, setSavedViews] = useState<SavedView[]>([
+    {
+      id: '1',
+      name: 'Default Financial View',
+      description: 'Standard view showing all financial calculation data',
+      columns: [
+        { key: 'period', label: 'Period', visible: true },
+        { key: 'municipality', label: 'Municipality', visible: true },
+        { key: 'totalAmount', label: 'Total Amount', visible: true },
+        { key: 'status', label: 'Status', visible: true },
+        { key: 'calculatedDate', label: 'Calculated Date', visible: true },
+        { key: 'studentsCount', label: 'Students Count', visible: true }
+      ],
+      filters: [],
+      isDefault: true,
+      isSystemView: true,
+      createdBy: 'system',
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01'
+    }
+  ]);
+
+  const [currentColumns, setCurrentColumns] = useState<ViewColumn[]>([
+    { key: 'period', label: 'Period', visible: true },
+    { key: 'municipality', label: 'Municipality', visible: true },
+    { key: 'totalAmount', label: 'Total Amount', visible: true },
+    { key: 'status', label: 'Status', visible: true },
+    { key: 'calculatedDate', label: 'Calculated Date', visible: true },
+    { key: 'studentsCount', label: 'Students Count', visible: true }
+  ]);
+
+  const [currentFilters, setCurrentFilters] = useState<ViewFilter[]>([]);
+  const [currentView, setCurrentView] = useState<SavedView | undefined>(savedViews[0]);
+
+  const handleSaveView = (view: Omit<SavedView, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newView: SavedView = {
+      ...view,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setSavedViews([...savedViews, newView]);
+  };
+
+  const handleLoadView = (view: SavedView) => {
+    setCurrentView(view);
+    setCurrentColumns(view.columns);
+    setCurrentFilters(view.filters);
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    setSavedViews(savedViews.filter(view => view.id !== viewId));
+    if (currentView?.id === viewId) {
+      setCurrentView(savedViews[0]);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "completed":
-        return <Badge className="bg-ike-success text-white">{t('financial.completed')}</Badge>;
-      case "running":
-        return <Badge className="bg-ike-primary text-white">{t('financial.ongoing')}</Badge>;
+        return <Badge className="bg-ike-success text-white">Completed</Badge>;
       case "pending":
-        return <Badge className="bg-ike-warning text-white">{t('financial.pending')}</Badge>;
-      case "failed":
-        return <Badge className="bg-ike-error text-white">{t('financial.failed')}</Badge>;
+        return <Badge className="bg-ike-warning text-white">Pending</Badge>;
+      case "error":
+        return <Badge className="bg-ike-error text-white">Error</Badge>;
       default:
-        return <Badge variant="secondary">{t('financial.unknown')}</Badge>;
+        return <Badge variant="secondary">Unknown</Badge>;
     }
   };
+
+  const visibleColumns = currentColumns.filter(col => col.visible);
+  const filteredData = calculationHistory; // Apply filters here when implemented
 
   return (
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ike-neutral-dark">{t('financial.title')}</h1>
+          <h1 className="text-3xl font-bold text-ike-neutral-dark">Financial Calculations</h1>
           <p className="text-ike-neutral mt-2">
-            {t('financial.subtitle')}
+            Manage and monitor financial calculations and payments
           </p>
         </div>
-        <div className="flex space-x-3">
-          <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-            <Download className="w-4 h-4 mr-2" />
-            {t('financial.export.results')}
-          </Button>
-          <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
-            <Play className="w-4 h-4 mr-2" />
-            {t('financial.new.calculation')}
-          </Button>
-        </div>
+        <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+          <Calculator className="w-4 h-4 mr-2" />
+          New Calculation
+        </Button>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="border-l-4 border-l-ike-primary">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-ike-neutral">
-              {t('financial.total.monthly.cost')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-ike-neutral-dark">
-              3,755,000 SEK
-            </div>
-            <div className="text-xs text-ike-success mt-1">
-              +1.5% {t('financial.from.last.month')}
-            </div>
-          </CardContent>
-        </Card>
-
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="border-l-4 border-l-ike-success">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              {t('financial.average.per.student')}
+              Completed Calculations
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-ike-neutral-dark">
-              1,319 SEK
-            </div>
-            <div className="text-xs text-ike-neutral mt-1">
-              {t('financial.monthly.average')}
-            </div>
+            <div className="text-2xl font-bold text-ike-neutral-dark">42</div>
+            <div className="text-xs text-ike-success">This month</div>
           </CardContent>
         </Card>
-
+        
         <Card className="border-l-4 border-l-ike-warning">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              {t('financial.active.students')}
+              Pending Review
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-ike-neutral-dark">2,847</div>
-            <div className="text-xs text-ike-neutral mt-1">
-              {t('financial.included.in.calculation')}
-            </div>
+            <div className="text-2xl font-bold text-ike-neutral-dark">8</div>
+            <div className="text-xs text-ike-neutral">Awaiting approval</div>
           </CardContent>
         </Card>
-
-        <Card className="border-l-4 border-l-green-500">
+        
+        <Card className="border-l-4 border-l-ike-primary">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
-              {t('financial.next.calculation')}
+              Total Amount
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-ike-neutral-dark">15 Dec</div>
-            <div className="text-xs text-ike-neutral mt-1">
-              {t('financial.scheduled.run')}
-            </div>
+            <div className="text-2xl font-bold text-ike-primary">7.54M SEK</div>
+            <div className="text-xs text-ike-neutral">Current period</div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Current Calculation Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center text-ike-neutral-dark">
-            <Calculator className="w-5 h-5 mr-2 text-ike-primary" />
-            {t('financial.current.calculation.status')} - November 2024
-          </CardTitle>
-          <CardDescription>
-            {t('financial.detailed.status')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{t('financial.data.validation')}</span>
-                  <Badge className="bg-ike-success text-white">
-                    <CheckCircle className="w-3 h-3 mr-1" />
-                    {t('financial.completed')}
-                  </Badge>
-                </div>
-                <Progress value={100} className="h-2" />
-                <p className="text-xs text-ike-neutral">{t('financial.validated.posts').replace('{count}', '2,847')}</p>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{t('financial.price.calculation')}</span>
-                  <Badge className="bg-ike-primary text-white">
-                    <Clock className="w-3 h-3 mr-1" />
-                    {t('financial.ongoing')}
-                  </Badge>
-                </div>
-                <Progress value={75} className="h-2" />
-                <p className="text-xs text-ike-neutral">{t('financial.processed.students').replace('{current}', '2,135').replace('{total}', '2,847')}</p>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{t('financial.export.distribution')}</span>
-                  <Badge variant="secondary">{t('financial.pending')}</Badge>
-                </div>
-                <Progress value={0} className="h-2" />
-                <p className="text-xs text-ike-neutral">{t('financial.waiting.completion')}</p>
-              </div>
-            </div>
-
-            <div className="border-t pt-4">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-ike-neutral">
-                  <div className="flex items-center space-x-4">
-                    <span>{t('financial.started')} 15 november 2024, 14:00</span>
-                    <span>{t('financial.estimated.completion')} 15 november 2024, 16:00</span>
-                  </div>
-                </div>
-                <Button size="sm" variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-                  {t('financial.show.details')}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* View Management */}
+      <FinancialViewManagement
+        views={savedViews}
+        currentView={currentView}
+        onSaveView={handleSaveView}
+        onLoadView={handleLoadView}
+        onDeleteView={handleDeleteView}
+        columns={currentColumns}
+        filters={currentFilters}
+        onColumnsChange={setCurrentColumns}
+        onFiltersChange={setCurrentFilters}
+      />
 
       {/* Calculation History */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-ike-neutral-dark">{t('financial.calculation.history')}</CardTitle>
+          <CardTitle className="flex items-center text-ike-neutral-dark">
+            <TrendingUp className="w-5 h-5 mr-2 text-ike-primary" />
+            Recent Calculations
+          </CardTitle>
           <CardDescription>
-            {t('financial.previous.calculations')}
+            Latest financial calculations and their status
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {calculations.map((calc) => (
-              <div key={calc.id} className="border rounded-lg p-4 hover:bg-ike-neutral-light/50 transition-colors">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-ike-primary rounded-full flex items-center justify-center">
-                      <Calculator className="w-4 h-4 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-ike-neutral-dark">{calc.month}</h3>
-                      <p className="text-sm text-ike-neutral">
-                        {calc.status === "completed" ? `${t('financial.completed.short')} ${calc.completionDate}` : 
-                         calc.status === "running" ? `${t('financial.estimated.completion')} ${calc.estimatedCompletion}` :
-                         `${t('financial.started')} ${calc.startDate}`}
-                      </p>
-                    </div>
-                  </div>
-                  {getStatusBadge(calc.status)}
-                </div>
-
-                {calc.status === "running" && (
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="text-ike-neutral">{t('bulk.progress')}</span>
-                      <span className="text-ike-neutral">{calc.progress}%</span>
-                    </div>
-                    <Progress value={calc.progress} className="h-2" />
-                  </div>
-                )}
-
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium text-ike-neutral">{t('financial.total.amount')}</span>
-                    <p className="text-ike-neutral-dark font-mono">
-                      {calc.totalAmount.toLocaleString('sv-SE')} SEK
-                    </p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-ike-neutral">{t('financial.number.of.students')}</span>
-                    <p className="text-ike-neutral-dark">{calc.studentCount.toLocaleString('sv-SE')}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-ike-neutral">{t('financial.average.per.student.short')}</span>
-                    <p className="text-ike-neutral-dark">{calc.avgPerStudent.toLocaleString('sv-SE')} SEK</p>
-                  </div>
-                  <div className="flex items-center justify-end space-x-2">
-                    <Button size="sm" variant="ghost" className="text-ike-neutral hover:text-ike-primary">
-                      {t('financial.details')}
-                    </Button>
-                    {calc.status === "completed" && (
-                      <Button size="sm" variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
-                        <Download className="w-4 h-4 mr-1" />
-                        {t('financial.export')}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {visibleColumns.map((column) => (
+                  <TableHead key={column.key}>{column.label}</TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredData.map((item) => (
+                <TableRow key={item.id}>
+                  {visibleColumns.map((column) => (
+                    <TableCell key={column.key}>
+                      {column.key === 'period' && (
+                        <div className="flex items-center">
+                          <Calendar className="w-4 h-4 mr-2 text-ike-neutral" />
+                          <span>{item.period}</span>
+                        </div>
+                      )}
+                      {column.key === 'municipality' && (
+                        <div className="flex items-center">
+                          <Building className="w-4 h-4 mr-2 text-ike-neutral" />
+                          <span className="font-medium text-ike-neutral-dark">{item.municipality}</span>
+                        </div>
+                      )}
+                      {column.key === 'totalAmount' && (
+                        <div className="flex items-center text-ike-primary font-medium">
+                          <Euro className="w-4 h-4 mr-1" />
+                          {item.totalAmount.toLocaleString()}
+                        </div>
+                      )}
+                      {column.key === 'status' && getStatusBadge(item.status)}
+                      {column.key === 'calculatedDate' && (
+                        <span className="text-ike-neutral">{item.calculatedDate}</span>
+                      )}
+                      {column.key === 'studentsCount' && (
+                        <span className="text-ike-neutral-dark">{item.studentsCount}</span>
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
 
-      {/* Municipality Breakdown */}
+      {/* Quick Actions */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center text-ike-neutral-dark">
-            <TrendingUp className="w-5 h-5 mr-2 text-ike-primary" />
-            {t('financial.municipality.breakdown')} - November 2024
-          </CardTitle>
+          <CardTitle className="text-ike-neutral-dark">Quick Actions</CardTitle>
           <CardDescription>
-            {t('financial.cost.distribution')}
+            Common financial calculation tasks
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {municipalities.map((municipality, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-ike-neutral-light rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-ike-primary rounded-full flex items-center justify-center text-white text-sm font-bold">
-                    {municipality.name.charAt(0)}
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-ike-neutral-dark">{municipality.name}</h4>
-                    <p className="text-sm text-ike-neutral">{municipality.students} {t('financial.students')}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-ike-neutral-dark">
-                    {municipality.amount.toLocaleString('sv-SE')} SEK
-                  </div>
-                  <div className="text-sm text-ike-neutral">
-                    {municipality.avgCost} {t('financial.sek.per.student')}
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Button variant="outline" className="h-20 flex flex-col border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+              <Calculator className="w-6 h-6 mb-2" />
+              <span>Run Calculation</span>
+            </Button>
+            <Button variant="outline" className="h-20 flex flex-col border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+              <CheckCircle className="w-6 h-6 mb-2" />
+              <span>Approve Pending</span>
+            </Button>
+            <Button variant="outline" className="h-20 flex flex-col border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+              <AlertCircle className="w-6 h-6 mb-2" />
+              <span>Review Errors</span>
+            </Button>
+            <Button variant="outline" className="h-20 flex flex-col border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+              <Clock className="w-6 h-6 mb-2" />
+              <span>Schedule Auto</span>
+            </Button>
           </div>
         </CardContent>
       </Card>
