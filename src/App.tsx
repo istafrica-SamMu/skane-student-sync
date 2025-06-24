@@ -158,6 +158,11 @@ const AppContent = () => {
                   <ChangeLists />
                 </ProtectedRoute>
               } />
+              <Route path="/reports/error-lists" element={
+                <ProtectedRoute>
+                  <ErrorLists />
+                </ProtectedRoute>
+              } />
 
               {/* KAA Management Routes */}
               <Route path="/kaa/dashboard" element={
