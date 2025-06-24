@@ -15,7 +15,8 @@ import {
   AlertTriangle,
   User,
   MapPin,
-  Clock
+  Clock,
+  Euro
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -31,6 +32,8 @@ interface ChangeRecord {
   schoolUnit?: string;
   isConfidential: boolean;
   measurementDate: string;
+  studyPath?: string;
+  priceCodeCategory?: string;
 }
 
 const ChangeLists = () => {
@@ -39,7 +42,7 @@ const ChangeLists = () => {
   const [selectedChangeType, setSelectedChangeType] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Sample data for population registration changes
+  // Sample data for both population registration and price code changes
   const mockChangeRecords: ChangeRecord[] = [
     {
       id: "CHG-001",
@@ -74,6 +77,51 @@ const ChangeLists = () => {
       previousValue: "Göteborg Municipality",
       newValue: "Lund Municipality",
       municipality: "Lund",
+      isConfidential: false,
+      measurementDate: "2024-11-01"
+    },
+    {
+      id: "CHG-004",
+      studentId: 4,
+      studentName: "Magnus Olsson",
+      changeType: "price_code",
+      changeDate: "2024-11-14T11:45:00Z",
+      previousValue: "PC-101 (Standard Rate)",
+      newValue: "PC-205 (Premium Rate)",
+      municipality: "Malmö",
+      schoolUnit: "Malmö Technical School",
+      studyPath: "Engineering Program",
+      priceCodeCategory: "Technical Education",
+      isConfidential: false,
+      measurementDate: "2024-11-01"
+    },
+    {
+      id: "CHG-005",
+      studentId: 5,
+      studentName: "Confidential Student",
+      changeType: "price_code",
+      changeDate: "2024-11-10T16:30:00Z",
+      previousValue: "***",
+      newValue: "***",
+      municipality: "Confidential",
+      schoolUnit: "***",
+      studyPath: "***",
+      priceCodeCategory: "***",
+      isConfidential: true,
+      measurementDate: "2024-11-01"
+    },
+    {
+      id: "CHG-006",
+      studentId: 6,
+      studentName: "Sara Lindberg",
+      changeType: "price_code",
+      changeDate: "2024-11-05T13:15:00Z",
+      previousValue: "PC-301 (Specialized Rate)",
+      newValue: "PC-102 (Basic Rate)",
+      municipality: "Stockholm",
+      schoolUnit: "Stockholm Arts Academy",
+      studyPath: "Arts & Design Program",
+      priceCodeCategory: "Creative Arts",
       isConfidential: false,
       measurementDate: "2024-11-01"
     }
@@ -119,6 +167,18 @@ const ChangeLists = () => {
     return labels[type as keyof typeof labels] || type;
   };
 
+  const getChangeTypeIcon = (type: string) => {
+    const icons = {
+      'population_registration': MapPin,
+      'price_code': Euro,
+      'start_date': Calendar,
+      'end_date': Calendar,
+      'municipality_registration': MapPin
+    };
+    const IconComponent = icons[type as keyof typeof icons] || MapPin;
+    return <IconComponent className="w-3 h-3" />;
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('sv-SE') + ' ' + 
            new Date(dateString).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' });
@@ -152,7 +212,7 @@ const ChangeLists = () => {
                 <p className="font-medium text-orange-800">Summer Period Active</p>
                 <p className="text-sm text-orange-700">
                   During July, August and September, only population registration changes are shown. 
-                  No education-related changes are tracked during summer months.
+                  No education-related changes (including price codes) are tracked during summer months.
                 </p>
               </div>
             </div>
@@ -260,8 +320,8 @@ const ChangeLists = () => {
                 <TableHead>Change Type</TableHead>
                 <TableHead>Previous Value</TableHead>
                 <TableHead>New Value</TableHead>
+                <TableHead>Additional Info</TableHead>
                 <TableHead>Change Date</TableHead>
-                <TableHead>Municipality</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -282,7 +342,7 @@ const ChangeLists = () => {
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="flex items-center gap-1 w-fit">
-                      <MapPin className="w-3 h-3" />
+                      {getChangeTypeIcon(record.changeType)}
                       {getChangeTypeLabel(record.changeType)}
                     </Badge>
                   </TableCell>
@@ -292,13 +352,25 @@ const ChangeLists = () => {
                   <TableCell className="font-mono text-sm">
                     {record.isConfidential ? "***" : record.newValue}
                   </TableCell>
+                  <TableCell className="text-sm">
+                    {record.changeType === 'price_code' && !record.isConfidential && (
+                      <div className="space-y-1">
+                        <div>School: {record.schoolUnit}</div>
+                        <div>Study Path: {record.studyPath}</div>
+                        <div>Category: {record.priceCodeCategory}</div>
+                      </div>
+                    )}
+                    {record.changeType === 'population_registration' && !record.isConfidential && (
+                      <div>Municipality: {record.municipality}</div>
+                    )}
+                    {record.isConfidential && <span className="text-ike-neutral">***</span>}
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1 text-sm">
                       <Clock className="w-3 h-3 text-ike-neutral" />
                       {formatDate(record.changeDate)}
                     </div>
                   </TableCell>
-                  <TableCell>{record.municipality}</TableCell>
                   <TableCell>
                     {record.isConfidential ? (
                       <Button 
@@ -338,12 +410,18 @@ const ChangeLists = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="text-center p-4 bg-ike-primary/5 rounded-lg">
               <div className="text-2xl font-bold text-ike-primary">
                 {filteredRecords.filter(r => r.changeType === 'population_registration').length}
               </div>
               <div className="text-sm text-ike-neutral">Population Registration Changes</div>
+            </div>
+            <div className="text-center p-4 bg-blue-100 rounded-lg">
+              <div className="text-2xl font-bold text-blue-600">
+                {filteredRecords.filter(r => r.changeType === 'price_code').length}
+              </div>
+              <div className="text-sm text-ike-neutral">Price Code Changes</div>
             </div>
             <div className="text-center p-4 bg-orange-100 rounded-lg">
               <div className="text-2xl font-bold text-orange-600">
