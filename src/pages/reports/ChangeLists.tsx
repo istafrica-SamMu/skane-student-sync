@@ -24,6 +24,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ChangeDetailsModal } from "@/components/reports/ChangeDetailsModal";
 import { ExportChangesModal } from "@/components/reports/ExportChangesModal";
 import { ConfidentialContactModal } from "@/components/reports/ConfidentialContactModal";
+import { ChangeListsViewManagement } from "@/components/reports/ChangeListsViewManagement";
+import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
 
 interface ChangeRecord {
   id: string;
@@ -63,7 +65,45 @@ const ChangeLists = () => {
   const [isConfidentialModalOpen, setIsConfidentialModalOpen] = useState(false);
   const [confidentialRecordId, setConfidentialRecordId] = useState<string>("");
 
-  // Sample data for all change types including municipality registration with additional amounts
+  // View Management State
+  const [views, setViews] = useState<SavedView[]>([]);
+  const [currentView, setCurrentView] = useState<SavedView | undefined>();
+  const [columns, setColumns] = useState<ViewColumn[]>([
+    { key: 'changeId', label: 'Change ID', visible: true },
+    { key: 'studentName', label: 'Student', visible: true },
+    { key: 'changeType', label: 'Change Type', visible: true },
+    { key: 'previousValue', label: 'Previous Value', visible: true },
+    { key: 'newValue', label: 'New Value', visible: true },
+    { key: 'additionalInfo', label: 'Additional Info', visible: true },
+    { key: 'changeDate', label: 'Change Date', visible: true },
+    { key: 'actions', label: 'Actions', visible: true }
+  ]);
+  const [filters, setFilters] = useState<ViewFilter[]>([]);
+
+  // View Management Handlers
+  const handleSaveView = (view: Omit<SavedView, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newView: SavedView = {
+      ...view,
+      id: `view-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    setViews([...views, newView]);
+  };
+
+  const handleLoadView = (view: SavedView) => {
+    setCurrentView(view);
+    setColumns(view.columns);
+    setFilters(view.filters);
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    setViews(views.filter(v => v.id !== viewId));
+    if (currentView?.id === viewId) {
+      setCurrentView(undefined);
+    }
+  };
+
   const mockChangeRecords: ChangeRecord[] = [
     {
       id: "CHG-001",
@@ -309,29 +349,52 @@ const ChangeLists = () => {
   ];
 
   const isSummerMonth = (date: string) => {
-    const month = new Date(date).getMonth() + 1; // getMonth() returns 0-11
-    return month >= 7 && month <= 9; // July (7), August (8), September (9)
+    const month = new Date(date).getMonth() + 1;
+    return month >= 7 && month <= 9;
   };
 
   const getFilteredRecords = () => {
     let filtered = mockChangeRecords;
 
-    // Apply change type filter
     if (selectedChangeType !== "all") {
       filtered = filtered.filter(record => record.changeType === selectedChangeType);
     }
 
-    // Apply summer months logic - only show population registration changes during July-September
     if (isSummerMonth(selectedPeriod)) {
       filtered = filtered.filter(record => record.changeType === 'population_registration');
     }
 
-    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(record => 
         record.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         record.id.toLowerCase().includes(searchTerm.toLowerCase())
       );
+    }
+
+    // Apply view management filters
+    if (filters.length > 0) {
+      filtered = filtered.filter(record => {
+        return filters.every(filter => {
+          const fieldValue = record[filter.field as keyof ChangeRecord];
+          const filterValue = filter.value as string;
+          
+          if (typeof fieldValue === 'string') {
+            switch (filter.operator) {
+              case 'equals':
+                return fieldValue === filterValue;
+              case 'contains':
+                return fieldValue.toLowerCase().includes(filterValue.toLowerCase());
+              case 'startsWith':
+                return fieldValue.toLowerCase().startsWith(filterValue.toLowerCase());
+              case 'endsWith':
+                return fieldValue.toLowerCase().endsWith(filterValue.toLowerCase());
+              default:
+                return true;
+            }
+          }
+          return true;
+        });
+      });
     }
 
     return filtered;
@@ -430,6 +493,19 @@ const ChangeLists = () => {
           Export Changes
         </Button>
       </div>
+
+      {/* View Management */}
+      <ChangeListsViewManagement
+        views={views}
+        currentView={currentView}
+        onSaveView={handleSaveView}
+        onLoadView={handleLoadView}
+        onDeleteView={handleDeleteView}
+        columns={columns}
+        filters={filters}
+        onColumnsChange={setColumns}
+        onFiltersChange={setFilters}
+      />
 
       {/* Summer Period Warning */}
       {isSummerMonth(selectedPeriod) && (
@@ -541,118 +617,141 @@ const ChangeLists = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Change ID</TableHead>
-                <TableHead>Student</TableHead>
-                <TableHead>Change Type</TableHead>
-                <TableHead>Previous Value</TableHead>
-                <TableHead>New Value</TableHead>
-                <TableHead>Additional Info</TableHead>
-                <TableHead>Change Date</TableHead>
-                <TableHead>Actions</TableHead>
+                {columns.filter(col => col.visible).map(column => (
+                  <TableHead key={column.key}>{column.label}</TableHead>
+                ))}
               </TableRow>
             </TableHeader>
             <TableBody>
               {paginatedRecords.map((record) => (
                 <TableRow key={record.id} className={record.isConfidential ? "bg-yellow-50" : ""}>
-                  <TableCell className="font-mono text-sm">{record.id}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-ike-neutral" />
-                      <span>{record.studentName}</span>
-                      {record.isConfidential && (
-                        <Badge variant="destructive" className="text-xs">
-                          Confidential
-                        </Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="flex items-center gap-1 w-fit">
-                      {getChangeTypeIcon(record.changeType)}
-                      {getChangeTypeLabel(record.changeType)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="font-mono text-sm">
-                    {record.isConfidential ? "***" : record.previousValue}
-                  </TableCell>
-                  <TableCell className="font-mono text-sm">
-                    {record.isConfidential ? "***" : record.newValue}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {record.changeType === 'price_code' && !record.isConfidential && (
-                      <div className="space-y-1">
-                        <div>School: {record.schoolUnit}</div>
-                        <div>Study Path: {record.studyPath}</div>
-                        <div>Category: {record.priceCodeCategory}</div>
-                      </div>
-                    )}
-                    {(record.changeType === 'start_date' || record.changeType === 'end_date') && !record.isConfidential && (
-                      <div className="space-y-1">
-                        <div>School Unit: {record.schoolUnit}</div>
-                        <div>Study Path: {record.studyPath}</div>
-                        <div>Municipality: {record.municipality}</div>
-                      </div>
-                    )}
-                    {record.changeType === 'municipality_registration' && !record.isConfidential && (
-                      <div className="space-y-1">
-                        <div>School Unit: {record.schoolUnit}</div>
-                        <div>Study Path: {record.studyPath}</div>
-                        <div>Municipality: {record.municipality}</div>
-                        {record.additionalAmounts && record.additionalAmounts.applied > 0 && (
-                          <div className="mt-2 p-2 bg-green-50 rounded border">
-                            <div className="font-medium text-green-800 flex items-center gap-1">
-                              <DollarSign className="w-3 h-3" />
-                              Additional Amounts Applied: {record.additionalAmounts.applied}
+                  {columns.filter(col => col.visible).map(column => {
+                    switch(column.key) {
+                      case 'changeId':
+                        return <TableCell key={column.key} className="font-mono text-sm">{record.id}</TableCell>;
+                      case 'studentName':
+                        return (
+                          <TableCell key={column.key}>
+                            <div className="flex items-center gap-2">
+                              <User className="w-4 h-4 text-ike-neutral" />
+                              <span>{record.studentName}</span>
+                              {record.isConfidential && (
+                                <Badge variant="destructive" className="text-xs">
+                                  Confidential
+                                </Badge>
+                              )}
                             </div>
-                            <div className="text-green-700 text-xs">
-                              Total: {record.additionalAmounts.total.toLocaleString()} SEK
+                          </TableCell>
+                        );
+                      case 'changeType':
+                        return (
+                          <TableCell key={column.key}>
+                            <Badge variant="outline" className="flex items-center gap-1 w-fit">
+                              {getChangeTypeIcon(record.changeType)}
+                              {getChangeTypeLabel(record.changeType)}
+                            </Badge>
+                          </TableCell>
+                        );
+                      case 'previousValue':
+                        return (
+                          <TableCell key={column.key} className="font-mono text-sm">
+                            {record.isConfidential ? "***" : record.previousValue}
+                          </TableCell>
+                        );
+                      case 'newValue':
+                        return (
+                          <TableCell key={column.key} className="font-mono text-sm">
+                            {record.isConfidential ? "***" : record.newValue}
+                          </TableCell>
+                        );
+                      case 'additionalInfo':
+                        return (
+                          <TableCell key={column.key} className="text-sm">
+                            {record.changeType === 'price_code' && !record.isConfidential && (
+                              <div className="space-y-1">
+                                <div>School: {record.schoolUnit}</div>
+                                <div>Study Path: {record.studyPath}</div>
+                                <div>Category: {record.priceCodeCategory}</div>
+                              </div>
+                            )}
+                            {(record.changeType === 'start_date' || record.changeType === 'end_date') && !record.isConfidential && (
+                              <div className="space-y-1">
+                                <div>School Unit: {record.schoolUnit}</div>
+                                <div>Study Path: {record.studyPath}</div>
+                                <div>Municipality: {record.municipality}</div>
+                              </div>
+                            )}
+                            {record.changeType === 'municipality_registration' && !record.isConfidential && (
+                              <div className="space-y-1">
+                                <div>School Unit: {record.schoolUnit}</div>
+                                <div>Study Path: {record.studyPath}</div>
+                                <div>Municipality: {record.municipality}</div>
+                                {record.additionalAmounts && record.additionalAmounts.applied > 0 && (
+                                  <div className="mt-2 p-2 bg-green-50 rounded border">
+                                    <div className="font-medium text-green-800 flex items-center gap-1">
+                                      <DollarSign className="w-3 h-3" />
+                                      Additional Amounts Applied: {record.additionalAmounts.applied}
+                                    </div>
+                                    <div className="text-green-700 text-xs">
+                                      Total: {record.additionalAmounts.total.toLocaleString()} SEK
+                                    </div>
+                                    <div className="text-green-600 text-xs">
+                                      Categories: {record.additionalAmounts.categories.join(", ")}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            {record.changeType === 'population_registration' && !record.isConfidential && (
+                              <div>Municipality: {record.municipality}</div>
+                            )}
+                            {record.isConfidential && <span className="text-ike-neutral">***</span>}
+                          </TableCell>
+                        );
+                      case 'changeDate':
+                        return (
+                          <TableCell key={column.key}>
+                            <div className="flex items-center gap-1 text-sm">
+                              <Clock className="w-3 h-3 text-ike-neutral" />
+                              {formatDate(record.changeDate)}
                             </div>
-                            <div className="text-green-600 text-xs">
-                              Categories: {record.additionalAmounts.categories.join(", ")}
+                          </TableCell>
+                        );
+                      case 'actions':
+                        return (
+                          <TableCell key={column.key}>
+                            <div className="flex gap-1">
+                              {record.isConfidential ? (
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="text-xs"
+                                  onClick={() => handleConfidentialContact(record.id)}
+                                >
+                                  Contact Admin
+                                </Button>
+                              ) : (
+                                <Button 
+                                  size="sm" 
+                                  variant="ghost"
+                                  onClick={() => handleViewDetails(record)}
+                                  className="text-ike-primary hover:text-ike-primary-dark"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                              )}
                             </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    {record.changeType === 'population_registration' && !record.isConfidential && (
-                      <div>Municipality: {record.municipality}</div>
-                    )}
-                    {record.isConfidential && <span className="text-ike-neutral">***</span>}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1 text-sm">
-                      <Clock className="w-3 h-3 text-ike-neutral" />
-                      {formatDate(record.changeDate)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-1">
-                      {record.isConfidential ? (
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          className="text-xs"
-                          onClick={() => handleConfidentialContact(record.id)}
-                        >
-                          Contact Admin
-                        </Button>
-                      ) : (
-                        <Button 
-                          size="sm" 
-                          variant="ghost"
-                          onClick={() => handleViewDetails(record)}
-                          className="text-ike-primary hover:text-ike-primary-dark"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
+                          </TableCell>
+                        );
+                      default:
+                        return <TableCell key={column.key}></TableCell>;
+                    }
+                  })}
                 </TableRow>
               ))}
               {paginatedRecords.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-ike-neutral">
+                  <TableCell colSpan={columns.filter(col => col.visible).length} className="text-center py-8 text-ike-neutral">
                     No change records found for the selected filters.
                   </TableCell>
                 </TableRow>
