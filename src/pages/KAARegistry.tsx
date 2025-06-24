@@ -59,6 +59,8 @@ import { Label } from "@/components/ui/label";
 import ProtectedDataDisplay from "@/components/students/ProtectedDataDisplay";
 import PrivacyIndicator from "@/components/students/PrivacyIndicator";
 import { privacyService } from "@/services/privacyService";
+import { KAARegistryViewManagement } from "@/components/kaa/KAARegistryViewManagement";
+import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
 
 interface KAARecord {
   id: number;
@@ -233,7 +235,21 @@ const KAARegistry = () => {
     notes: ""
   });
 
-  const filteredRecords = kaaRecords.filter(record => {
+  // View Management State
+  const [savedViews, setSavedViews] = useState<SavedView[]>([]);
+  const [currentView, setCurrentView] = useState<SavedView | undefined>(undefined);
+  const [viewColumns, setViewColumns] = useState<ViewColumn[]>([
+    { key: 'name', label: 'Name', visible: true },
+    { key: 'personalNumber', label: 'Personal Number', visible: true },
+    { key: 'populationRegMunicipalityName', label: 'Municipality', visible: true },
+    { key: 'category', label: 'Category', visible: true },
+    { key: 'registrationDate', label: 'Registration Date', visible: true },
+    { key: 'status', label: 'Status', visible: true },
+    { key: 'actions', label: 'Actions', visible: true }
+  ]);
+  const [viewFilters, setViewFilters] = useState<ViewFilter[]>([]);
+
+  const filteredRecordsBase = kaaRecords.filter(record => {
     const matchesSearch = 
       record.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -244,6 +260,61 @@ const KAARegistry = () => {
     
     return matchesSearch && matchesStatus && matchesCategory;
   });
+
+  // View Management Handlers
+  const handleSaveView = (view: Omit<SavedView, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newView: SavedView = {
+      ...view,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    setSavedViews([...savedViews, newView]);
+  };
+
+  const handleLoadView = (view: SavedView) => {
+    setCurrentView(view);
+    setViewColumns(view.columns);
+    setViewFilters(view.filters);
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    setSavedViews(savedViews.filter(v => v.id !== viewId));
+    if (currentView?.id === viewId) {
+      setCurrentView(undefined);
+    }
+  };
+
+  // Apply view filters to the existing filteredRecords logic
+  const applyViewFilters = (records: KAARecord[]) => {
+    return records.filter(record => {
+      return viewFilters.every(filter => {
+        const fieldValue = String(record[filter.field as keyof KAARecord] || '').toLowerCase();
+        const filterValue = String(filter.value).toLowerCase();
+        
+        switch (filter.operator) {
+          case 'equals':
+            return fieldValue === filterValue;
+          case 'contains':
+            return fieldValue.includes(filterValue);
+          case 'startsWith':
+            return fieldValue.startsWith(filterValue);
+          case 'endsWith':
+            return fieldValue.endsWith(filterValue);
+          default:
+            return true;
+        }
+      });
+    });
+  };
+
+  const filteredRecords = applyViewFilters(filteredRecordsBase);
+
+  // Helper function to check if column should be visible
+  const isColumnVisible = (columnKey: string) => {
+    const column = viewColumns.find(col => col.key === columnKey);
+    return column ? column.visible : true;
+  };
 
   const handleViewDetails = (record: KAARecord) => {
     setSelectedRecord(record);
@@ -355,6 +426,19 @@ const KAARegistry = () => {
           New KAA Registration
         </Button>
       </div>
+
+      {/* View Management */}
+      <KAARegistryViewManagement
+        views={savedViews}
+        currentView={currentView}
+        onSaveView={handleSaveView}
+        onLoadView={handleLoadView}
+        onDeleteView={handleDeleteView}
+        columns={viewColumns}
+        filters={viewFilters}
+        onColumnsChange={setViewColumns}
+        onFiltersChange={setViewFilters}
+      />
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -470,13 +554,13 @@ const KAARegistry = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="font-medium">Name</TableHead>
-                <TableHead className="font-medium">Personal Number</TableHead>
-                <TableHead className="font-medium">Municipality</TableHead>
-                <TableHead className="font-medium">Category</TableHead>
-                <TableHead className="font-medium">Registration Date</TableHead>
-                <TableHead className="font-medium">Status</TableHead>
-                <TableHead className="font-medium text-center">Actions</TableHead>
+                {isColumnVisible('name') && <TableHead className="font-medium">Name</TableHead>}
+                {isColumnVisible('personalNumber') && <TableHead className="font-medium">Personal Number</TableHead>}
+                {isColumnVisible('populationRegMunicipalityName') && <TableHead className="font-medium">Municipality</TableHead>}
+                {isColumnVisible('category') && <TableHead className="font-medium">Category</TableHead>}
+                {isColumnVisible('registrationDate') && <TableHead className="font-medium">Registration Date</TableHead>}
+                {isColumnVisible('status') && <TableHead className="font-medium">Status</TableHead>}
+                {isColumnVisible('actions') && <TableHead className="font-medium text-center">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -486,79 +570,93 @@ const KAARegistry = () => {
                 
                 return (
                   <TableRow key={record.id} className="hover:bg-ike-neutral-light/50">
-                    <TableCell className="font-medium text-ike-neutral-dark">
-                      <div className="flex items-center gap-2">
+                    {isColumnVisible('name') && (
+                      <TableCell className="font-medium text-ike-neutral-dark">
+                        <div className="flex items-center gap-2">
+                          {isProtected ? (
+                            <ProtectedDataDisplay 
+                              studentId={record.id}
+                              field="displayName"
+                              fallbackValue={`${record.firstName} ${record.lastName}`}
+                              userRole="municipal_admin"
+                              showPrivacyIndicator={true}
+                            />
+                          ) : (
+                            <span>{record.firstName} {record.lastName}</span>
+                          )}
+                        </div>
+                      </TableCell>
+                    )}
+                    {isColumnVisible('personalNumber') && (
+                      <TableCell className="font-mono text-sm">
                         {isProtected ? (
                           <ProtectedDataDisplay 
                             studentId={record.id}
-                            field="displayName"
-                            fallbackValue={`${record.firstName} ${record.lastName}`}
+                            field="personalNumber"
+                            fallbackValue={record.personalNumber}
                             userRole="municipal_admin"
-                            showPrivacyIndicator={true}
+                            showPrivacyIndicator={false}
                           />
                         ) : (
-                          <span>{record.firstName} {record.lastName}</span>
+                          record.personalNumber
                         )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {isProtected ? (
-                        <ProtectedDataDisplay 
-                          studentId={record.id}
-                          field="personalNumber"
-                          fallbackValue={record.personalNumber}
-                          userRole="municipal_admin"
-                          showPrivacyIndicator={false}
-                        />
-                      ) : (
-                        record.personalNumber
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        <div>{record.populationRegMunicipalityName}</div>
-                        <div className="text-ike-neutral text-xs">({record.populationRegMunicipalityCode})</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="text-xs">
-                        {record.category}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {record.registrationDate}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {getStatusBadge(record.status)}
-                        {isProtected && privacyMark && (
-                          <PrivacyIndicator privacyMark={privacyMark} showDetails={false} />
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-white border shadow-lg z-50">
-                          <DropdownMenuItem onClick={() => handleViewDetails(record)}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleEdit(record)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit Record
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDelete(record.id)}>
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete Record
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+                      </TableCell>
+                    )}
+                    {isColumnVisible('populationRegMunicipalityName') && (
+                      <TableCell>
+                        <div className="text-sm">
+                          <div>{record.populationRegMunicipalityName}</div>
+                          <div className="text-ike-neutral text-xs">({record.populationRegMunicipalityCode})</div>
+                        </div>
+                      </TableCell>
+                    )}
+                    {isColumnVisible('category') && (
+                      <TableCell>
+                        <Badge variant="outline" className="text-xs">
+                          {record.category}
+                        </Badge>
+                      </TableCell>
+                    )}
+                    {isColumnVisible('registrationDate') && (
+                      <TableCell className="text-sm">
+                        {record.registrationDate}
+                      </TableCell>
+                    )}
+                    {isColumnVisible('status') && (
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          {getStatusBadge(record.status)}
+                          {isProtected && privacyMark && (
+                            <PrivacyIndicator privacyMark={privacyMark} showDetails={false} />
+                          )}
+                        </div>
+                      </TableCell>
+                    )}
+                    {isColumnVisible('actions') && (
+                      <TableCell className="text-center">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-white border shadow-lg z-50">
+                            <DropdownMenuItem onClick={() => handleViewDetails(record)}>
+                              <Eye className="mr-2 h-4 w-4" />
+                              View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleEdit(record)}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit Record
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDelete(record.id)}>
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete Record
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })}
