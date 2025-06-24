@@ -25,6 +25,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { PERMISSIONS, ROLE_TEMPLATES } from "@/config/permissions";
 import { OrganizationalRole } from "@/types/roleManagement";
+import { RoleManagementViewManagement } from "@/components/system/RoleManagementViewManagement";
+import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
 
 const RoleManagement = () => {
   const { toast } = useToast();
@@ -32,6 +34,20 @@ const RoleManagement = () => {
   const [showCreateRole, setShowCreateRole] = useState(false);
   const [showEditRole, setShowEditRole] = useState(false);
   const [selectedRole, setSelectedRole] = useState<OrganizationalRole | null>(null);
+
+  // View Management State
+  const [savedViews, setSavedViews] = useState<SavedView[]>([]);
+  const [currentView, setCurrentView] = useState<SavedView | undefined>();
+  const [columns, setColumns] = useState<ViewColumn[]>([
+    { key: 'roleType', label: 'Role Type', visible: true },
+    { key: 'municipality', label: 'Municipality', visible: true },
+    { key: 'schoolUnit', label: 'School Unit', visible: true },
+    { key: 'principal', label: 'Principal', visible: true },
+    { key: 'group', label: 'Group', visible: true },
+    { key: 'permissions', label: 'Permissions', visible: true },
+    { key: 'status', label: 'Status', visible: true },
+  ]);
+  const [filters, setFilters] = useState<ViewFilter[]>([]);
 
   const municipalities = ["Malmö Municipality", "Stockholm Municipality", "Göteborg Municipality"];
   const schoolUnits = ["Malmö Central Elementary", "Malmö North High School", "Malmö Tech Academy"];
@@ -60,6 +76,54 @@ const RoleManagement = () => {
     }
   ]);
 
+  // View Management Functions
+  const handleSaveView = (view: Omit<SavedView, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newView: SavedView = {
+      ...view,
+      id: `view-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setSavedViews([...savedViews, newView]);
+    setCurrentView(newView);
+  };
+
+  const handleLoadView = (view: SavedView) => {
+    setCurrentView(view);
+    setColumns(view.columns);
+    setFilters(view.filters);
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    setSavedViews(savedViews.filter(v => v.id !== viewId));
+    if (currentView?.id === viewId) {
+      setCurrentView(undefined);
+    }
+  };
+
+  // Apply filters to roles
+  const applyFilters = (roles: OrganizationalRole[]) => {
+    return roles.filter(role => {
+      return filters.every(filter => {
+        const fieldValue = String(role[filter.field as keyof OrganizationalRole] || '').toLowerCase();
+        const filterValue = String(filter.value).toLowerCase();
+        
+        switch (filter.operator) {
+          case 'equals':
+            return fieldValue === filterValue;
+          case 'contains':
+            return fieldValue.includes(filterValue);
+          case 'startsWith':
+            return fieldValue.startsWith(filterValue);
+          case 'endsWith':
+            return fieldValue.endsWith(filterValue);
+          default:
+            return true;
+        }
+      });
+    });
+  };
+
   const [newRole, setNewRole] = useState({
     roleType: "",
     municipality: "",
@@ -84,11 +148,11 @@ const RoleManagement = () => {
     isActive: true
   });
 
-  const filteredRoles = organizationalRoles.filter(role =>
+  const filteredRoles = applyFilters(organizationalRoles.filter(role =>
     role.roleType.toLowerCase().includes(searchTerm.toLowerCase()) ||
     role.municipality?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     role.schoolUnit?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ));
 
   const handleCreateRole = () => {
     const roleTemplate = ROLE_TEMPLATES.find(t => t.name === newRole.roleType);
@@ -209,6 +273,19 @@ const RoleManagement = () => {
         </Button>
       </div>
 
+      {/* View Management Component */}
+      <RoleManagementViewManagement
+        views={savedViews}
+        currentView={currentView}
+        onSaveView={handleSaveView}
+        onLoadView={handleLoadView}
+        onDeleteView={handleDeleteView}
+        columns={columns}
+        filters={filters}
+        onColumnsChange={setColumns}
+        onFiltersChange={setFilters}
+      />
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -240,32 +317,38 @@ const RoleManagement = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-4 font-medium text-ike-neutral-dark">Role Type</th>
-                  <th className="text-left p-4 font-medium text-ike-neutral-dark">Municipality</th>
-                  <th className="text-left p-4 font-medium text-ike-neutral-dark">School Unit</th>
-                  <th className="text-left p-4 font-medium text-ike-neutral-dark">Principal</th>
-                  <th className="text-left p-4 font-medium text-ike-neutral-dark">Group</th>
-                  <th className="text-left p-4 font-medium text-ike-neutral-dark">Permissions</th>
-                  <th className="text-left p-4 font-medium text-ike-neutral-dark">Status</th>
+                  {columns.filter(col => col.visible).map((column) => (
+                    <th key={column.key} className="text-left p-4 font-medium text-ike-neutral-dark">
+                      {column.label}
+                    </th>
+                  ))}
                   <th className="text-left p-4 font-medium text-ike-neutral-dark">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredRoles.map((role) => (
                   <tr key={role.id} className="border-b hover:bg-ike-neutral-light/50">
-                    <td className="p-4 font-medium">{role.roleType}</td>
-                    <td className="p-4 text-ike-neutral">{role.municipality || '-'}</td>
-                    <td className="p-4 text-ike-neutral">{role.schoolUnit || '-'}</td>
-                    <td className="p-4 text-ike-neutral">{role.principal || '-'}</td>
-                    <td className="p-4 text-ike-neutral">{role.group || '-'}</td>
-                    <td className="p-4">
-                      <Badge variant="outline">{role.permissions.length} permissions</Badge>
-                    </td>
-                    <td className="p-4">
-                      <Badge className={role.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-                        {role.isActive ? 'Active' : 'Inactive'}
-                      </Badge>
-                    </td>
+                    {columns.filter(col => col.visible).map((column) => (
+                      <td key={column.key} className="p-4">
+                        {column.key === 'roleType' ? (
+                          <span className="font-medium">{role.roleType}</span>
+                        ) : column.key === 'municipality' ? (
+                          <span className="text-ike-neutral">{role.municipality || '-'}</span>
+                        ) : column.key === 'schoolUnit' ? (
+                          <span className="text-ike-neutral">{role.schoolUnit || '-'}</span>
+                        ) : column.key === 'principal' ? (
+                          <span className="text-ike-neutral">{role.principal || '-'}</span>
+                        ) : column.key === 'group' ? (
+                          <span className="text-ike-neutral">{role.group || '-'}</span>
+                        ) : column.key === 'permissions' ? (
+                          <Badge variant="outline">{role.permissions.length} permissions</Badge>
+                        ) : column.key === 'status' ? (
+                          <Badge className={role.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                            {role.isActive ? 'Active' : 'Inactive'}
+                          </Badge>
+                        ) : null}
+                      </td>
+                    ))}
                     <td className="p-4">
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" onClick={() => handleEditRole(role)}>
