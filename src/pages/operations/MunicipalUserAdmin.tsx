@@ -38,6 +38,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { MunicipalUsersViewManagement } from "@/components/operations/MunicipalUsersViewManagement";
+import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
 
 const MunicipalUserAdmin = () => {
   const { toast } = useToast();
@@ -52,6 +54,19 @@ const MunicipalUserAdmin = () => {
     role: "",
     school: ""
   });
+
+  // View Management State
+  const [savedViews, setSavedViews] = useState<SavedView[]>([]);
+  const [currentView, setCurrentView] = useState<SavedView | undefined>();
+  const [columns, setColumns] = useState<ViewColumn[]>([
+    { key: 'name', label: 'Name', visible: true },
+    { key: 'email', label: 'Email', visible: true },
+    { key: 'role', label: 'Role', visible: true },
+    { key: 'school', label: 'School', visible: true },
+    { key: 'status', label: 'Status', visible: true },
+    { key: 'lastLogin', label: 'Last Login', visible: true },
+  ]);
+  const [filters, setFilters] = useState<ViewFilter[]>([]);
 
   const roles = [
     "School Principal",
@@ -103,12 +118,60 @@ const MunicipalUserAdmin = () => {
     }
   ]);
 
-  const filteredUsers = municipalUsers.filter(user =>
+  // View Management Functions
+  const handleSaveView = (view: Omit<SavedView, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newView: SavedView = {
+      ...view,
+      id: `view-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setSavedViews([...savedViews, newView]);
+    setCurrentView(newView);
+  };
+
+  const handleLoadView = (view: SavedView) => {
+    setCurrentView(view);
+    setColumns(view.columns);
+    setFilters(view.filters);
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    setSavedViews(savedViews.filter(v => v.id !== viewId));
+    if (currentView?.id === viewId) {
+      setCurrentView(undefined);
+    }
+  };
+
+  // Apply filters to users
+  const applyFilters = (users: any[]) => {
+    return users.filter(user => {
+      return filters.every(filter => {
+        const fieldValue = String(user[filter.field]).toLowerCase();
+        const filterValue = String(filter.value).toLowerCase();
+        
+        switch (filter.operator) {
+          case 'equals':
+            return fieldValue === filterValue;
+          case 'contains':
+            return fieldValue.includes(filterValue);
+          case 'startsWith':
+            return fieldValue.startsWith(filterValue);
+          case 'endsWith':
+            return fieldValue.endsWith(filterValue);
+          default:
+            return true;
+        }
+      });
+    });
+  };
+
+  const filteredUsers = applyFilters(municipalUsers.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.school.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ));
 
   const handleAddUser = () => {
     if (!newUserData.name || !newUserData.email || !newUserData.role) {
@@ -196,6 +259,19 @@ const MunicipalUserAdmin = () => {
         </Button>
       </div>
 
+      {/* View Management Component */}
+      <MunicipalUsersViewManagement
+        views={savedViews}
+        currentView={currentView}
+        onSaveView={handleSaveView}
+        onLoadView={handleLoadView}
+        onDeleteView={handleDeleteView}
+        columns={columns}
+        filters={filters}
+        onColumnsChange={setColumns}
+        onFiltersChange={setFilters}
+      />
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -227,30 +303,34 @@ const MunicipalUserAdmin = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-4 font-medium text-ike-neutral-dark">Name</th>
-                  <th className="text-left p-4 font-medium text-ike-neutral-dark">Email</th>
-                  <th className="text-left p-4 font-medium text-ike-neutral-dark">Role</th>
-                  <th className="text-left p-4 font-medium text-ike-neutral-dark">School</th>
-                  <th className="text-left p-4 font-medium text-ike-neutral-dark">Status</th>
-                  <th className="text-left p-4 font-medium text-ike-neutral-dark">Last Login</th>
+                  {columns.filter(col => col.visible).map((column) => (
+                    <th key={column.key} className="text-left p-4 font-medium text-ike-neutral-dark">
+                      {column.label}
+                    </th>
+                  ))}
                   <th className="text-left p-4 font-medium text-ike-neutral-dark">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredUsers.map((user) => (
                   <tr key={user.id} className="border-b hover:bg-ike-neutral-light/50">
-                    <td className="p-4 font-medium">{user.name}</td>
-                    <td className="p-4 text-ike-neutral">{user.email}</td>
-                    <td className="p-4">
-                      <Badge variant="outline">{user.role}</Badge>
-                    </td>
-                    <td className="p-4 text-ike-neutral">{user.school}</td>
-                    <td className="p-4">
-                      <Badge className={user.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
-                        {user.status}
-                      </Badge>
-                    </td>
-                    <td className="p-4 text-ike-neutral">{user.lastLogin}</td>
+                    {columns.filter(col => col.visible).map((column) => (
+                      <td key={column.key} className="p-4">
+                        {column.key === 'role' ? (
+                          <Badge variant="outline">{user[column.key]}</Badge>
+                        ) : column.key === 'status' ? (
+                          <Badge className={user.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+                            {user.status}
+                          </Badge>
+                        ) : column.key === 'name' ? (
+                          <span className="font-medium">{user[column.key]}</span>
+                        ) : (
+                          <span className={column.key === 'email' || column.key === 'school' || column.key === 'lastLogin' ? 'text-ike-neutral' : ''}>
+                            {user[column.key]}
+                          </span>
+                        )}
+                      </td>
+                    ))}
                     <td className="p-4">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
