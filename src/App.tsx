@@ -84,6 +84,7 @@ import GeographicalAnalysis from "./pages/analysis/GeographicalAnalysis";
 import ConflictResolution from "./pages/students/ConflictResolution";
 import ReportsDashboard from "./pages/reports/ReportsDashboard";
 import ChangeLists from "./pages/reports/ChangeLists";
+import ErrorLists from "./pages/reports/ErrorLists";
 
 const queryClient = new QueryClient();
 
