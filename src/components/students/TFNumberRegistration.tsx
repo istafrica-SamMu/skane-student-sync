@@ -52,6 +52,8 @@ import { useToast } from "@/hooks/use-toast";
 import ProtectedDataDisplay from "./ProtectedDataDisplay";
 import PrivacyIndicator from "./PrivacyIndicator";
 import { privacyService } from "@/services/privacyService";
+import { TFRegistrationViewManagement } from "./TFRegistrationViewManagement";
+import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
 
 interface TFStudent {
   id: number;
@@ -78,6 +80,21 @@ const TFNumberRegistration = () => {
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<TFStudent | null>(null);
   const [studentToConvert, setStudentToConvert] = useState<TFStudent | null>(null);
+
+  // View Management State
+  const [savedViews, setSavedViews] = useState<SavedView[]>([]);
+  const [currentView, setCurrentView] = useState<SavedView | undefined>();
+  const [columns, setColumns] = useState<ViewColumn[]>([
+    { key: 'tfNumber', label: 'TF Number', visible: true },
+    { key: 'firstName', label: 'First Name', visible: true },
+    { key: 'lastName', label: 'Last Name', visible: true },
+    { key: 'birthDate', label: 'Birth Date', visible: true },
+    { key: 'municipalCode', label: 'Municipal Code', visible: true },
+    { key: 'homeMunicipality', label: 'Home Municipality', visible: true },
+    { key: 'studyPath', label: 'Study Path', visible: true },
+    { key: 'status', label: 'Status', visible: true },
+  ]);
+  const [filters, setFilters] = useState<ViewFilter[]>([]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -194,6 +211,30 @@ const TFNumberRegistration = () => {
     "Estetik", "Hantverksprogrammet", "Vård och omsorg"
   ];
 
+  // View Management Functions
+  const handleSaveView = (view: Omit<SavedView, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newView: SavedView = {
+      ...view,
+      id: `view-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setSavedViews([...savedViews, newView]);
+  };
+
+  const handleLoadView = (view: SavedView) => {
+    setCurrentView(view);
+    setColumns(view.columns);
+    setFilters(view.filters);
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    setSavedViews(savedViews.filter(v => v.id !== viewId));
+    if (currentView?.id === viewId) {
+      setCurrentView(undefined);
+    }
+  };
+
   const handleConvertTF = (student: TFStudent) => {
     setStudentToConvert(student);
   };
@@ -308,11 +349,38 @@ const TFNumberRegistration = () => {
     }
   };
 
-  const filteredStudents = tfStudents.filter(student =>
-    student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.tfNumber.toLowerCase().includes(searchTerm.toLowerCase())
+  // Apply filters to students
+  const applyFilters = (students: TFStudent[]) => {
+    return students.filter(student => {
+      return filters.every(filter => {
+        const fieldValue = (student as any)[filter.field]?.toString().toLowerCase() || '';
+        const filterValue = filter.value.toString().toLowerCase();
+        
+        switch (filter.operator) {
+          case 'equals':
+            return fieldValue === filterValue;
+          case 'contains':
+            return fieldValue.includes(filterValue);
+          case 'startsWith':
+            return fieldValue.startsWith(filterValue);
+          case 'endsWith':
+            return fieldValue.endsWith(filterValue);
+          default:
+            return true;
+        }
+      });
+    });
+  };
+
+  const filteredStudents = applyFilters(
+    tfStudents.filter(student =>
+      student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.tfNumber.toLowerCase().includes(searchTerm.toLowerCase())
+    )
   );
+
+  const visibleColumns = columns.filter(col => col.visible);
 
   return (
     <div className="min-h-screen w-full">
@@ -474,6 +542,19 @@ const TFNumberRegistration = () => {
           </Dialog>
         </div>
 
+        {/* View Management Component */}
+        <TFRegistrationViewManagement
+          views={savedViews}
+          currentView={currentView}
+          onSaveView={handleSaveView}
+          onLoadView={handleLoadView}
+          onDeleteView={handleDeleteView}
+          columns={columns}
+          filters={filters}
+          onColumnsChange={setColumns}
+          onFiltersChange={setFilters}
+        />
+
         {/* Search and Filters */}
         <Card>
           <CardHeader>
@@ -511,13 +592,11 @@ const TFNumberRegistration = () => {
               <Table className="min-w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="font-medium min-w-[120px]">TF Number</TableHead>
-                    <TableHead className="font-medium min-w-[150px]">Name</TableHead>
-                    <TableHead className="font-medium min-w-[100px]">Birth Date</TableHead>
-                    <TableHead className="font-medium min-w-[100px]">Municipal Code</TableHead>
-                    <TableHead className="font-medium min-w-[180px]">Home Municipality</TableHead>
-                    <TableHead className="font-medium min-w-[120px]">Study Path</TableHead>
-                    <TableHead className="font-medium min-w-[100px]">Status</TableHead>
+                    {visibleColumns.map((column) => (
+                      <TableHead key={column.key} className="font-medium min-w-[120px]">
+                        {column.label}
+                      </TableHead>
+                    ))}
                     <TableHead className="font-medium text-center min-w-[200px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -528,60 +607,71 @@ const TFNumberRegistration = () => {
                     
                     return (
                       <TableRow key={student.id}>
-                        <TableCell className="font-mono">{student.tfNumber}</TableCell>
-                        <TableCell className="font-medium">
-                          <div className="flex items-center gap-2 min-w-0">
-                            {isProtected ? (
-                              <ProtectedDataDisplay 
-                                studentId={student.id}
-                                field="displayName"
-                                fallbackValue={`${student.firstName} ${student.lastName}`}
-                                userRole="principal"
-                                showPrivacyIndicator={true}
-                              />
-                            ) : (
-                              <span className="truncate max-w-[140px]">{student.firstName} {student.lastName}</span>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {isProtected ? (
-                            <ProtectedDataDisplay 
-                              studentId={student.id}
-                              field="birthDate"
-                              fallbackValue={student.birthDate}
-                              userRole="principal"
-                              showPrivacyIndicator={false}
-                            />
-                          ) : (
-                            student.birthDate
-                          )}
-                        </TableCell>
-                        <TableCell className="font-mono">{student.municipalCode}</TableCell>
-                        <TableCell>
-                          {student.needsHomeMunicipality ? (
-                            <div className="flex items-center gap-2">
-                              <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0" />
-                              <span className="text-orange-600 truncate">Not Assigned</span>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-2">
-                              <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />
-                              <span className="truncate max-w-[160px]">{student.homeMunicipality}</span>
-                            </div>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <span className="truncate max-w-[110px] block">{student.studyPath}</span>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {getStatusBadge(student.status)}
-                            {isProtected && privacyMark && (
-                              <PrivacyIndicator privacyMark={privacyMark} showDetails={false} />
-                            )}
-                          </div>
-                        </TableCell>
+                        {visibleColumns.map((column) => (
+                          <TableCell key={column.key} className={column.key === 'tfNumber' ? 'font-mono' : column.key === 'firstName' || column.key === 'lastName' ? 'font-medium' : ''}>
+                            {(() => {
+                              switch (column.key) {
+                                case 'firstName':
+                                case 'lastName':
+                                  if (column.key === 'firstName') {
+                                    return (
+                                      <div className="flex items-center gap-2 min-w-0">
+                                        {isProtected ? (
+                                          <ProtectedDataDisplay 
+                                            studentId={student.id}
+                                            field="displayName"
+                                            fallbackValue={`${student.firstName} ${student.lastName}`}
+                                            userRole="principal"
+                                            showPrivacyIndicator={true}
+                                          />
+                                        ) : (
+                                          <span className="truncate max-w-[140px]">{student.firstName} {student.lastName}</span>
+                                        )}
+                                      </div>
+                                    );
+                                  }
+                                  return null; // lastName is included in firstName display
+                                case 'birthDate':
+                                  return isProtected ? (
+                                    <ProtectedDataDisplay 
+                                      studentId={student.id}
+                                      field="birthDate"
+                                      fallbackValue={student.birthDate}
+                                      userRole="principal"
+                                      showPrivacyIndicator={false}
+                                    />
+                                  ) : (
+                                    student.birthDate
+                                  );
+                                case 'homeMunicipality':
+                                  return student.needsHomeMunicipality ? (
+                                    <div className="flex items-center gap-2">
+                                      <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0" />
+                                      <span className="text-orange-600 truncate">Not Assigned</span>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center gap-2">
+                                      <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />
+                                      <span className="truncate max-w-[160px]">{student.homeMunicipality}</span>
+                                    </div>
+                                  );
+                                case 'status':
+                                  return (
+                                    <div className="flex items-center gap-2">
+                                      {getStatusBadge(student.status)}
+                                      {isProtected && privacyMark && (
+                                        <PrivacyIndicator privacyMark={privacyMark} showDetails={false} />
+                                      )}
+                                    </div>
+                                  );
+                                case 'studyPath':
+                                  return <span className="truncate max-w-[110px] block">{student.studyPath}</span>;
+                                default:
+                                  return (student as any)[column.key];
+                              }
+                            })()}
+                          </TableCell>
+                        ))}
                         <TableCell>
                           <div className="flex gap-1 justify-center flex-wrap">
                             {student.needsHomeMunicipality && (
