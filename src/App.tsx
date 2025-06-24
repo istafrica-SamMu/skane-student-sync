@@ -47,6 +47,7 @@ import SchoolStatistics from "./pages/reports/SchoolStatistics";
 import Messages from "./pages/my-page/Messages";
 import EnrollmentSettings from "./pages/my-page/EnrollmentSettings";
 import ActivityLogs from "./pages/my-page/ActivityLogs";
+import ContactDirectory from "./pages/my-page/ContactDirectory";
 import ExtensExport from "./pages/integration/ExtensExport";
 import PopulationRegistry from "./pages/integration/PopulationRegistry";
 import IntegrationTesting from "./pages/integration/IntegrationTesting";
@@ -435,6 +436,11 @@ const AppContent = () => {
               <Route path="/my-page/messages" element={
                 <ProtectedRoute>
                   <Messages />
+                </ProtectedRoute>
+              } />
+              <Route path="/my-page/contacts" element={
+                <ProtectedRoute>
+                  <ContactDirectory />
                 </ProtectedRoute>
               } />
               <Route path="/my-page/enrollment" element={

@@ -47,7 +47,8 @@ import {
   HelpCircle,
   Ban,
   IdCard,
-  Receipt
+  Receipt,
+  Contact
 } from "lucide-react";
 
 export interface MenuItem {
@@ -175,6 +176,11 @@ export const regionalAdminMenu: MenuItem[] = [
         title: "Messages",
         url: "/my-page/messages",
         icon: MessageSquare,
+      },
+      {
+        title: "Contact Directory",
+        url: "/my-page/contacts",
+        icon: Contact,
       },
       {
         title: "Enrollment Settings",
@@ -407,6 +413,11 @@ export const municipalityAdminMenu: MenuItem[] = [
         icon: MessageSquare,
       },
       {
+        title: "Contact Directory",
+        url: "/my-page/contacts",
+        icon: Contact,
+      },
+      {
         title: "Enrollment Settings",
         url: "/my-page/enrollment",
         icon: Settings,
@@ -528,6 +539,11 @@ export const schoolAdminMenu: MenuItem[] = [
         title: "Messages",
         url: "/my-page/messages",
         icon: MessageSquare,
+      },
+      {
+        title: "Contact Directory",
+        url: "/my-page/contacts",
+        icon: Contact,
       },
       {
         title: "Activity Logs",
