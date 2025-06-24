@@ -151,6 +151,11 @@ export const regionalAdminMenu: MenuItem[] = [
     icon: FileText,
     items: [
       {
+        title: "Change Lists",
+        url: "/reports/change-lists",
+        icon: FileText,
+      },
+      {
         title: "Geographical Analysis",
         url: "/analysis/geographical",
         icon: MapPin,
@@ -349,6 +354,11 @@ export const municipalityAdminMenu: MenuItem[] = [
         title: "Reports Dashboard",
         url: "/reports/dashboard",
         icon: BarChart3,
+      },
+      {
+        title: "Change Lists",
+        url: "/reports/change-lists",
+        icon: FileText,
       },
       {
         title: "Money to Receive",

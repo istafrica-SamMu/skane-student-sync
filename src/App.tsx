@@ -83,6 +83,7 @@ import TFRegistration from "@/pages/students/TFRegistration";
 import GeographicalAnalysis from "./pages/analysis/GeographicalAnalysis";
 import ConflictResolution from "./pages/students/ConflictResolution";
 import ReportsDashboard from "./pages/reports/ReportsDashboard";
+import ChangeLists from "./pages/reports/ChangeLists";
 
 const queryClient = new QueryClient();
 
@@ -150,6 +151,13 @@ const AppContent = () => {
                 </ProtectedRoute>
               } />
               
+              {/* Reports Routes */}
+              <Route path="/reports/change-lists" element={
+                <ProtectedRoute>
+                  <ChangeLists />
+                </ProtectedRoute>
+              } />
+
               {/* KAA Management Routes */}
               <Route path="/kaa/dashboard" element={
                 <ProtectedRoute>
