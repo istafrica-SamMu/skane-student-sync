@@ -108,7 +108,7 @@ export const ExportChangesModal = ({
               <Checkbox 
                 id="includeDetails" 
                 checked={includeDetails}
-                onCheckedChange={setIncludeDetails}
+                onCheckedChange={(checked) => setIncludeDetails(checked === true)}
               />
               <label htmlFor="includeDetails" className="text-sm text-ike-neutral-dark">
                 Include detailed information (school units, study paths, etc.)
@@ -119,7 +119,7 @@ export const ExportChangesModal = ({
               <Checkbox 
                 id="includeConfidential" 
                 checked={includeConfidential}
-                onCheckedChange={setIncludeConfidential}
+                onCheckedChange={(checked) => setIncludeConfidential(checked === true)}
               />
               <label htmlFor="includeConfidential" className="text-sm text-ike-neutral-dark">
                 Include confidential student records
