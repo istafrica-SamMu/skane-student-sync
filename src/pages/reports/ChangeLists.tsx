@@ -42,7 +42,7 @@ const ChangeLists = () => {
   const [selectedChangeType, setSelectedChangeType] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Sample data for both population registration and price code changes
+  // Sample data for all change types including start/end dates
   const mockChangeRecords: ChangeRecord[] = [
     {
       id: "CHG-001",
@@ -123,6 +123,90 @@ const ChangeLists = () => {
       studyPath: "Arts & Design Program",
       priceCodeCategory: "Creative Arts",
       isConfidential: false,
+      measurementDate: "2024-11-01"
+    },
+    {
+      id: "CHG-007",
+      studentId: 7,
+      studentName: "Johan Svensson",
+      changeType: "start_date",
+      changeDate: "2024-11-09T08:45:00Z",
+      previousValue: "No start date",
+      newValue: "2024-11-15",
+      municipality: "Malmö",
+      schoolUnit: "Malmö Business School",
+      studyPath: "Business Administration",
+      isConfidential: false,
+      measurementDate: "2024-11-01"
+    },
+    {
+      id: "CHG-008",
+      studentId: 8,
+      studentName: "Maria Nilsson",
+      changeType: "start_date",
+      changeDate: "2024-11-07T14:20:00Z",
+      previousValue: "2024-10-01",
+      newValue: "2024-11-01",
+      municipality: "Stockholm",
+      schoolUnit: "Stockholm Technical Institute",
+      studyPath: "Computer Science",
+      isConfidential: false,
+      measurementDate: "2024-11-01"
+    },
+    {
+      id: "CHG-009",
+      studentId: 9,
+      studentName: "Confidential Student",
+      changeType: "start_date",
+      changeDate: "2024-11-11T11:15:00Z",
+      previousValue: "***",
+      newValue: "***",
+      municipality: "Confidential",
+      schoolUnit: "***",
+      studyPath: "***",
+      isConfidential: true,
+      measurementDate: "2024-11-01"
+    },
+    {
+      id: "CHG-010",
+      studentId: 10,
+      studentName: "Lars Petersson",
+      changeType: "end_date",
+      changeDate: "2024-11-13T16:30:00Z",
+      previousValue: "2025-06-15",
+      newValue: "2024-12-20",
+      municipality: "Göteborg",
+      schoolUnit: "Göteborg Vocational School",
+      studyPath: "Automotive Technology",
+      isConfidential: false,
+      measurementDate: "2024-11-01"
+    },
+    {
+      id: "CHG-011",
+      studentId: 11,
+      studentName: "Emma Johansson",
+      changeType: "end_date",
+      changeDate: "2024-11-06T10:10:00Z",
+      previousValue: "No end date",
+      newValue: "2025-05-30",
+      municipality: "Lund",
+      schoolUnit: "Lund Arts College",
+      studyPath: "Visual Arts Program",
+      isConfidential: false,
+      measurementDate: "2024-11-01"
+    },
+    {
+      id: "CHG-012",
+      studentId: 12,
+      studentName: "Confidential Student",
+      changeType: "end_date",
+      changeDate: "2024-11-04T09:25:00Z",
+      previousValue: "***",
+      newValue: "***",
+      municipality: "Confidential",
+      schoolUnit: "***",
+      studyPath: "***",
+      isConfidential: true,
       measurementDate: "2024-11-01"
     }
   ];
@@ -212,7 +296,7 @@ const ChangeLists = () => {
                 <p className="font-medium text-orange-800">Summer Period Active</p>
                 <p className="text-sm text-orange-700">
                   During July, August and September, only population registration changes are shown. 
-                  No education-related changes (including price codes) are tracked during summer months.
+                  No education-related changes (including price codes, start/end dates) are tracked during summer months.
                 </p>
               </div>
             </div>
@@ -360,6 +444,13 @@ const ChangeLists = () => {
                         <div>Category: {record.priceCodeCategory}</div>
                       </div>
                     )}
+                    {(record.changeType === 'start_date' || record.changeType === 'end_date') && !record.isConfidential && (
+                      <div className="space-y-1">
+                        <div>School Unit: {record.schoolUnit}</div>
+                        <div>Study Path: {record.studyPath}</div>
+                        <div>Municipality: {record.municipality}</div>
+                      </div>
+                    )}
                     {record.changeType === 'population_registration' && !record.isConfidential && (
                       <div>Municipality: {record.municipality}</div>
                     )}
@@ -410,12 +501,12 @@ const ChangeLists = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="text-center p-4 bg-ike-primary/5 rounded-lg">
               <div className="text-2xl font-bold text-ike-primary">
                 {filteredRecords.filter(r => r.changeType === 'population_registration').length}
               </div>
-              <div className="text-sm text-ike-neutral">Population Registration Changes</div>
+              <div className="text-sm text-ike-neutral">Population Registration</div>
             </div>
             <div className="text-center p-4 bg-blue-100 rounded-lg">
               <div className="text-2xl font-bold text-blue-600">
@@ -423,17 +514,23 @@ const ChangeLists = () => {
               </div>
               <div className="text-sm text-ike-neutral">Price Code Changes</div>
             </div>
+            <div className="text-center p-4 bg-green-100 rounded-lg">
+              <div className="text-2xl font-bold text-green-600">
+                {filteredRecords.filter(r => r.changeType === 'start_date').length}
+              </div>
+              <div className="text-sm text-ike-neutral">Start Date Changes</div>
+            </div>
+            <div className="text-center p-4 bg-purple-100 rounded-lg">
+              <div className="text-2xl font-bold text-purple-600">
+                {filteredRecords.filter(r => r.changeType === 'end_date').length}
+              </div>
+              <div className="text-sm text-ike-neutral">End Date Changes</div>
+            </div>
             <div className="text-center p-4 bg-orange-100 rounded-lg">
               <div className="text-2xl font-bold text-orange-600">
                 {filteredRecords.filter(r => r.isConfidential).length}
               </div>
               <div className="text-sm text-ike-neutral">Confidential Records</div>
-            </div>
-            <div className="text-center p-4 bg-green-100 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">
-                {filteredRecords.length}
-              </div>
-              <div className="text-sm text-ike-neutral">Total Changes</div>
             </div>
           </div>
         </CardContent>
