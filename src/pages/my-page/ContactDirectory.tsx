@@ -329,13 +329,6 @@ const ContactDirectory = () => {
                   </span>
                 </div>
                 
-                <div className="flex items-center gap-2 text-sm">
-                  <Phone className="w-4 h-4 text-ike-neutral" />
-                  <span className="text-ike-primary">
-                    {contact.phone}
-                  </span>
-                </div>
-                
                 <div className="flex items-start gap-2 text-sm">
                   <MapPin className="w-4 h-4 text-ike-neutral mt-0.5" />
                   <span className="text-ike-neutral text-xs leading-relaxed">
@@ -380,6 +373,20 @@ const ContactDirectory = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Modals */}
+      <ContactDetailsModal
+        contact={selectedContact}
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        onSendMessage={handleSendMessage}
+      />
+
+      <SendMessageModal
+        contact={selectedContact}
+        isOpen={isMessageModalOpen}
+        onClose={() => setIsMessageModalOpen(false)}
+      />
     </div>
   );
 };
