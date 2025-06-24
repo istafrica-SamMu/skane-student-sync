@@ -26,6 +26,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import PriceCodeModal from "@/components/modals/PriceCodeModal";
 import ImportPricelistModal from "@/components/modals/ImportPricelistModal";
+import { PriceListsViewManagement } from "@/components/financial/PriceListsViewManagement";
+import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
 
 interface PriceCode {
   id: number;
@@ -64,6 +66,68 @@ const PriceLists = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedPriceCode, setSelectedPriceCode] = useState<PriceCode | null>(null);
+
+  // View management state
+  const [savedViews, setSavedViews] = useState<SavedView[]>([
+    {
+      id: '1',
+      name: 'Default Price Lists View',
+      description: 'Standard view showing all price code data',
+      columns: [
+        { key: 'code', label: 'Code', visible: true },
+        { key: 'name', label: 'Program Name', visible: true },
+        { key: 'municipality', label: 'Municipality', visible: true },
+        { key: 'specialization', label: 'Specialization', visible: true },
+        { key: 'normalPrice', label: 'Normal Price', visible: true },
+        { key: 'internalPrice', label: 'Internal Price', visible: true },
+        { key: 'status', label: 'Status', visible: true },
+        { key: 'lastUpdated', label: 'Last Updated', visible: true }
+      ],
+      filters: [],
+      isDefault: true,
+      isSystemView: true,
+      createdBy: 'system',
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01'
+    }
+  ]);
+
+  const [currentColumns, setCurrentColumns] = useState<ViewColumn[]>([
+    { key: 'code', label: 'Code', visible: true },
+    { key: 'name', label: 'Program Name', visible: true },
+    { key: 'municipality', label: 'Municipality', visible: true },
+    { key: 'specialization', label: 'Specialization', visible: true },
+    { key: 'normalPrice', label: 'Normal Price', visible: true },
+    { key: 'internalPrice', label: 'Internal Price', visible: true },
+    { key: 'status', label: 'Status', visible: true },
+    { key: 'lastUpdated', label: 'Last Updated', visible: true }
+  ]);
+
+  const [currentFilters, setCurrentFilters] = useState<ViewFilter[]>([]);
+  const [currentView, setCurrentView] = useState<SavedView | undefined>(savedViews[0]);
+
+  const handleSaveView = (view: Omit<SavedView, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newView: SavedView = {
+      ...view,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setSavedViews([...savedViews, newView]);
+  };
+
+  const handleLoadView = (view: SavedView) => {
+    setCurrentView(view);
+    setCurrentColumns(view.columns);
+    setCurrentFilters(view.filters);
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    setSavedViews(savedViews.filter(view => view.id !== viewId));
+    if (currentView?.id === viewId) {
+      setCurrentView(savedViews[0]);
+    }
+  };
 
   // Mock data for current municipality
   const municipalityName = "Malmö";
@@ -211,6 +275,9 @@ const PriceLists = () => {
     ? Math.round(activePriceCodes.reduce((sum, pc) => sum + pc.internalPrice, 0) / activePriceCodes.length)
     : 0;
 
+  const visibleColumns = currentColumns.filter(col => col.visible);
+  const filteredData = filteredPriceCodes; // Apply filters here when implemented
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -296,6 +363,19 @@ const PriceLists = () => {
         </Card>
       </div>
 
+      {/* View Management */}
+      <PriceListsViewManagement
+        views={savedViews}
+        currentView={currentView}
+        onSaveView={handleSaveView}
+        onLoadView={handleLoadView}
+        onDeleteView={handleDeleteView}
+        columns={currentColumns}
+        filters={currentFilters}
+        onColumnsChange={setCurrentColumns}
+        onFiltersChange={setCurrentFilters}
+      />
+
       {/* Price Codes Management */}
       <Card>
         <CardHeader>
@@ -322,38 +402,48 @@ const PriceLists = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="font-medium">Code</TableHead>
-                  <TableHead className="font-medium">Program Name</TableHead>
-                  <TableHead className="font-medium">Municipality</TableHead>
-                  <TableHead className="font-medium">Specialization</TableHead>
-                  <TableHead className="font-medium text-right">Normal Price</TableHead>
-                  <TableHead className="font-medium text-right">Internal Price</TableHead>
-                  <TableHead className="font-medium">Status</TableHead>
-                  <TableHead className="font-medium">Last Updated</TableHead>
+                  {visibleColumns.map((column) => (
+                    <TableHead key={column.key} className="font-medium">
+                      {column.key === 'normalPrice' || column.key === 'internalPrice' 
+                        ? <span className="text-right">{column.label}</span>
+                        : column.label
+                      }
+                    </TableHead>
+                  ))}
                   <TableHead className="font-medium text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredPriceCodes.map((priceCode) => (
+                {filteredData.map((priceCode) => (
                   <TableRow key={priceCode.id} className="hover:bg-ike-neutral-light/50">
-                    <TableCell className="font-medium font-mono text-ike-primary">
-                      {priceCode.code}
-                    </TableCell>
-                    <TableCell className="font-medium text-ike-neutral-dark">
-                      {priceCode.name}
-                    </TableCell>
-                    <TableCell className="font-medium text-ike-primary">
-                      {priceCode.municipality}
-                    </TableCell>
-                    <TableCell>{priceCode.specialization}</TableCell>
-                    <TableCell className="text-right font-medium">
-                      {priceCode.normalPrice.toLocaleString('sv-SE')} SEK
-                    </TableCell>
-                    <TableCell className="text-right font-medium">
-                      {priceCode.internalPrice.toLocaleString('sv-SE')} SEK
-                    </TableCell>
-                    <TableCell>{getStatusBadge(priceCode.status)}</TableCell>
-                    <TableCell className="text-ike-neutral">{priceCode.lastUpdated}</TableCell>
+                    {visibleColumns.map((column) => (
+                      <TableCell key={column.key}>
+                        {column.key === 'code' && (
+                          <span className="font-medium font-mono text-ike-primary">{priceCode.code}</span>
+                        )}
+                        {column.key === 'name' && (
+                          <span className="font-medium text-ike-neutral-dark">{priceCode.name}</span>
+                        )}
+                        {column.key === 'municipality' && (
+                          <span className="font-medium text-ike-primary">{priceCode.municipality}</span>
+                        )}
+                        {column.key === 'specialization' && priceCode.specialization}
+                        {column.key === 'normalPrice' && (
+                          <span className="text-right font-medium block">
+                            {priceCode.normalPrice.toLocaleString('sv-SE')} SEK
+                          </span>
+                        )}
+                        {column.key === 'internalPrice' && (
+                          <span className="text-right font-medium block">
+                            {priceCode.internalPrice.toLocaleString('sv-SE')} SEK
+                          </span>
+                        )}
+                        {column.key === 'status' && getStatusBadge(priceCode.status)}
+                        {column.key === 'lastUpdated' && (
+                          <span className="text-ike-neutral">{priceCode.lastUpdated}</span>
+                        )}
+                      </TableCell>
+                    ))}
                     <TableCell className="text-center">
                       <div className="flex justify-center space-x-2">
                         <Button 
