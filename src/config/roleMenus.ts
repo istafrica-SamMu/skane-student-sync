@@ -156,6 +156,11 @@ export const regionalAdminMenu: MenuItem[] = [
         icon: FileText,
       },
       {
+        title: "Error Lists",
+        url: "/reports/error-lists",
+        icon: AlertTriangle,
+      },
+      {
         title: "Geographical Analysis",
         url: "/analysis/geographical",
         icon: MapPin,
@@ -361,6 +366,11 @@ export const municipalityAdminMenu: MenuItem[] = [
         icon: FileText,
       },
       {
+        title: "Error Lists",
+        url: "/reports/error-lists",
+        icon: AlertTriangle,
+      },
+      {
         title: "Money to Receive",
         url: "/reports/money-to-receive",
         icon: TrendingUp,
@@ -492,6 +502,11 @@ export const schoolAdminMenu: MenuItem[] = [
         title: "Reports Dashboard",
         url: "/reports/dashboard",
         icon: BarChart3,
+      },
+      {
+        title: "Error Lists",
+        url: "/reports/error-lists",
+        icon: AlertTriangle,
       },
       {
         title: "Student Lists",
