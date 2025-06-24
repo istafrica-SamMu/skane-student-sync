@@ -80,8 +80,8 @@ export const ChangeDetailsModal = ({ isOpen, onClose, record }: ChangeDetailsMod
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2 text-ike-neutral-dark">
             {getChangeTypeIcon(record.changeType)}
             Change Details - {record.id}
@@ -91,7 +91,7 @@ export const ChangeDetailsModal = ({ isOpen, onClose, record }: ChangeDetailsMod
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="flex-1 overflow-y-auto pr-2 space-y-6">
           {/* Student Information */}
           <div className="space-y-3">
             <h3 className="font-semibold text-ike-neutral-dark flex items-center gap-2">
@@ -143,13 +143,13 @@ export const ChangeDetailsModal = ({ isOpen, onClose, record }: ChangeDetailsMod
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 bg-red-50 rounded-lg border border-red-200">
                   <label className="text-sm font-medium text-red-800">Previous Value</label>
-                  <p className="text-red-900 font-mono text-sm mt-1">
+                  <p className="text-red-900 font-mono text-sm mt-1 break-words">
                     {record.isConfidential ? "***" : record.previousValue}
                   </p>
                 </div>
                 <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                   <label className="text-sm font-medium text-green-800">New Value</label>
-                  <p className="text-green-900 font-mono text-sm mt-1">
+                  <p className="text-green-900 font-mono text-sm mt-1 break-words">
                     {record.isConfidential ? "***" : record.newValue}
                   </p>
                 </div>
@@ -172,19 +172,19 @@ export const ChangeDetailsModal = ({ isOpen, onClose, record }: ChangeDetailsMod
                   {record.schoolUnit && (
                     <div>
                       <label className="text-sm font-medium text-ike-neutral">School Unit</label>
-                      <p className="text-ike-neutral-dark">{record.schoolUnit}</p>
+                      <p className="text-ike-neutral-dark break-words">{record.schoolUnit}</p>
                     </div>
                   )}
                   {record.studyPath && (
                     <div>
                       <label className="text-sm font-medium text-ike-neutral">Study Path</label>
-                      <p className="text-ike-neutral-dark">{record.studyPath}</p>
+                      <p className="text-ike-neutral-dark break-words">{record.studyPath}</p>
                     </div>
                   )}
                   {record.priceCodeCategory && (
                     <div>
                       <label className="text-sm font-medium text-ike-neutral">Price Code Category</label>
-                      <p className="text-ike-neutral-dark">{record.priceCodeCategory}</p>
+                      <p className="text-ike-neutral-dark break-words">{record.priceCodeCategory}</p>
                     </div>
                   )}
                   {record.additionalAmounts && record.additionalAmounts.applied > 0 && (
@@ -196,7 +196,7 @@ export const ChangeDetailsModal = ({ isOpen, onClose, record }: ChangeDetailsMod
                       <div className="space-y-1 text-sm">
                         <div>Applied: <span className="font-medium">{record.additionalAmounts.applied}</span></div>
                         <div>Total Amount: <span className="font-medium">{record.additionalAmounts.total.toLocaleString()} SEK</span></div>
-                        <div>Categories: <span className="font-medium">{record.additionalAmounts.categories.join(", ")}</span></div>
+                        <div>Categories: <span className="font-medium break-words">{record.additionalAmounts.categories.join(", ")}</span></div>
                       </div>
                     </div>
                   )}
@@ -206,7 +206,7 @@ export const ChangeDetailsModal = ({ isOpen, onClose, record }: ChangeDetailsMod
           )}
         </div>
 
-        <div className="flex justify-end pt-4">
+        <div className="flex justify-end pt-4 border-t flex-shrink-0">
           <Button onClick={onClose} variant="outline">
             Close
           </Button>

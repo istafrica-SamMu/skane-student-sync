@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { 
   FileText, 
   Search, 
@@ -50,6 +51,10 @@ const ChangeLists = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<string>("2024-11");
   const [selectedChangeType, setSelectedChangeType] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 10;
 
   // Modal states
   const [selectedRecord, setSelectedRecord] = useState<ChangeRecord | null>(null);
@@ -332,6 +337,18 @@ const ChangeLists = () => {
     return filtered;
   };
 
+  const getPaginatedRecords = () => {
+    const filtered = getFilteredRecords();
+    const startIndex = (currentPage - 1) * recordsPerPage;
+    const endIndex = startIndex + recordsPerPage;
+    return filtered.slice(startIndex, endIndex);
+  };
+
+  const getTotalPages = () => {
+    const filtered = getFilteredRecords();
+    return Math.ceil(filtered.length / recordsPerPage);
+  };
+
   const getChangeTypeLabel = (type: string) => {
     const labels = {
       'population_registration': 'Population Registration',
@@ -375,6 +392,25 @@ const ChangeLists = () => {
   };
 
   const filteredRecords = getFilteredRecords();
+  const paginatedRecords = getPaginatedRecords();
+  const totalPages = getTotalPages();
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleFilterChange = (filterType: string, value: string) => {
+    setCurrentPage(1);
+    if (filterType === 'period') setSelectedPeriod(value);
+    if (filterType === 'changeType') setSelectedChangeType(value);
+    if (filterType === 'search') setSearchTerm(value);
+  };
+
+  const handleResetFilters = () => {
+    setSelectedChangeType("all");
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
 
   return (
     <div className="space-y-6">
@@ -427,7 +463,7 @@ const ChangeLists = () => {
               <label className="text-sm font-medium text-ike-neutral-dark mb-2 block">
                 Period
               </label>
-              <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+              <Select value={selectedPeriod} onValueChange={(value) => handleFilterChange('period', value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -445,7 +481,7 @@ const ChangeLists = () => {
               <label className="text-sm font-medium text-ike-neutral-dark mb-2 block">
                 Change Type
               </label>
-              <Select value={selectedChangeType} onValueChange={setSelectedChangeType}>
+              <Select value={selectedChangeType} onValueChange={(value) => handleFilterChange('changeType', value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -469,7 +505,7 @@ const ChangeLists = () => {
                 <Input
                   placeholder="Search changes..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => handleFilterChange('search', e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -479,10 +515,7 @@ const ChangeLists = () => {
               <Button 
                 variant="outline" 
                 className="w-full border-ike-primary text-ike-primary hover:bg-ike-primary/10"
-                onClick={() => {
-                  setSelectedChangeType("all");
-                  setSearchTerm("");
-                }}
+                onClick={handleResetFilters}
               >
                 Reset Filters
               </Button>
@@ -519,7 +552,7 @@ const ChangeLists = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredRecords.map((record) => (
+              {paginatedRecords.map((record) => (
                 <TableRow key={record.id} className={record.isConfidential ? "bg-yellow-50" : ""}>
                   <TableCell className="font-mono text-sm">{record.id}</TableCell>
                   <TableCell>
@@ -617,7 +650,7 @@ const ChangeLists = () => {
                   </TableCell>
                 </TableRow>
               ))}
-              {filteredRecords.length === 0 && (
+              {paginatedRecords.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={8} className="text-center py-8 text-ike-neutral">
                     No change records found for the selected filters.
@@ -626,6 +659,44 @@ const ChangeLists = () => {
               )}
             </TableBody>
           </Table>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4">
+              <div className="text-sm text-ike-neutral">
+                Showing {((currentPage - 1) * recordsPerPage) + 1} to {Math.min(currentPage * recordsPerPage, filteredRecords.length)} of {filteredRecords.length} results
+              </div>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        onClick={() => handlePageChange(page)}
+                        isActive={currentPage === page}
+                        className="cursor-pointer"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </CardContent>
       </Card>
 
