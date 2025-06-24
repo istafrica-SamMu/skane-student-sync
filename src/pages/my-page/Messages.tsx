@@ -25,6 +25,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import { 
   Send, 
   Search, 
@@ -41,16 +51,58 @@ import {
   Archive,
   Bell,
   Shield,
-  Palette
+  Palette,
+  Users,
+  Mail,
+  Plus,
+  Eye,
+  Clock,
+  UserCheck
 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Messages = () => {
   const [messageText, setMessageText] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [selectedConversationId, setSelectedConversationId] = useState(1);
+  const [showNewMessageDialog, setShowNewMessageDialog] = useState(false);
+  const [showMessageTrackingDialog, setShowMessageTrackingDialog] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // New message form state
+  const [newMessage, setNewMessage] = useState({
+    recipient: "",
+    recipientType: "individual", // individual, principal, role
+    subject: "",
+    content: "",
+    sendToEmail: false,
+    attachments: [] as File[]
+  });
+
+  // Message tracking data
+  const [sentMessages] = useState([
+    {
+      id: 1,
+      subject: "System Maintenance Notification",
+      recipients: ["All Users"],
+      sentDate: "2024-01-15 14:30",
+      deliveredCount: 45,
+      readCount: 32,
+      emailSent: true
+    },
+    {
+      id: 2,
+      subject: "New Feature Announcement",
+      recipients: ["Regional Administrators"],
+      sentDate: "2024-01-10 09:15",
+      deliveredCount: 8,
+      readCount: 6,
+      emailSent: false
+    }
+  ]);
 
   const conversations = [
     {
@@ -175,6 +227,28 @@ const Messages = () => {
   const selectedConversation = conversations.find(conv => conv.id === selectedConversationId) || conversations[0];
   const currentMessages = messages.filter(msg => msg.conversationId === selectedConversationId);
 
+  const isSystemAdmin = user?.role === 'devadmin' || user?.role === 'regional-admin';
+
+  const recipientOptions = [
+    { value: "individual", label: "Individual User" },
+    { value: "principal", label: "Users by Principal" },
+    { value: "role", label: "Users by Role" },
+    { value: "all", label: "All Users" }
+  ];
+
+  const principalOptions = [
+    { value: "principal-1", label: "Malmö Elementary School" },
+    { value: "principal-2", label: "Lund High School" },
+    { value: "principal-3", label: "Helsingborg Middle School" }
+  ];
+
+  const roleOptions = [
+    { value: "regional-admin", label: "Regional Administrators" },
+    { value: "municipality-admin", label: "Municipality Administrators" },
+    { value: "school-admin", label: "School Administrators" },
+    { value: "orgadmin", label: "Organization Administrators" }
+  ];
+
   const handleConversationClick = (conversationId: number) => {
     setSelectedConversationId(conversationId);
   };
@@ -219,6 +293,60 @@ const Messages = () => {
     }
   };
 
+  const handleSendNewMessage = () => {
+    if (!newMessage.subject.trim() || !newMessage.content.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in both subject and message content.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    let recipientDescription = "";
+    switch (newMessage.recipientType) {
+      case "individual":
+        recipientDescription = "selected user";
+        break;
+      case "principal":
+        recipientDescription = principalOptions.find(p => p.value === newMessage.recipient)?.label || "selected principal";
+        break;
+      case "role":
+        recipientDescription = roleOptions.find(r => r.value === newMessage.recipient)?.label || "selected role";
+        break;
+      case "all":
+        recipientDescription = "all users";
+        break;
+    }
+
+    toast({
+      title: "Message Sent Successfully",
+      description: `Message sent to ${recipientDescription}${newMessage.sendToEmail ? ' (including email)' : ''}`,
+    });
+
+    setShowNewMessageDialog(false);
+    setNewMessage({
+      recipient: "",
+      recipientType: "individual",
+      subject: "",
+      content: "",
+      sendToEmail: false,
+      attachments: []
+    });
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    setNewMessage(prev => ({
+      ...prev,
+      attachments: [...prev.attachments, ...files]
+    }));
+    toast({
+      title: "Files attached",
+      description: `${files.length} file(s) attached to message`,
+    });
+  };
+
   return (
     <div className="h-[calc(100vh-120px)] flex bg-ike-neutral-light">
       {/* Left Sidebar - Conversations List */}
@@ -228,89 +356,320 @@ const Messages = () => {
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Messages</h2>
             
-            {/* Settings Modal */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-white hover:bg-ike-primary-dark">
-                  <Settings className="w-5 h-5" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Settings className="w-5 h-5" />
-                    Message Settings
-                  </DialogTitle>
-                  <DialogDescription>
-                    Configure your messaging preferences and notifications
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-6 py-4">
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-semibold flex items-center gap-2">
-                      <Bell className="w-4 h-4" />
-                      Notifications
-                    </h4>
-                    <div className="space-y-3 pl-6">
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
-                        <span className="text-sm">Desktop notifications</span>
-                      </label>
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
-                        <span className="text-sm">Email notifications</span>
-                      </label>
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" className="rounded" />
-                        <span className="text-sm">Sound alerts</span>
-                      </label>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-semibold flex items-center gap-2">
-                      <Shield className="w-4 h-4" />
-                      Privacy
-                    </h4>
-                    <div className="space-y-3 pl-6">
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
-                        <span className="text-sm">Show online status</span>
-                      </label>
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
-                        <span className="text-sm">Read receipts</span>
-                      </label>
-                    </div>
-                  </div>
+            <div className="flex items-center space-x-2">
+              {/* New Message for System Admins */}
+              {isSystemAdmin && (
+                <Dialog open={showNewMessageDialog} onOpenChange={setShowNewMessageDialog}>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="text-white hover:bg-ike-primary-dark">
+                      <Plus className="w-4 h-4 mr-1" />
+                      New
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[600px]">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Users className="w-5 h-5" />
+                        Send New Message
+                      </DialogTitle>
+                      <DialogDescription>
+                        Send a message to individual users or groups within the system
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="recipientType">Recipient Type</Label>
+                          <Select 
+                            value={newMessage.recipientType} 
+                            onValueChange={(value) => setNewMessage(prev => ({...prev, recipientType: value, recipient: ""}))}
+                          >
+                            <SelectTrigger className="border-ike-primary/20">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {recipientOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        {newMessage.recipientType === "principal" && (
+                          <div>
+                            <Label htmlFor="principal">Select Principal</Label>
+                            <Select 
+                              value={newMessage.recipient} 
+                              onValueChange={(value) => setNewMessage(prev => ({...prev, recipient: value}))}
+                            >
+                              <SelectTrigger className="border-ike-primary/20">
+                                <SelectValue placeholder="Choose principal" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {principalOptions.map((option) => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
 
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-semibold flex items-center gap-2">
-                      <Palette className="w-4 h-4" />
-                      Appearance
-                    </h4>
-                    <div className="space-y-3 pl-6">
+                        {newMessage.recipientType === "role" && (
+                          <div>
+                            <Label htmlFor="role">Select Role</Label>
+                            <Select 
+                              value={newMessage.recipient} 
+                              onValueChange={(value) => setNewMessage(prev => ({...prev, recipient: value}))}
+                            >
+                              <SelectTrigger className="border-ike-primary/20">
+                                <SelectValue placeholder="Choose role" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {roleOptions.map((option) => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+
+                        {newMessage.recipientType === "individual" && (
+                          <div>
+                            <Label htmlFor="individual">Search User</Label>
+                            <Input
+                              placeholder="Type to search users..."
+                              value={newMessage.recipient}
+                              onChange={(e) => setNewMessage(prev => ({...prev, recipient: e.target.value}))}
+                              className="border-ike-primary/20 focus:border-ike-primary"
+                            />
+                          </div>
+                        )}
+                      </div>
+
                       <div>
-                        <label className="text-sm font-medium">Theme</label>
-                        <select className="w-full mt-1 p-2 border rounded-md">
-                          <option>Light</option>
-                          <option>Dark</option>
-                          <option>Auto</option>
-                        </select>
+                        <Label htmlFor="subject">Subject *</Label>
+                        <Input
+                          id="subject"
+                          placeholder="Enter message subject"
+                          value={newMessage.subject}
+                          onChange={(e) => setNewMessage(prev => ({...prev, subject: e.target.value}))}
+                          className="border-ike-primary/20 focus:border-ike-primary"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="content">Message Content *</Label>
+                        <Textarea
+                          id="content"
+                          placeholder="Enter your message..."
+                          rows={4}
+                          value={newMessage.content}
+                          onChange={(e) => setNewMessage(prev => ({...prev, content: e.target.value}))}
+                          className="border-ike-primary/20 focus:border-ike-primary"
+                        />
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="sendToEmail"
+                          checked={newMessage.sendToEmail}
+                          onCheckedChange={(checked) => setNewMessage(prev => ({...prev, sendToEmail: !!checked}))}
+                        />
+                        <Label htmlFor="sendToEmail" className="flex items-center gap-2">
+                          <Mail className="w-4 h-4" />
+                          Also send to recipients' email addresses
+                        </Label>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="attachments">Attachments</Label>
+                        <Input
+                          id="attachments"
+                          type="file"
+                          multiple
+                          onChange={handleFileUpload}
+                          className="border-ike-primary/20 focus:border-ike-primary"
+                        />
+                        {newMessage.attachments.length > 0 && (
+                          <div className="mt-2 space-y-1">
+                            {newMessage.attachments.map((file, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {file.name}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button variant="outline">Cancel</Button>
+                      </DialogClose>
+                      <Button onClick={handleSendNewMessage} className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+                        <Send className="w-4 h-4 mr-2" />
+                        Send Message
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
+
+              {/* Message Tracking for System Admins */}
+              {isSystemAdmin && (
+                <Dialog open={showMessageTrackingDialog} onOpenChange={setShowMessageTrackingDialog}>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="text-white hover:bg-ike-primary-dark">
+                      <Eye className="w-4 h-4 mr-1" />
+                      Track
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[800px]">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Eye className="w-5 h-5" />
+                        Message Tracking
+                      </DialogTitle>
+                      <DialogDescription>
+                        View delivery status and read receipts for sent messages
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      {sentMessages.map((message) => (
+                        <Card key={message.id} className="p-4">
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-semibold text-ike-neutral-dark">{message.subject}</h4>
+                              <div className="flex items-center space-x-2">
+                                <Badge variant="outline" className="text-xs">
+                                  <Clock className="w-3 h-3 mr-1" />
+                                  {message.sentDate}
+                                </Badge>
+                                {message.emailSent && (
+                                  <Badge className="bg-ike-primary text-white text-xs">
+                                    <Mail className="w-3 h-3 mr-1" />
+                                    Email Sent
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center space-x-4 text-sm text-ike-neutral">
+                              <span>Recipients: {message.recipients.join(", ")}</span>
+                            </div>
+                            
+                            <div className="flex items-center space-x-6">
+                              <div className="flex items-center space-x-2">
+                                <CheckCheck className="w-4 h-4 text-ike-success" />
+                                <span className="text-sm">Delivered: {message.deliveredCount}</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <UserCheck className="w-4 h-4 text-ike-primary" />
+                                <span className="text-sm">Read: {message.readCount}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button variant="outline">Close</Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
+
+              {/* Settings Modal */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-white hover:bg-ike-primary-dark">
+                    <Settings className="w-5 h-5" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px]">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Settings className="w-5 h-5" />
+                      Message Settings
+                    </DialogTitle>
+                    <DialogDescription>
+                      Configure your messaging preferences and notifications
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-6 py-4">
+                    <div className="space-y-4">
+                      <h4 className="text-sm font-semibold flex items-center gap-2">
+                        <Bell className="w-4 h-4" />
+                        Notifications
+                      </h4>
+                      <div className="space-y-3 pl-6">
+                        <label className="flex items-center space-x-2">
+                          <input type="checkbox" defaultChecked className="rounded" />
+                          <span className="text-sm">Desktop notifications</span>
+                        </label>
+                        <label className="flex items-center space-x-2">
+                          <input type="checkbox" defaultChecked className="rounded" />
+                          <span className="text-sm">Email notifications</span>
+                        </label>
+                        <label className="flex items-center space-x-2">
+                          <input type="checkbox" className="rounded" />
+                          <span className="text-sm">Sound alerts</span>
+                        </label>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <h4 className="text-sm font-semibold flex items-center gap-2">
+                        <Shield className="w-4 h-4" />
+                        Privacy
+                      </h4>
+                      <div className="space-y-3 pl-6">
+                        <label className="flex items-center space-x-2">
+                          <input type="checkbox" defaultChecked className="rounded" />
+                          <span className="text-sm">Show online status</span>
+                        </label>
+                        <label className="flex items-center space-x-2">
+                          <input type="checkbox" defaultChecked className="rounded" />
+                          <span className="text-sm">Read receipts</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="text-sm font-semibold flex items-center gap-2">
+                        <Palette className="w-4 h-4" />
+                        Appearance
+                      </h4>
+                      <div className="space-y-3 pl-6">
+                        <div>
+                          <label className="text-sm font-medium">Theme</label>
+                          <select className="w-full mt-1 p-2 border rounded-md">
+                            <option>Light</option>
+                            <option>Dark</option>
+                            <option>Auto</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button onClick={() => toast({ title: "Settings saved", description: "Your preferences have been updated" })}>
-                    Save Changes
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">Cancel</Button>
+                    </DialogClose>
+                    <Button onClick={() => toast({ title: "Settings saved", description: "Your preferences have been updated" })}>
+                      Save Changes
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </div>
 
