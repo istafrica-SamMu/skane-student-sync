@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,8 @@ import {
   User,
   MapPin,
   Clock,
-  Euro
+  Euro,
+  DollarSign
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -34,6 +34,11 @@ interface ChangeRecord {
   measurementDate: string;
   studyPath?: string;
   priceCodeCategory?: string;
+  additionalAmounts?: {
+    applied: number;
+    total: number;
+    categories: string[];
+  };
 }
 
 const ChangeLists = () => {
@@ -42,7 +47,7 @@ const ChangeLists = () => {
   const [selectedChangeType, setSelectedChangeType] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Sample data for all change types including start/end dates
+  // Sample data for all change types including municipality registration with additional amounts
   const mockChangeRecords: ChangeRecord[] = [
     {
       id: "CHG-001",
@@ -208,6 +213,82 @@ const ChangeLists = () => {
       studyPath: "***",
       isConfidential: true,
       measurementDate: "2024-11-01"
+    },
+    {
+      id: "CHG-013",
+      studentId: 13,
+      studentName: "Peter Magnusson",
+      changeType: "municipality_registration",
+      changeDate: "2024-11-16T09:30:00Z",
+      previousValue: "Helsingborg Municipality",
+      newValue: "Malmö Municipality",
+      municipality: "Malmö",
+      schoolUnit: "Malmö International School",
+      studyPath: "International Baccalaureate",
+      isConfidential: false,
+      measurementDate: "2024-11-01",
+      additionalAmounts: {
+        applied: 3,
+        total: 15500,
+        categories: ["Language Support", "Special Education", "Transportation"]
+      }
+    },
+    {
+      id: "CHG-014",
+      studentId: 14,
+      studentName: "Lisa Karlsson",
+      changeType: "municipality_registration",
+      changeDate: "2024-11-14T14:15:00Z",
+      previousValue: "Kristianstad Municipality",
+      newValue: "Lund Municipality",
+      municipality: "Lund",
+      schoolUnit: "Lund Science Academy",
+      studyPath: "Natural Science Program",
+      isConfidential: false,
+      measurementDate: "2024-11-01",
+      additionalAmounts: {
+        applied: 2,
+        total: 8200,
+        categories: ["Lab Equipment", "Advanced Materials"]
+      }
+    },
+    {
+      id: "CHG-015",
+      studentId: 15,
+      studentName: "Confidential Student",
+      changeType: "municipality_registration",
+      changeDate: "2024-11-11T16:45:00Z",
+      previousValue: "***",
+      newValue: "***",
+      municipality: "Confidential",
+      schoolUnit: "***",
+      studyPath: "***",
+      isConfidential: true,
+      measurementDate: "2024-11-01",
+      additionalAmounts: {
+        applied: 0,
+        total: 0,
+        categories: []
+      }
+    },
+    {
+      id: "CHG-016",
+      studentId: 16,
+      studentName: "Andreas Johansson",
+      changeType: "municipality_registration",
+      changeDate: "2024-11-09T11:20:00Z",
+      previousValue: "Växjö Municipality",
+      newValue: "Stockholm Municipality",
+      municipality: "Stockholm",
+      schoolUnit: "Stockholm Business Institute",
+      studyPath: "Economics Program",
+      isConfidential: false,
+      measurementDate: "2024-11-01",
+      additionalAmounts: {
+        applied: 1,
+        total: 12000,
+        categories: ["Urban Studies Supplement"]
+      }
     }
   ];
 
@@ -257,7 +338,7 @@ const ChangeLists = () => {
       'price_code': Euro,
       'start_date': Calendar,
       'end_date': Calendar,
-      'municipality_registration': MapPin
+      'municipality_registration': DollarSign
     };
     const IconComponent = icons[type as keyof typeof icons] || MapPin;
     return <IconComponent className="w-3 h-3" />;
@@ -296,7 +377,7 @@ const ChangeLists = () => {
                 <p className="font-medium text-orange-800">Summer Period Active</p>
                 <p className="text-sm text-orange-700">
                   During July, August and September, only population registration changes are shown. 
-                  No education-related changes (including price codes, start/end dates) are tracked during summer months.
+                  No education-related changes (including price codes, start/end dates, municipality registration) are tracked during summer months.
                 </p>
               </div>
             </div>
@@ -451,6 +532,27 @@ const ChangeLists = () => {
                         <div>Municipality: {record.municipality}</div>
                       </div>
                     )}
+                    {record.changeType === 'municipality_registration' && !record.isConfidential && (
+                      <div className="space-y-1">
+                        <div>School Unit: {record.schoolUnit}</div>
+                        <div>Study Path: {record.studyPath}</div>
+                        <div>Municipality: {record.municipality}</div>
+                        {record.additionalAmounts && record.additionalAmounts.applied > 0 && (
+                          <div className="mt-2 p-2 bg-green-50 rounded border">
+                            <div className="font-medium text-green-800 flex items-center gap-1">
+                              <DollarSign className="w-3 h-3" />
+                              Additional Amounts Applied: {record.additionalAmounts.applied}
+                            </div>
+                            <div className="text-green-700 text-xs">
+                              Total: {record.additionalAmounts.total.toLocaleString()} SEK
+                            </div>
+                            <div className="text-green-600 text-xs">
+                              Categories: {record.additionalAmounts.categories.join(", ")}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                     {record.changeType === 'population_registration' && !record.isConfidential && (
                       <div>Municipality: {record.municipality}</div>
                     )}
@@ -501,7 +603,7 @@ const ChangeLists = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
             <div className="text-center p-4 bg-ike-primary/5 rounded-lg">
               <div className="text-2xl font-bold text-ike-primary">
                 {filteredRecords.filter(r => r.changeType === 'population_registration').length}
@@ -525,6 +627,12 @@ const ChangeLists = () => {
                 {filteredRecords.filter(r => r.changeType === 'end_date').length}
               </div>
               <div className="text-sm text-ike-neutral">End Date Changes</div>
+            </div>
+            <div className="text-center p-4 bg-teal-100 rounded-lg">
+              <div className="text-2xl font-bold text-teal-600">
+                {filteredRecords.filter(r => r.changeType === 'municipality_registration').length}
+              </div>
+              <div className="text-sm text-ike-neutral">Municipality Registration</div>
             </div>
             <div className="text-center p-4 bg-orange-100 rounded-lg">
               <div className="text-2xl font-bold text-orange-600">
