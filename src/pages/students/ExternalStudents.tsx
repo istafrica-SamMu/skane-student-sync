@@ -60,6 +60,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
+import { ExternalStudentsViewManagement } from "@/components/students/ExternalStudentsViewManagement";
+import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
 
 interface ExternalStudent {
   id: number;
@@ -88,6 +90,60 @@ const ExternalStudents = () => {
   const [showCalculateDialog, setShowCalculateDialog] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
+
+  // View Management State
+  const [savedViews, setSavedViews] = useState<SavedView[]>([]);
+  const [currentView, setCurrentView] = useState<SavedView | undefined>();
+  const [columns, setColumns] = useState<ViewColumn[]>([
+    { key: 'name', label: 'Name', visible: true },
+    { key: 'personalNumber', label: 'Personal Number', visible: true },
+    { key: 'residenceMunicipality', label: 'Residence Municipality', visible: true },
+    { key: 'schoolMunicipality', label: 'School Municipality', visible: true },
+    { key: 'school', label: 'School', visible: true },
+    { key: 'program', label: 'Program', visible: true },
+    { key: 'class', label: 'Class', visible: true },
+    { key: 'status', label: 'Status', visible: true },
+    { key: 'ikeCost', label: 'IKE Cost', visible: true },
+    { key: 'paymentStatus', label: 'Payment Status', visible: true }
+  ]);
+  const [filters, setFilters] = useState<ViewFilter[]>([]);
+
+  // View Management Handlers
+  const handleSaveView = (view: Omit<SavedView, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newView: SavedView = {
+      ...view,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    setSavedViews([...savedViews, newView]);
+    setCurrentView(newView);
+  };
+
+  const handleLoadView = (view: SavedView) => {
+    setCurrentView(view);
+    setColumns(view.columns);
+    setFilters(view.filters);
+    toast({
+      title: "View Loaded",
+      description: `View "${view.name}" has been applied successfully.`,
+    });
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    setSavedViews(savedViews.filter(view => view.id !== viewId));
+    if (currentView?.id === viewId) {
+      setCurrentView(undefined);
+    }
+  };
+
+  const handleColumnsChange = (newColumns: ViewColumn[]) => {
+    setColumns(newColumns);
+  };
+
+  const handleFiltersChange = (newFilters: ViewFilter[]) => {
+    setFilters(newFilters);
+  };
 
   // Mock data for external students (municipal residents attending other municipalities' schools)
   const externalStudents = [
@@ -177,7 +233,26 @@ const ExternalStudents = () => {
     const matchesMunicipality = municipalityFilter === "all" || student.schoolMunicipality === municipalityFilter;
     const matchesStatus = statusFilter === "all" || student.status === statusFilter;
     
-    return matchesSearch && matchesMunicipality && matchesStatus;
+    // Apply view filters
+    const matchesViewFilters = filters.every(filter => {
+      const fieldValue = (student as any)[filter.field]?.toString().toLowerCase() || '';
+      const filterValue = filter.value.toString().toLowerCase();
+      
+      switch (filter.operator) {
+        case 'equals':
+          return fieldValue === filterValue;
+        case 'contains':
+          return fieldValue.includes(filterValue);
+        case 'startsWith':
+          return fieldValue.startsWith(filterValue);
+        case 'endsWith':
+          return fieldValue.endsWith(filterValue);
+        default:
+          return true;
+      }
+    });
+    
+    return matchesSearch && matchesMunicipality && matchesStatus && matchesViewFilters;
   });
 
   const handleViewDetails = (student: ExternalStudent) => {
@@ -393,6 +468,19 @@ const ExternalStudents = () => {
         </div>
       </div>
 
+      {/* View Management */}
+      <ExternalStudentsViewManagement
+        views={savedViews}
+        currentView={currentView}
+        onSaveView={handleSaveView}
+        onLoadView={handleLoadView}
+        onDeleteView={handleDeleteView}
+        columns={columns}
+        filters={filters}
+        onColumnsChange={handleColumnsChange}
+        onFiltersChange={handleFiltersChange}
+      />
+
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="border-l-4 border-l-ike-primary">
@@ -502,39 +590,54 @@ const ExternalStudents = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="font-medium">Name</TableHead>
-                <TableHead className="font-medium">Personal Number</TableHead>
-                <TableHead className="font-medium">School Municipality</TableHead>
-                <TableHead className="font-medium">School</TableHead>
-                <TableHead className="font-medium">Program</TableHead>
-                <TableHead className="font-medium">Status</TableHead>
-                <TableHead className="font-medium">Payment</TableHead>
-                <TableHead className="font-medium text-right">IKE Cost</TableHead>
+                {columns.filter(col => col.visible).map((column) => (
+                  <TableHead key={column.key} className="font-medium">
+                    {column.key === 'ikeCost' ? (
+                      <div className="text-right">{column.label}</div>
+                    ) : column.key === 'actions' ? (
+                      <div className="text-center">{column.label}</div>
+                    ) : (
+                      column.label
+                    )}
+                  </TableHead>
+                ))}
                 <TableHead className="font-medium text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredStudents.map((student) => (
                 <TableRow key={student.id} className="hover:bg-ike-neutral-light/50">
-                  <TableCell className="font-medium text-ike-neutral-dark">
-                    {student.name}
-                  </TableCell>
-                  <TableCell className="font-mono text-sm">
-                    {student.personalNumber}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <MapPin className="w-4 h-4 mr-1 text-ike-neutral" />
-                      {student.schoolMunicipality}
-                    </div>
-                  </TableCell>
-                  <TableCell>{student.school}</TableCell>
-                  <TableCell>{student.program}</TableCell>
-                  <TableCell>{getStatusBadge(student.status)}</TableCell>
-                  <TableCell>{getPaymentBadge(student.paymentStatus)}</TableCell>
-                  <TableCell className="text-right font-medium">
-                    {student.ikeCost.toLocaleString('sv-SE')}
-                  </TableCell>
+                  {columns.filter(col => col.visible).map((column) => (
+                    <TableCell key={column.key}>
+                      {column.key === 'name' && (
+                        <div className="font-medium text-ike-neutral-dark">
+                          {student.name}
+                        </div>
+                      )}
+                      {column.key === 'personalNumber' && (
+                        <div className="font-mono text-sm">
+                          {student.personalNumber}
+                        </div>
+                      )}
+                      {column.key === 'residenceMunicipality' && student.residenceMunicipality}
+                      {column.key === 'schoolMunicipality' && (
+                        <div className="flex items-center">
+                          <MapPin className="w-4 h-4 mr-1 text-ike-neutral" />
+                          {student.schoolMunicipality}
+                        </div>
+                      )}
+                      {column.key === 'school' && student.school}
+                      {column.key === 'program' && student.program}
+                      {column.key === 'class' && student.class}
+                      {column.key === 'status' && getStatusBadge(student.status)}
+                      {column.key === 'paymentStatus' && getPaymentBadge(student.paymentStatus)}
+                      {column.key === 'ikeCost' && (
+                        <div className="text-right font-medium">
+                          {student.ikeCost.toLocaleString('sv-SE')}
+                        </div>
+                      )}
+                    </TableCell>
+                  ))}
                   <TableCell className="text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
