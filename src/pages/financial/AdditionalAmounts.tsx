@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Plus, 
@@ -32,9 +39,13 @@ import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
 const AdditionalAmounts = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
 
   // Mock data for additional amounts
-  const additionalAmountsData = [
+  const [additionalAmountsData, setAdditionalAmountsData] = useState([
     {
       id: 1,
       studentPersonalId: "199901011234",
@@ -74,7 +85,7 @@ const AdditionalAmounts = () => {
       createdDate: "2024-11-25",
       description: "Computer equipment for technical program"
     }
-  ];
+  ]);
 
   // View management state
   const [savedViews, setSavedViews] = useState<SavedView[]>([
@@ -138,6 +149,32 @@ const AdditionalAmounts = () => {
     }
   };
 
+  const handleAddAmount = () => {
+    setShowAddDialog(true);
+  };
+
+  const handleEditAmount = (item: any) => {
+    setSelectedItem(item);
+    setShowEditDialog(true);
+  };
+
+  const handleDeleteAmount = (item: any) => {
+    setSelectedItem(item);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = () => {
+    if (selectedItem) {
+      setAdditionalAmountsData(prev => prev.filter(item => item.id !== selectedItem.id));
+      toast({
+        title: "Amount Deleted",
+        description: `Additional amount for ${selectedItem.studentName} has been deleted.`,
+      });
+      setShowDeleteDialog(false);
+      setSelectedItem(null);
+    }
+  };
+
   const filteredData = additionalAmountsData.filter(item =>
     item.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.schoolUnit.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -175,7 +212,10 @@ const AdditionalAmounts = () => {
             Manage additional amounts for students beyond standard pricing
           </p>
         </div>
-        <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+        <Button 
+          onClick={handleAddAmount}
+          className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+        >
           <Plus className="w-4 h-4 mr-2" />
           Add Additional Amount
         </Button>
@@ -316,10 +356,20 @@ const AdditionalAmounts = () => {
                     ))}
                     <TableCell className="text-center">
                       <div className="flex justify-center space-x-2">
-                        <Button variant="ghost" size="sm" className="text-ike-neutral hover:text-ike-primary">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleEditAmount(item)}
+                          className="text-ike-neutral hover:text-ike-primary"
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="text-ike-neutral hover:text-ike-error">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleDeleteAmount(item)}
+                          className="text-ike-neutral hover:text-ike-error"
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -331,6 +381,119 @@ const AdditionalAmounts = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Add Amount Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="bg-white border border-gray-200 shadow-lg">
+          <DialogHeader>
+            <DialogTitle>Add Additional Amount</DialogTitle>
+            <DialogDescription>
+              Create a new additional amount entry for a student.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-ike-neutral">
+              Additional amount form will be implemented here.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => {
+                setShowAddDialog(false);
+                toast({
+                  title: "Feature Coming Soon",
+                  description: "Add additional amount functionality will be implemented.",
+                });
+              }}
+              className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+            >
+              Add Amount
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Amount Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="bg-white border border-gray-200 shadow-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Additional Amount</DialogTitle>
+            <DialogDescription>
+              Modify the selected additional amount entry.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedItem && (
+              <div className="text-sm text-ike-neutral">
+                <p><strong>Student:</strong> {selectedItem.studentName}</p>
+                <p><strong>Amount Type:</strong> {selectedItem.amountType}</p>
+                <p><strong>Current Amount:</strong> {selectedItem.amount} SEK</p>
+              </div>
+            )}
+            <p className="text-sm text-ike-neutral">
+              Edit form will be implemented here.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => {
+                setShowEditDialog(false);
+                toast({
+                  title: "Feature Coming Soon",
+                  description: "Edit additional amount functionality will be implemented.",
+                });
+              }}
+              className="bg-ike-primary hover:bg-ike-primary-dark text-white"
+            >
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="bg-white border border-gray-200 shadow-lg">
+          <DialogHeader>
+            <DialogTitle>Delete Additional Amount</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this additional amount? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedItem && (
+              <div className="bg-ike-error/10 p-4 rounded-lg border border-ike-error/20">
+                <p className="text-sm text-ike-neutral-dark">
+                  <strong>Student:</strong> {selectedItem.studentName}
+                </p>
+                <p className="text-sm text-ike-neutral-dark">
+                  <strong>Amount Type:</strong> {selectedItem.amountType}
+                </p>
+                <p className="text-sm text-ike-neutral-dark">
+                  <strong>Amount:</strong> {selectedItem.amount} SEK
+                </p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={confirmDelete}
+              className="bg-ike-error hover:bg-ike-error/90 text-white"
+            >
+              Delete Amount
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
