@@ -3,6 +3,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { 
   Table,
   TableBody,
@@ -43,6 +52,18 @@ const AdditionalAmounts = () => {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
+
+  // Form state for Add/Edit
+  const [formData, setFormData] = useState({
+    studentPersonalId: "",
+    studentName: "",
+    schoolUnit: "",
+    principal: "",
+    amountType: "",
+    amount: "",
+    period: "",
+    description: ""
+  });
 
   // Mock data for additional amounts
   const [additionalAmountsData, setAdditionalAmountsData] = useState([
@@ -150,17 +171,103 @@ const AdditionalAmounts = () => {
   };
 
   const handleAddAmount = () => {
+    setFormData({
+      studentPersonalId: "",
+      studentName: "",
+      schoolUnit: "",
+      principal: "",
+      amountType: "",
+      amount: "",
+      period: "",
+      description: ""
+    });
     setShowAddDialog(true);
   };
 
   const handleEditAmount = (item: any) => {
     setSelectedItem(item);
+    setFormData({
+      studentPersonalId: item.studentPersonalId,
+      studentName: item.studentName,
+      schoolUnit: item.schoolUnit,
+      principal: item.principal,
+      amountType: item.amountType,
+      amount: item.amount.toString(),
+      period: item.period,
+      description: item.description
+    });
     setShowEditDialog(true);
   };
 
   const handleDeleteAmount = (item: any) => {
     setSelectedItem(item);
     setShowDeleteDialog(true);
+  };
+
+  const handleSaveAdd = () => {
+    if (!formData.studentName || !formData.amountType || !formData.amount) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newAmount = {
+      id: Date.now(),
+      studentPersonalId: formData.studentPersonalId,
+      studentName: formData.studentName,
+      schoolUnit: formData.schoolUnit,
+      principal: formData.principal,
+      amountType: formData.amountType,
+      amount: parseInt(formData.amount),
+      period: formData.period,
+      status: "pending",
+      createdDate: new Date().toISOString().split('T')[0],
+      description: formData.description
+    };
+
+    setAdditionalAmountsData(prev => [...prev, newAmount]);
+    setShowAddDialog(false);
+    toast({
+      title: "Additional Amount Added",
+      description: `Additional amount for ${formData.studentName} has been added successfully.`,
+    });
+  };
+
+  const handleSaveEdit = () => {
+    if (!formData.studentName || !formData.amountType || !formData.amount) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (selectedItem) {
+      const updatedAmount = {
+        ...selectedItem,
+        studentPersonalId: formData.studentPersonalId,
+        studentName: formData.studentName,
+        schoolUnit: formData.schoolUnit,
+        principal: formData.principal,
+        amountType: formData.amountType,
+        amount: parseInt(formData.amount),
+        period: formData.period,
+        description: formData.description
+      };
+
+      setAdditionalAmountsData(prev => 
+        prev.map(item => item.id === selectedItem.id ? updatedAmount : item)
+      );
+      setShowEditDialog(false);
+      toast({
+        title: "Additional Amount Updated",
+        description: `Additional amount for ${formData.studentName} has been updated successfully.`,
+      });
+    }
   };
 
   const confirmDelete = () => {
@@ -173,6 +280,13 @@ const AdditionalAmounts = () => {
       setShowDeleteDialog(false);
       setSelectedItem(null);
     }
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const filteredData = additionalAmountsData.filter(item =>
@@ -384,7 +498,7 @@ const AdditionalAmounts = () => {
 
       {/* Add Amount Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="bg-white border border-gray-200 shadow-lg">
+        <DialogContent className="max-w-2xl bg-white border border-gray-200 shadow-lg">
           <DialogHeader>
             <DialogTitle>Add Additional Amount</DialogTitle>
             <DialogDescription>
@@ -392,22 +506,110 @@ const AdditionalAmounts = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <p className="text-sm text-ike-neutral">
-              Additional amount form will be implemented here.
-            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="studentPersonalId">Personal ID *</Label>
+                <Input
+                  id="studentPersonalId"
+                  value={formData.studentPersonalId}
+                  onChange={(e) => handleInputChange('studentPersonalId', e.target.value)}
+                  placeholder="YYYYMMDD-XXXX"
+                  className="border-ike-primary/20 focus:border-ike-primary"
+                />
+              </div>
+              <div>
+                <Label htmlFor="studentName">Student Name *</Label>
+                <Input
+                  id="studentName"
+                  value={formData.studentName}
+                  onChange={(e) => handleInputChange('studentName', e.target.value)}
+                  placeholder="Enter student name"
+                  className="border-ike-primary/20 focus:border-ike-primary"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="schoolUnit">School Unit</Label>
+                <Input
+                  id="schoolUnit"
+                  value={formData.schoolUnit}
+                  onChange={(e) => handleInputChange('schoolUnit', e.target.value)}
+                  placeholder="Enter school unit"
+                  className="border-ike-primary/20 focus:border-ike-primary"
+                />
+              </div>
+              <div>
+                <Label htmlFor="principal">Principal</Label>
+                <Input
+                  id="principal"
+                  value={formData.principal}
+                  onChange={(e) => handleInputChange('principal', e.target.value)}
+                  placeholder="Enter principal name"
+                  className="border-ike-primary/20 focus:border-ike-primary"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="amountType">Amount Type *</Label>
+                <Select value={formData.amountType} onValueChange={(value) => handleInputChange('amountType', value)}>
+                  <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                    <SelectValue placeholder="Select amount type" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-gray-200 shadow-md z-50">
+                    <SelectItem value="Transport Support">Transport Support</SelectItem>
+                    <SelectItem value="Special Needs Support">Special Needs Support</SelectItem>
+                    <SelectItem value="Equipment Allowance">Equipment Allowance</SelectItem>
+                    <SelectItem value="Study Materials">Study Materials</SelectItem>
+                    <SelectItem value="Accommodation Support">Accommodation Support</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="amount">Amount (SEK) *</Label>
+                <Input
+                  id="amount"
+                  type="number"
+                  value={formData.amount}
+                  onChange={(e) => handleInputChange('amount', e.target.value)}
+                  placeholder="Enter amount"
+                  className="border-ike-primary/20 focus:border-ike-primary"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="period">Period</Label>
+              <Input
+                id="period"
+                value={formData.period}
+                onChange={(e) => handleInputChange('period', e.target.value)}
+                placeholder="YYYY-MM"
+                className="border-ike-primary/20 focus:border-ike-primary"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => handleInputChange('description', e.target.value)}
+                placeholder="Enter description for this additional amount"
+                rows={3}
+                className="border-ike-primary/20 focus:border-ike-primary"
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddDialog(false)}>
               Cancel
             </Button>
             <Button 
-              onClick={() => {
-                setShowAddDialog(false);
-                toast({
-                  title: "Feature Coming Soon",
-                  description: "Add additional amount functionality will be implemented.",
-                });
-              }}
+              onClick={handleSaveAdd}
               className="bg-ike-primary hover:bg-ike-primary-dark text-white"
             >
               Add Amount
@@ -418,7 +620,7 @@ const AdditionalAmounts = () => {
 
       {/* Edit Amount Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="bg-white border border-gray-200 shadow-lg">
+        <DialogContent className="max-w-2xl bg-white border border-gray-200 shadow-lg">
           <DialogHeader>
             <DialogTitle>Edit Additional Amount</DialogTitle>
             <DialogDescription>
@@ -426,29 +628,110 @@ const AdditionalAmounts = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            {selectedItem && (
-              <div className="text-sm text-ike-neutral">
-                <p><strong>Student:</strong> {selectedItem.studentName}</p>
-                <p><strong>Amount Type:</strong> {selectedItem.amountType}</p>
-                <p><strong>Current Amount:</strong> {selectedItem.amount} SEK</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-studentPersonalId">Personal ID *</Label>
+                <Input
+                  id="edit-studentPersonalId"
+                  value={formData.studentPersonalId}
+                  onChange={(e) => handleInputChange('studentPersonalId', e.target.value)}
+                  placeholder="YYYYMMDD-XXXX"
+                  className="border-ike-primary/20 focus:border-ike-primary"
+                />
               </div>
-            )}
-            <p className="text-sm text-ike-neutral">
-              Edit form will be implemented here.
-            </p>
+              <div>
+                <Label htmlFor="edit-studentName">Student Name *</Label>
+                <Input
+                  id="edit-studentName"
+                  value={formData.studentName}
+                  onChange={(e) => handleInputChange('studentName', e.target.value)}
+                  placeholder="Enter student name"
+                  className="border-ike-primary/20 focus:border-ike-primary"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-schoolUnit">School Unit</Label>
+                <Input
+                  id="edit-schoolUnit"
+                  value={formData.schoolUnit}
+                  onChange={(e) => handleInputChange('schoolUnit', e.target.value)}
+                  placeholder="Enter school unit"
+                  className="border-ike-primary/20 focus:border-ike-primary"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-principal">Principal</Label>
+                <Input
+                  id="edit-principal"
+                  value={formData.principal}
+                  onChange={(e) => handleInputChange('principal', e.target.value)}
+                  placeholder="Enter principal name"
+                  className="border-ike-primary/20 focus:border-ike-primary"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-amountType">Amount Type *</Label>
+                <Select value={formData.amountType} onValueChange={(value) => handleInputChange('amountType', value)}>
+                  <SelectTrigger className="border-ike-primary/20 focus:border-ike-primary">
+                    <SelectValue placeholder="Select amount type" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-gray-200 shadow-md z-50">
+                    <SelectItem value="Transport Support">Transport Support</SelectItem>
+                    <SelectItem value="Special Needs Support">Special Needs Support</SelectItem>
+                    <SelectItem value="Equipment Allowance">Equipment Allowance</SelectItem>
+                    <SelectItem value="Study Materials">Study Materials</SelectItem>
+                    <SelectItem value="Accommodation Support">Accommodation Support</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="edit-amount">Amount (SEK) *</Label>
+                <Input
+                  id="edit-amount"
+                  type="number"
+                  value={formData.amount}
+                  onChange={(e) => handleInputChange('amount', e.target.value)}
+                  placeholder="Enter amount"
+                  className="border-ike-primary/20 focus:border-ike-primary"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="edit-period">Period</Label>
+              <Input
+                id="edit-period"
+                value={formData.period}
+                onChange={(e) => handleInputChange('period', e.target.value)}
+                placeholder="YYYY-MM"
+                className="border-ike-primary/20 focus:border-ike-primary"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="edit-description">Description</Label>
+              <Textarea
+                id="edit-description"
+                value={formData.description}
+                onChange={(e) => handleInputChange('description', e.target.value)}
+                placeholder="Enter description for this additional amount"
+                rows={3}
+                className="border-ike-primary/20 focus:border-ike-primary"
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowEditDialog(false)}>
               Cancel
             </Button>
             <Button 
-              onClick={() => {
-                setShowEditDialog(false);
-                toast({
-                  title: "Feature Coming Soon",
-                  description: "Edit additional amount functionality will be implemented.",
-                });
-              }}
+              onClick={handleSaveEdit}
               className="bg-ike-primary hover:bg-ike-primary-dark text-white"
             >
               Save Changes
