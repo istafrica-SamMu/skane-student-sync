@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
 import { 
   BarChart3, 
   TrendingUp, 
@@ -30,7 +31,11 @@ import {
   MapPin,
   Search,
   Settings,
-  Database
+  Database,
+  Trash2,
+  Edit,
+  Check,
+  X
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, ComposedChart, Area, AreaChart } from 'recharts';
 
@@ -77,6 +82,7 @@ const reconciliationHistory = [
 ];
 
 export default function StatisticsDashboard() {
+  const { toast } = useToast();
   const [filterOpen, setFilterOpen] = useState(false);
   const [mapView, setMapView] = useState(false);
   const [currentView, setCurrentView] = useState('current');
@@ -85,6 +91,12 @@ export default function StatisticsDashboard() {
   const [newViewName, setNewViewName] = useState('');
   const [selectedReconciliation, setSelectedReconciliation] = useState('');
   const [showHistoricalData, setShowHistoricalData] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
+  const [saveViewOpen, setSaveViewOpen] = useState(false);
+  const [customExportOpen, setCustomExportOpen] = useState(false);
+  const [deleteViewOpen, setDeleteViewOpen] = useState(false);
+  const [viewToDelete, setViewToDelete] = useState('');
   const [selectedFilters, setSelectedFilters] = useState({
     timePeriod: '',
     educationalPath: '',
@@ -93,29 +105,118 @@ export default function StatisticsDashboard() {
     region: 'all',
     reconciliationDate: ''
   });
+  const [customExportSettings, setCustomExportSettings] = useState({
+    studentEnrollment: true,
+    educationPaths: false,
+    pathChanges: false,
+    schoolUnits: false,
+    paymentStreams: true,
+    geographical: false,
+    format: 'xlsx'
+  });
 
   const handleSaveView = () => {
     if (newViewName.trim()) {
       setSavedViews([...savedViews, newViewName.trim()]);
       setNewViewName('');
+      setSaveViewOpen(false);
+      toast({
+        title: "View Saved",
+        description: `Analysis view "${newViewName.trim()}" has been saved successfully.`,
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Please enter a valid view name.",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleExport = (format: string) => {
+  const handleDeleteView = (viewName: string) => {
+    setViewToDelete(viewName);
+    setDeleteViewOpen(true);
+  };
+
+  const confirmDeleteView = () => {
+    setSavedViews(savedViews.filter(view => view !== viewToDelete));
+    setDeleteViewOpen(false);
+    setViewToDelete('');
+    toast({
+      title: "View Deleted",
+      description: `Analysis view "${viewToDelete}" has been deleted.`,
+    });
+  };
+
+  const handleLoadView = (viewName: string) => {
+    toast({
+      title: "View Loaded",
+      description: `Analysis view "${viewName}" has been loaded successfully.`,
+    });
+    console.log(`Loading saved view: ${viewName}`);
+  };
+
+  const handleExport = async (format: string) => {
+    setIsExporting(true);
+    setExportProgress(0);
+    
+    // Simulate export progress
+    const progressInterval = setInterval(() => {
+      setExportProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          setIsExporting(false);
+          toast({
+            title: "Export Complete",
+            description: `${format} exported as editable Excel file successfully!`,
+          });
+          return 100;
+        }
+        return prev + 20;
+      });
+    }, 500);
+
     console.log(`Exporting ${format} in Excel format...`);
-    // Simulate Excel export with editable format
-    setTimeout(() => {
-      alert(`${format} exported as editable Excel file successfully!`);
-    }, 1000);
+  };
+
+  const handleCustomExport = async () => {
+    const selectedFields = Object.entries(customExportSettings)
+      .filter(([key, value]) => value && key !== 'format')
+      .map(([key]) => key);
+
+    if (selectedFields.length === 0) {
+      toast({
+        title: "No Data Selected",
+        description: "Please select at least one data field to export.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setCustomExportOpen(false);
+    await handleExport('Custom IKE Data');
   };
 
   const handleReconciliationSelect = (reconciliationDate: string) => {
     setSelectedReconciliation(reconciliationDate);
     setShowHistoricalData(true);
+    toast({
+      title: "Historical Data Loaded",
+      description: `Data for reconciliation ${reconciliationDate} has been loaded.`,
+    });
     console.log(`Loading data for reconciliation: ${reconciliationDate}`);
   };
 
   const applyFilters = () => {
+    const activeFilters = Object.entries(selectedFilters)
+      .filter(([key, value]) => value && value !== 'all' && value !== '')
+      .length;
+
+    toast({
+      title: "Filters Applied",
+      description: `${activeFilters} filter(s) have been applied to the analysis.`,
+    });
+    
     console.log('Applied filters:', selectedFilters);
     setFilterOpen(false);
   };
@@ -129,6 +230,19 @@ export default function StatisticsDashboard() {
       region: 'all',
       reconciliationDate: ''
     });
+    
+    toast({
+      title: "Filters Reset",
+      description: "All filters have been reset to default values.",
+    });
+  };
+
+  const toggleMapView = () => {
+    setMapView(!mapView);
+    toast({
+      title: mapView ? "Chart View Activated" : "Map View Activated",
+      description: mapView ? "Switched to statistical chart view." : "Switched to geographical map view.",
+    });
   };
 
   return (
@@ -139,7 +253,7 @@ export default function StatisticsDashboard() {
           <p className="text-ike-neutral">Comprehensive analysis and reporting for Skåne IKE collaboration area</p>
         </div>
         
-        {/* Saved Views and Controls */}
+        {/* Enhanced Controls */}
         <div className="flex items-center space-x-4">
           <Select value={selectedReconciliation} onValueChange={handleReconciliationSelect}>
             <SelectTrigger className="w-56">
@@ -154,18 +268,33 @@ export default function StatisticsDashboard() {
             </SelectContent>
           </Select>
           
-          <Select>
+          <Select onValueChange={handleLoadView}>
             <SelectTrigger className="w-48">
               <SelectValue placeholder="Load Saved View" />
             </SelectTrigger>
             <SelectContent>
               {savedViews.map((view, index) => (
-                <SelectItem key={index} value={view}>{view}</SelectItem>
+                <SelectItem key={index} value={view}>
+                  <div className="flex items-center justify-between w-full">
+                    <span>{view}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-1 ml-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteView(view);
+                      }}
+                    >
+                      <Trash2 className="w-3 h-3 text-red-500" />
+                    </Button>
+                  </div>
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
           
-          <Dialog>
+          <Dialog open={saveViewOpen} onOpenChange={setSaveViewOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
                 <Save className="w-4 h-4 mr-2" />
@@ -187,18 +316,26 @@ export default function StatisticsDashboard() {
                     value={newViewName}
                     onChange={(e) => setNewViewName(e.target.value)}
                     placeholder="Enter analysis view name..."
+                    className="mt-1"
                   />
                 </div>
-                <Button onClick={handleSaveView} className="w-full">
-                  Save Analysis View
-                </Button>
+                <div className="flex space-x-2">
+                  <Button onClick={handleSaveView} className="flex-1">
+                    <Check className="w-4 h-4 mr-2" />
+                    Save View
+                  </Button>
+                  <Button variant="outline" onClick={() => setSaveViewOpen(false)} className="flex-1">
+                    <X className="w-4 h-4 mr-2" />
+                    Cancel
+                  </Button>
+                </div>
               </div>
             </DialogContent>
           </Dialog>
 
           <Button
             variant={mapView ? "default" : "outline"}
-            onClick={() => setMapView(!mapView)}
+            onClick={toggleMapView}
           >
             <Map className="w-4 h-4 mr-2" />
             {mapView ? 'Chart View' : 'Geographical Analysis'}
@@ -206,13 +343,62 @@ export default function StatisticsDashboard() {
         </div>
       </div>
 
+      {/* Export Progress Modal */}
+      {isExporting && (
+        <Dialog open={isExporting} onOpenChange={() => {}}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Exporting Data</DialogTitle>
+              <DialogDescription>
+                Please wait while we prepare your Excel export file...
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div 
+                  className="bg-ike-primary h-2.5 rounded-full transition-all duration-300"
+                  style={{ width: `${exportProgress}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-center text-ike-neutral">{exportProgress}% Complete</p>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Delete View Confirmation Modal */}
+      <Dialog open={deleteViewOpen} onOpenChange={setDeleteViewOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Saved View</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete the view "{viewToDelete}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex space-x-2">
+            <Button variant="destructive" onClick={confirmDeleteView} className="flex-1">
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete View
+            </Button>
+            <Button variant="outline" onClick={() => setDeleteViewOpen(false)} className="flex-1">
+              Cancel
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <div className="flex space-x-6">
-        {/* Enhanced Filter Panel for IKE Requirements */}
+        {/* Enhanced Filter Panel */}
         <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" className="mb-4">
               <Filter className="w-4 h-4 mr-2" />
               IKE Analysis Filters
+              {Object.values(selectedFilters).filter(value => value && value !== 'all').length > 0 && (
+                <Badge variant="secondary" className="ml-2">
+                  {Object.values(selectedFilters).filter(value => value && value !== 'all').length}
+                </Badge>
+              )}
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-96">
@@ -243,7 +429,6 @@ export default function StatisticsDashboard() {
                 </Select>
               </div>
 
-              {/* Historical Reconciliation Data */}
               <div>
                 <Label className="text-sm font-medium">Historical Reconciliation Data</Label>
                 <Select value={selectedFilters.reconciliationDate} onValueChange={(value) => setSelectedFilters({...selectedFilters, reconciliationDate: value})}>
@@ -261,7 +446,6 @@ export default function StatisticsDashboard() {
                 </Select>
               </div>
 
-              {/* Educational Path Changes Filter */}
               <div>
                 <Label className="text-sm font-medium">Educational Path Changes</Label>
                 <Select value={selectedFilters.educationalPath} onValueChange={(value) => setSelectedFilters({...selectedFilters, educationalPath: value})}>
@@ -279,7 +463,6 @@ export default function StatisticsDashboard() {
                 </Select>
               </div>
 
-              {/* School Unit Changes Filter */}
               <div>
                 <Label className="text-sm font-medium">School Unit Changes</Label>
                 <Select value={selectedFilters.schoolUnit} onValueChange={(value) => setSelectedFilters({...selectedFilters, schoolUnit: value})}>
@@ -296,7 +479,6 @@ export default function StatisticsDashboard() {
                 </Select>
               </div>
 
-              {/* Payment Streams Filter */}
               <div>
                 <Label className="text-sm font-medium">Payment Streams Analysis</Label>
                 <Select value={selectedFilters.paymentStream} onValueChange={(value) => setSelectedFilters({...selectedFilters, paymentStream: value})}>
@@ -314,7 +496,6 @@ export default function StatisticsDashboard() {
                 </Select>
               </div>
 
-              {/* Time Period */}
               <div>
                 <Label className="text-sm font-medium">Time Period Analysis</Label>
                 <Select value={selectedFilters.timePeriod} onValueChange={(value) => setSelectedFilters({...selectedFilters, timePeriod: value})}>
@@ -335,8 +516,14 @@ export default function StatisticsDashboard() {
               <Separator />
 
               <div className="space-y-3">
-                <Button onClick={applyFilters} className="w-full">Apply IKE Filters</Button>
-                <Button variant="outline" onClick={resetFilters} className="w-full">Reset All Filters</Button>
+                <Button onClick={applyFilters} className="w-full">
+                  <Check className="w-4 h-4 mr-2" />
+                  Apply IKE Filters
+                </Button>
+                <Button variant="outline" onClick={resetFilters} className="w-full">
+                  <X className="w-4 h-4 mr-2" />
+                  Reset All Filters
+                </Button>
               </div>
             </div>
           </SheetContent>
@@ -346,7 +533,7 @@ export default function StatisticsDashboard() {
           {/* Enhanced Quick Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             {quickStatsData.map((stat, index) => (
-              <Card key={index}>
+              <Card key={index} className="hover:shadow-md transition-shadow cursor-pointer">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
                   <stat.icon className="h-4 w-4 text-ike-neutral" />
@@ -397,7 +584,6 @@ export default function StatisticsDashboard() {
             </Card>
           ) : (
             <div className="space-y-6">
-              {/* Current Data View */}
               {currentView === 'current' && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Card>
@@ -452,7 +638,6 @@ export default function StatisticsDashboard() {
                 </div>
               )}
 
-              {/* Historical Comparison View */}
               {currentView === 'comparison' && (
                 <Card>
                   <CardHeader>
@@ -475,7 +660,6 @@ export default function StatisticsDashboard() {
                 </Card>
               )}
 
-              {/* Regional Analysis View */}
               {currentView === 'regional' && (
                 <Card>
                   <CardHeader>
@@ -485,7 +669,7 @@ export default function StatisticsDashboard() {
                   <CardContent>
                     <div className="space-y-4">
                       {regionalData.map((region, index) => (
-                        <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div key={index} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                           <div className="flex items-center space-x-4">
                             <MapPin className="w-5 h-5 text-ike-primary" />
                             <div>
@@ -519,6 +703,7 @@ export default function StatisticsDashboard() {
                 variant="outline" 
                 className="w-full justify-start"
                 onClick={() => handleExport('IKE Monthly Statistical Report')}
+                disabled={isExporting}
               >
                 <FileDown className="w-4 h-4 mr-2" />
                 Monthly IKE Report
@@ -528,6 +713,7 @@ export default function StatisticsDashboard() {
                 variant="outline" 
                 className="w-full justify-start"
                 onClick={() => handleExport('Educational Path Analysis')}
+                disabled={isExporting}
               >
                 <FileDown className="w-4 h-4 mr-2" />
                 Educational Path Analysis
@@ -537,6 +723,7 @@ export default function StatisticsDashboard() {
                 variant="outline" 
                 className="w-full justify-start"
                 onClick={() => handleExport('Payment Stream Analysis')}
+                disabled={isExporting}
               >
                 <FileDown className="w-4 h-4 mr-2" />
                 Payment Stream Analysis
@@ -546,14 +733,15 @@ export default function StatisticsDashboard() {
                 variant="outline" 
                 className="w-full justify-start"
                 onClick={() => handleExport('Regional Comparison Report')}
+                disabled={isExporting}
               >
                 <FileDown className="w-4 h-4 mr-2" />
                 Regional Comparison
               </Button>
               
-              <Dialog>
+              <Dialog open={customExportOpen} onOpenChange={setCustomExportOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button variant="outline" className="w-full justify-start" disabled={isExporting}>
                     <Download className="w-4 h-4 mr-2" />
                     Custom IKE Export
                   </Button>
@@ -571,15 +759,27 @@ export default function StatisticsDashboard() {
                         <Label className="font-medium">Student Data</Label>
                         <div className="space-y-2">
                           <div className="flex items-center space-x-2">
-                            <Checkbox id="student-enrollment" defaultChecked />
+                            <Checkbox 
+                              id="student-enrollment" 
+                              checked={customExportSettings.studentEnrollment}
+                              onCheckedChange={(checked) => setCustomExportSettings(prev => ({...prev, studentEnrollment: checked as boolean}))}
+                            />
                             <Label htmlFor="student-enrollment" className="text-sm">Student Enrollment</Label>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <Checkbox id="education-paths" />
+                            <Checkbox 
+                              id="education-paths" 
+                              checked={customExportSettings.educationPaths}
+                              onCheckedChange={(checked) => setCustomExportSettings(prev => ({...prev, educationPaths: checked as boolean}))}
+                            />
                             <Label htmlFor="education-paths" className="text-sm">Educational Paths</Label>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <Checkbox id="path-changes" />
+                            <Checkbox 
+                              id="path-changes" 
+                              checked={customExportSettings.pathChanges}
+                              onCheckedChange={(checked) => setCustomExportSettings(prev => ({...prev, pathChanges: checked as boolean}))}
+                            />
                             <Label htmlFor="path-changes" className="text-sm">Path Changes</Label>
                           </div>
                         </div>
@@ -588,21 +788,36 @@ export default function StatisticsDashboard() {
                         <Label className="font-medium">System Data</Label>
                         <div className="space-y-2">
                           <div className="flex items-center space-x-2">
-                            <Checkbox id="school-units" />
+                            <Checkbox 
+                              id="school-units" 
+                              checked={customExportSettings.schoolUnits}
+                              onCheckedChange={(checked) => setCustomExportSettings(prev => ({...prev, schoolUnits: checked as boolean}))}
+                            />
                             <Label htmlFor="school-units" className="text-sm">School Units</Label>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <Checkbox id="payment-streams" defaultChecked />
+                            <Checkbox 
+                              id="payment-streams" 
+                              checked={customExportSettings.paymentStreams}
+                              onCheckedChange={(checked) => setCustomExportSettings(prev => ({...prev, paymentStreams: checked as boolean}))}
+                            />
                             <Label htmlFor="payment-streams" className="text-sm">Payment Streams</Label>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <Checkbox id="geographical" />
+                            <Checkbox 
+                              id="geographical" 
+                              checked={customExportSettings.geographical}
+                              onCheckedChange={(checked) => setCustomExportSettings(prev => ({...prev, geographical: checked as boolean}))}
+                            />
                             <Label htmlFor="geographical" className="text-sm">Geographical Data</Label>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <Select>
+                    <Select 
+                      value={customExportSettings.format} 
+                      onValueChange={(value) => setCustomExportSettings(prev => ({...prev, format: value}))}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Export Format" />
                       </SelectTrigger>
@@ -612,12 +827,15 @@ export default function StatisticsDashboard() {
                         <SelectItem value="pdf">PDF Report - Formatted</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Button 
-                      className="w-full"
-                      onClick={() => handleExport('Custom IKE Data')}
-                    >
-                      Export IKE Data
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button onClick={handleCustomExport} className="flex-1">
+                        <Download className="w-4 h-4 mr-2" />
+                        Export IKE Data
+                      </Button>
+                      <Button variant="outline" onClick={() => setCustomExportOpen(false)} className="flex-1">
+                        Cancel
+                      </Button>
+                    </div>
                   </div>
                 </DialogContent>
               </Dialog>
