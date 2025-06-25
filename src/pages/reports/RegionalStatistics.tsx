@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -273,7 +272,7 @@ export default function RegionalStatistics() {
                 <CardTitle className="flex items-center text-ike-neutral-dark">
                   <Users className="w-5 h-5 mr-2 text-ike-primary" />
                   De-identified Student Data Sample
-                  <Shield className="w-4 h-4 ml-2 text-ike-success" title="De-identified Data" />
+                  <Shield className="w-4 h-4 ml-2 text-ike-success" />
                 </CardTitle>
                 <CardDescription>
                   Sample of de-identified regional student data (Municipal Principals can view all placements)
@@ -339,7 +338,7 @@ export default function RegionalStatistics() {
               <CardTitle className="flex items-center text-ike-neutral-dark">
                 <Users className="w-5 h-5 mr-2 text-ike-primary" />
                 Regional Student Data Access
-                <Shield className="w-4 h-4 ml-2 text-ike-success" title="De-identified Data" />
+                <Shield className="w-4 h-4 ml-2 text-ike-success" />
               </CardTitle>
               <CardDescription>
                 Access comprehensive de-identified student data across the collaboration area

@@ -157,7 +157,7 @@ const RegionalPriceCodeAnalysis = () => {
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <Filter className="w-5 h-5 mr-2 text-ike-primary" />
             Regional Price Code Analysis Filters
-            <Shield className="w-4 h-4 ml-2 text-ike-success" title="De-identified Data" />
+            <Shield className="w-4 h-4 ml-2 text-ike-success" />
           </CardTitle>
           <CardDescription>
             Filter and analyze regional price codes across municipalities
@@ -239,7 +239,7 @@ const RegionalPriceCodeAnalysis = () => {
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <DollarSign className="w-5 h-5 mr-2 text-ike-primary" />
             Regional Price Code Details
-            <Shield className="w-4 h-4 ml-2 text-ike-success" title="De-identified Data" />
+            <Shield className="w-4 h-4 ml-2 text-ike-success" />
           </CardTitle>
           <CardDescription>
             Detailed breakdown of price codes across municipalities

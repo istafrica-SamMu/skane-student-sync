@@ -44,7 +44,7 @@ const RegionalHistoricalTracking = () => {
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <TrendingUp className="w-5 h-5 mr-2 text-ike-primary" />
             Regional Historical Tracking
-            <Shield className="w-4 h-4 ml-2 text-ike-success" title="De-identified Data" />
+            <Shield className="w-4 h-4 ml-2 text-ike-success" />
           </CardTitle>
           <CardDescription>
             Follow selected students across the collaboration area over time (de-identified data)
@@ -141,7 +141,7 @@ const RegionalHistoricalTracking = () => {
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <Users className="w-5 h-5 mr-2 text-ike-primary" />
             Regional Change History
-            <Shield className="w-4 h-4 ml-2 text-ike-success" title="De-identified Data" />
+            <Shield className="w-4 h-4 ml-2 text-ike-success" />
           </CardTitle>
           <CardDescription>
             De-identified timeline of changes across the collaboration area

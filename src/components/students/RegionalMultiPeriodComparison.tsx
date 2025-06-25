@@ -144,7 +144,7 @@ const RegionalMultiPeriodComparison = () => {
           <CardTitle className="flex items-center text-ike-neutral-dark">
             <BarChart3 className="w-5 h-5 mr-2 text-ike-primary" />
             Regional Multi-Period Comparison
-            <Shield className="w-4 h-4 ml-2 text-ike-success" title="De-identified Data" />
+            <Shield className="w-4 h-4 ml-2 text-ike-success" />
           </CardTitle>
           <CardDescription>
             Compare de-identified regional data across multiple reconciliation periods (up to 5 columns)
