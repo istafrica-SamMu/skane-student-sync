@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -151,6 +152,13 @@ const AppContent = () => {
               <Route path="/reports/statistics-dashboard" element={
                 <ProtectedRoute>
                   <StatisticsDashboard />
+                </ProtectedRoute>
+              } />
+              
+              {/* Regional Statistics Route */}
+              <Route path="/reports/regional-statistics" element={
+                <ProtectedRoute>
+                  <RegionalStatistics />
                 </ProtectedRoute>
               } />
               
@@ -554,20 +562,22 @@ const AppContent = () => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <LanguageProvider>
-        <AuthProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
-        </AuthProvider>
-      </LanguageProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <BrowserRouter>
+              <AppContent />
+              <Toaster />
+              <Sonner />
+            </BrowserRouter>
+          </AuthProvider>
+        </LanguageProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;

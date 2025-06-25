@@ -158,6 +158,11 @@ export const regionalAdminMenu: MenuItem[] = [
         icon: LineChart,
       },
       {
+        title: "Regional Statistics",
+        url: "/reports/regional-statistics",
+        icon: BarChart3,
+      },
+      {
         title: "Change Lists",
         url: "/reports/change-lists",
         icon: FileText,
@@ -373,6 +378,11 @@ export const municipalityAdminMenu: MenuItem[] = [
         icon: LineChart,
       },
       {
+        title: "Regional Statistics",
+        url: "/reports/regional-statistics",
+        icon: BarChart3,
+      },
+      {
         title: "Reports Dashboard",
         url: "/reports/dashboard",
         icon: BarChart3,
@@ -524,6 +534,11 @@ export const schoolAdminMenu: MenuItem[] = [
         title: "Statistics Dashboard",
         url: "/reports/statistics-dashboard",
         icon: LineChart,
+      },
+      {
+        title: "Regional Statistics",
+        url: "/reports/regional-statistics",
+        icon: BarChart3,
       },
       {
         title: "Reports Dashboard",
