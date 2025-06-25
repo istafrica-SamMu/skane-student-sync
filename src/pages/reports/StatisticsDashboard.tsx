@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -1021,8 +1022,8 @@ export default function StatisticsDashboard() {
                         <Area type="monotone" dataKey="transfers" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
                         <Area type="monotone" dataKey="paymentStreams" stackId="1" stroke="#ffc658" fill="#ffc658" />
                       </AreaChart>
-                    </CardContent>
-                  </Card>
+                    </ResponsiveContainer>
+                  </CardContent>
                 </Card>
               )}
 
