@@ -86,6 +86,7 @@ import ConflictResolution from "./pages/students/ConflictResolution";
 import ReportsDashboard from "./pages/reports/ReportsDashboard";
 import ChangeLists from "./pages/reports/ChangeLists";
 import ErrorLists from "./pages/reports/ErrorLists";
+import StatisticsDashboard from "./pages/reports/StatisticsDashboard";
 
 const queryClient = new QueryClient();
 
@@ -143,6 +144,13 @@ const AppContent = () => {
               <Route path="/statistics" element={
                 <ProtectedRoute>
                   <Statistics />
+                </ProtectedRoute>
+              } />
+              
+              {/* Statistics Dashboard Route */}
+              <Route path="/reports/statistics-dashboard" element={
+                <ProtectedRoute>
+                  <StatisticsDashboard />
                 </ProtectedRoute>
               } />
               

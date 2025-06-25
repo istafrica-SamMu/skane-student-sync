@@ -48,7 +48,8 @@ import {
   Ban,
   IdCard,
   Receipt,
-  Contact
+  Contact,
+  LineChart
 } from "lucide-react";
 
 export interface MenuItem {
@@ -151,6 +152,11 @@ export const regionalAdminMenu: MenuItem[] = [
     title: "Reports & Analytics",
     icon: FileText,
     items: [
+      {
+        title: "Statistics Dashboard",
+        url: "/reports/statistics-dashboard",
+        icon: LineChart,
+      },
       {
         title: "Change Lists",
         url: "/reports/change-lists",
@@ -362,6 +368,11 @@ export const municipalityAdminMenu: MenuItem[] = [
     icon: FileText,
     items: [
       {
+        title: "Statistics Dashboard",
+        url: "/reports/statistics-dashboard",
+        icon: LineChart,
+      },
+      {
         title: "Reports Dashboard",
         url: "/reports/dashboard",
         icon: BarChart3,
@@ -509,6 +520,11 @@ export const schoolAdminMenu: MenuItem[] = [
     title: "Reports",
     icon: FileText,
     items: [
+      {
+        title: "Statistics Dashboard",
+        url: "/reports/statistics-dashboard",
+        icon: LineChart,
+      },
       {
         title: "Reports Dashboard",
         url: "/reports/dashboard",
