@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -97,6 +96,15 @@ export default function StatisticsDashboard() {
   const [customExportOpen, setCustomExportOpen] = useState(false);
   const [deleteViewOpen, setDeleteViewOpen] = useState(false);
   const [viewToDelete, setViewToDelete] = useState('');
+  
+  // New states for Quick Analysis Tools
+  const [trendAnalysisOpen, setTrendAnalysisOpen] = useState(false);
+  const [regionalBreakdownOpen, setRegionalBreakdownOpen] = useState(false);
+  const [reconciliationHistoryOpen, setReconciliationHistoryOpen] = useState(false);
+  const [transferAnalysisOpen, setTransferAnalysisOpen] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState(0);
+  
   const [selectedFilters, setSelectedFilters] = useState({
     timePeriod: '',
     educationalPath: '',
@@ -245,6 +253,107 @@ export default function StatisticsDashboard() {
     });
   };
 
+  const handleTrendAnalysis = async () => {
+    setTrendAnalysisOpen(false);
+    setIsAnalyzing(true);
+    setAnalysisProgress(0);
+    
+    const progressInterval = setInterval(() => {
+      setAnalysisProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          setIsAnalyzing(false);
+          setCurrentView('comparison');
+          toast({
+            title: "Trend Analysis Complete",
+            description: "Historical trend analysis has been generated and applied to the dashboard.",
+          });
+          return 100;
+        }
+        return prev + 25;
+      });
+    }, 800);
+
+    console.log('Running trend analysis...');
+  };
+
+  const handleRegionalBreakdown = async () => {
+    setRegionalBreakdownOpen(false);
+    setIsAnalyzing(true);
+    setAnalysisProgress(0);
+    
+    const progressInterval = setInterval(() => {
+      setAnalysisProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          setIsAnalyzing(false);
+          setCurrentView('regional');
+          toast({
+            title: "Regional Analysis Complete",
+            description: "Regional breakdown analysis has been generated and applied to the dashboard.",
+          });
+          return 100;
+        }
+        return prev + 20;
+      });
+    }, 600);
+
+    console.log('Running regional breakdown analysis...');
+  };
+
+  const handleReconciliationHistory = async () => {
+    setReconciliationHistoryOpen(false);
+    setIsAnalyzing(true);
+    setAnalysisProgress(0);
+    
+    const progressInterval = setInterval(() => {
+      setAnalysisProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          setIsAnalyzing(false);
+          setShowHistoricalData(true);
+          toast({
+            title: "Reconciliation History Analysis Complete",
+            description: "Historical reconciliation data has been loaded and is ready for comparison.",
+          });
+          return 100;
+        }
+        return prev + 30;
+      });
+    }, 700);
+
+    console.log('Loading reconciliation history analysis...');
+  };
+
+  const handleTransferAnalysis = async () => {
+    setTransferAnalysisOpen(false);
+    setIsAnalyzing(true);
+    setAnalysisProgress(0);
+    
+    const progressInterval = setInterval(() => {
+      setAnalysisProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          setIsAnalyzing(false);
+          // Apply transfer-specific filters
+          setSelectedFilters(prev => ({
+            ...prev,
+            educationalPath: 'changes',
+            schoolUnit: 'transfers'
+          }));
+          toast({
+            title: "Transfer Analysis Complete",
+            description: "Student transfer and path change analysis has been applied to the dashboard.",
+          });
+          return 100;
+        }
+        return prev + 15;
+      });
+    }, 500);
+
+    console.log('Running transfer analysis...');
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -383,6 +492,263 @@ export default function StatisticsDashboard() {
             <Button variant="outline" onClick={() => setDeleteViewOpen(false)} className="flex-1">
               Cancel
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Analysis Progress Modal */}
+      {isAnalyzing && (
+        <Dialog open={isAnalyzing} onOpenChange={() => {}}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Running Analysis</DialogTitle>
+              <DialogDescription>
+                Please wait while we process your analysis request...
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div 
+                  className="bg-ike-primary h-2.5 rounded-full transition-all duration-300"
+                  style={{ width: `${analysisProgress}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-center text-ike-neutral">{analysisProgress}% Complete</p>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Trend Analysis Modal */}
+      <Dialog open={trendAnalysisOpen} onOpenChange={setTrendAnalysisOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>IKE Trend Analysis</DialogTitle>
+            <DialogDescription>
+              Analyze historical trends across student enrollment, educational paths, and payment streams.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Analysis Period</Label>
+                <Select defaultValue="6months">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="3months">Last 3 Months</SelectItem>
+                    <SelectItem value="6months">Last 6 Months</SelectItem>
+                    <SelectItem value="1year">Last Year</SelectItem>
+                    <SelectItem value="2years">Last 2 Years</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Focus Area</Label>
+                <Select defaultValue="all">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Areas</SelectItem>
+                    <SelectItem value="enrollment">Student Enrollment</SelectItem>
+                    <SelectItem value="pathchanges">Educational Path Changes</SelectItem>
+                    <SelectItem value="payments">Payment Streams</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="flex space-x-2">
+              <Button onClick={handleTrendAnalysis} className="flex-1">
+                <TrendingUp className="w-4 h-4 mr-2" />
+                Run Trend Analysis
+              </Button>
+              <Button variant="outline" onClick={() => setTrendAnalysisOpen(false)} className="flex-1">
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Regional Breakdown Modal */}
+      <Dialog open={regionalBreakdownOpen} onOpenChange={setRegionalBreakdownOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Regional Breakdown Analysis</DialogTitle>
+            <DialogDescription>
+              Generate detailed statistics for Skåne regions and municipalities.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Regional Scope</Label>
+              <Select defaultValue="all">
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Entire Skåne Collaboration Area</SelectItem>
+                  <SelectItem value="north">North Skåne Region</SelectItem>
+                  <SelectItem value="south">South Skåne Region</SelectItem>
+                  <SelectItem value="municipalities">By Municipality</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Analysis Metrics</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="students" defaultChecked />
+                  <Label htmlFor="students" className="text-sm">Student Distribution</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="schoolunits" defaultChecked />
+                  <Label htmlFor="schoolunits" className="text-sm">School Units</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="compensation" defaultChecked />
+                  <Label htmlFor="compensation" className="text-sm">Compensation Flows</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="transfers" />
+                  <Label htmlFor="transfers" className="text-sm">Transfer Patterns</Label>
+                </div>
+              </div>
+            </div>
+            <div className="flex space-x-2">
+              <Button onClick={handleRegionalBreakdown} className="flex-1">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Generate Regional Analysis
+              </Button>
+              <Button variant="outline" onClick={() => setRegionalBreakdownOpen(false)} className="flex-1">
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reconciliation History Modal */}
+      <Dialog open={reconciliationHistoryOpen} onOpenChange={setReconciliationHistoryOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reconciliation History Analysis</DialogTitle>
+            <DialogDescription>
+              Compare current data with previous reconciliation periods for trend analysis.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Comparison Periods</Label>
+              <div className="space-y-2 mt-2">
+                {reconciliationHistory.slice(0, 3).map((reconciliation, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <Checkbox id={`reconciliation-${index}`} defaultChecked={index < 2} />
+                    <Label htmlFor={`reconciliation-${index}`} className="text-sm">
+                      {reconciliation.date} - {reconciliation.type} ({reconciliation.records} records)
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label>Analysis Focus</Label>
+              <Select defaultValue="variance">
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="variance">Period-to-Period Variance</SelectItem>
+                  <SelectItem value="trends">Long-term Trends</SelectItem>
+                  <SelectItem value="anomalies">Anomaly Detection</SelectItem>
+                  <SelectItem value="growth">Growth Analysis</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex space-x-2">
+              <Button onClick={handleReconciliationHistory} className="flex-1">
+                <History className="w-4 h-4 mr-2" />
+                Run Historical Comparison
+              </Button>
+              <Button variant="outline" onClick={() => setReconciliationHistoryOpen(false)} className="flex-1">
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Transfer Analysis Modal */}
+      <Dialog open={transferAnalysisOpen} onOpenChange={setTransferAnalysisOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Student Transfer Analysis</DialogTitle>
+            <DialogDescription>
+              Analyze educational path changes and school unit transfers within the IKE system.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Transfer Type</Label>
+                <Select defaultValue="all">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Transfers</SelectItem>
+                    <SelectItem value="pathchange">Educational Path Changes</SelectItem>
+                    <SelectItem value="schoolunit">School Unit Changes</SelectItem>
+                    <SelectItem value="municipal">Municipal Transfers</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Time Frame</Label>
+                <Select defaultValue="currentyear">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="currentmonth">Current Month</SelectItem>
+                    <SelectItem value="currentyear">Current School Year</SelectItem>
+                    <SelectItem value="lastyear">Previous School Year</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Analysis Dimensions</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="frequency" defaultChecked />
+                  <Label htmlFor="frequency" className="text-sm">Transfer Frequency</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="patterns" defaultChecked />
+                  <Label htmlFor="patterns" className="text-sm">Transfer Patterns</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="impact" />
+                  <Label htmlFor="impact" className="text-sm">Financial Impact</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="reasons" />
+                  <Label htmlFor="reasons" className="text-sm">Transfer Reasons</Label>
+                </div>
+              </div>
+            </div>
+            <div className="flex space-x-2">
+              <Button onClick={handleTransferAnalysis} className="flex-1">
+                <ArrowUpDown className="w-4 h-4 mr-2" />
+                Analyze Transfers
+              </Button>
+              <Button variant="outline" onClick={() => setTransferAnalysisOpen(false)} className="flex-1">
+                Cancel
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -655,8 +1021,8 @@ export default function StatisticsDashboard() {
                         <Area type="monotone" dataKey="transfers" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
                         <Area type="monotone" dataKey="paymentStreams" stackId="1" stroke="#ffc658" fill="#ffc658" />
                       </AreaChart>
-                    </ResponsiveContainer>
-                  </CardContent>
+                    </CardContent>
+                  </Card>
                 </Card>
               )}
 
@@ -847,22 +1213,42 @@ export default function StatisticsDashboard() {
               <CardTitle className="text-lg">Quick Analysis Tools</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button variant="outline" className="w-full justify-start">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => setTrendAnalysisOpen(true)}
+                disabled={isAnalyzing}
+              >
                 <TrendingUp className="w-4 h-4 mr-2" />
                 Trend Analysis
               </Button>
               
-              <Button variant="outline" className="w-full justify-start">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => setRegionalBreakdownOpen(true)}
+                disabled={isAnalyzing}
+              >
                 <BarChart3 className="w-4 h-4 mr-2" />
                 Regional Breakdown
               </Button>
               
-              <Button variant="outline" className="w-full justify-start">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => setReconciliationHistoryOpen(true)}
+                disabled={isAnalyzing}
+              >
                 <History className="w-4 h-4 mr-2" />
                 Reconciliation History
               </Button>
 
-              <Button variant="outline" className="w-full justify-start">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => setTransferAnalysisOpen(true)}
+                disabled={isAnalyzing}
+              >
                 <ArrowUpDown className="w-4 h-4 mr-2" />
                 Transfer Analysis
               </Button>
