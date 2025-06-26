@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Users, Plus, Edit, Trash2, Settings, Search, Filter } from "lucide-react";
+import { Shield, Users, Plus, Edit, Trash2, Settings, Search, Filter, MoreVertical } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -14,6 +13,31 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   Select,
   SelectContent,
@@ -27,23 +51,26 @@ import { PERMISSIONS, ROLE_TEMPLATES } from "@/config/permissions";
 import { OrganizationalRole } from "@/types/roleManagement";
 import { RoleManagementViewManagement } from "@/components/system/RoleManagementViewManagement";
 import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const RoleManagement = () => {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [searchTerm, setSearchTerm] = useState("");
   const [showCreateRole, setShowCreateRole] = useState(false);
   const [showEditRole, setShowEditRole] = useState(false);
   const [selectedRole, setSelectedRole] = useState<OrganizationalRole | null>(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // View Management State
   const [savedViews, setSavedViews] = useState<SavedView[]>([]);
   const [currentView, setCurrentView] = useState<SavedView | undefined>();
   const [columns, setColumns] = useState<ViewColumn[]>([
     { key: 'roleType', label: 'Role Type', visible: true },
-    { key: 'municipality', label: 'Municipality', visible: true },
-    { key: 'schoolUnit', label: 'School Unit', visible: true },
-    { key: 'principal', label: 'Principal', visible: true },
-    { key: 'group', label: 'Group', visible: true },
+    { key: 'municipality', label: 'Municipality', visible: !isMobile },
+    { key: 'schoolUnit', label: 'School Unit', visible: !isMobile },
+    { key: 'principal', label: 'Principal', visible: false },
+    { key: 'group', label: 'Group', visible: false },
     { key: 'permissions', label: 'Permissions', visible: true },
     { key: 'status', label: 'Status', visible: true },
   ]);
@@ -258,134 +285,266 @@ const RoleManagement = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-ike-primary">Role Management</h1>
-          <p className="text-ike-neutral">Manage organizational roles and permissions</p>
+    <div className="space-y-3 sm:space-y-4 lg:space-y-6 p-3 sm:p-4 lg:p-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-ike-primary leading-tight truncate">
+            Role Management
+          </h1>
+          <p className="text-ike-neutral mt-1 sm:mt-2 text-xs sm:text-sm lg:text-base leading-relaxed">
+            Manage organizational roles and permissions
+          </p>
         </div>
         <Button 
-          className="bg-ike-primary hover:bg-ike-primary/90"
+          className="bg-ike-primary hover:bg-ike-primary/90 w-full sm:w-auto text-sm sm:text-base h-9 sm:h-10"
           onClick={() => setShowCreateRole(true)}
         >
           <Plus className="w-4 h-4 mr-2" />
-          Create Role
+          <span className="hidden xs:inline">Create Role</span>
+          <span className="xs:hidden">Create</span>
         </Button>
       </div>
 
-      {/* View Management Component */}
-      <RoleManagementViewManagement
-        views={savedViews}
-        currentView={currentView}
-        onSaveView={handleSaveView}
-        onLoadView={handleLoadView}
-        onDeleteView={handleDeleteView}
-        columns={columns}
-        filters={filters}
-        onColumnsChange={setColumns}
-        onFiltersChange={setFilters}
-      />
+      {/* View Management Component - Hidden on mobile */}
+      <div className="hidden sm:block">
+        <RoleManagementViewManagement
+          views={savedViews}
+          currentView={currentView}
+          onSaveView={handleSaveView}
+          onLoadView={handleLoadView}
+          onDeleteView={handleDeleteView}
+          columns={columns}
+          filters={filters}
+          onColumnsChange={setColumns}
+          onFiltersChange={setFilters}
+        />
+      </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="w-5 h-5" />
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Shield className="w-4 h-4 sm:w-5 sm:h-5" />
             Organizational Roles
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             Manage role assignments with organizational context and permissions
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex gap-4 mb-6">
+        <CardContent className="p-3 sm:p-6">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-4 sm:mb-6">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ike-neutral" />
+              <Search className="absolute left-3 top-1/2 h-3 w-3 sm:h-4 sm:w-4 -translate-y-1/2 text-ike-neutral" />
               <Input
                 placeholder="Search roles..."
-                className="pl-10"
+                className="pl-8 sm:pl-10 text-sm h-9 sm:h-10"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button variant="outline">
-              <Filter className="w-4 h-4 mr-2" />
-              Filter
-            </Button>
+            
+            <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="w-full sm:w-auto text-sm h-9 sm:h-10">
+                  <Filter className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                  Filter
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="w-[90vw] sm:w-96">
+                <SheetHeader>
+                  <SheetTitle className="text-base sm:text-lg">Filter Roles</SheetTitle>
+                  <SheetDescription className="text-sm">
+                    Apply filters to find specific roles in the system.
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="grid gap-3 sm:gap-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="filter-role" className="text-sm">Role Type</Label>
+                    <Input id="filter-role" placeholder="Filter by role type" className="text-sm h-9" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="filter-municipality" className="text-sm">Municipality</Label>
+                    <Input id="filter-municipality" placeholder="Filter by municipality" className="text-sm h-9" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="filter-status" className="text-sm">Status</Label>
+                    <Input id="filter-status" placeholder="Filter by status" className="text-sm h-9" />
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2 pt-4">
+                    <Button onClick={() => setIsFilterOpen(false)} className="text-sm h-9">Apply Filters</Button>
+                    <Button variant="outline" onClick={() => setIsFilterOpen(false)} className="text-sm h-9">Clear</Button>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  {columns.filter(col => col.visible).map((column) => (
-                    <th key={column.key} className="text-left p-4 font-medium text-ike-neutral-dark">
-                      {column.label}
-                    </th>
-                  ))}
-                  <th className="text-left p-4 font-medium text-ike-neutral-dark">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredRoles.map((role) => (
-                  <tr key={role.id} className="border-b hover:bg-ike-neutral-light/50">
-                    {columns.filter(col => col.visible).map((column) => (
-                      <td key={column.key} className="p-4">
-                        {column.key === 'roleType' ? (
-                          <span className="font-medium">{role.roleType}</span>
-                        ) : column.key === 'municipality' ? (
-                          <span className="text-ike-neutral">{role.municipality || '-'}</span>
-                        ) : column.key === 'schoolUnit' ? (
-                          <span className="text-ike-neutral">{role.schoolUnit || '-'}</span>
-                        ) : column.key === 'principal' ? (
-                          <span className="text-ike-neutral">{role.principal || '-'}</span>
-                        ) : column.key === 'group' ? (
-                          <span className="text-ike-neutral">{role.group || '-'}</span>
-                        ) : column.key === 'permissions' ? (
-                          <Badge variant="outline">{role.permissions.length} permissions</Badge>
-                        ) : column.key === 'status' ? (
-                          <Badge className={role.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-                            {role.isActive ? 'Active' : 'Inactive'}
-                          </Badge>
-                        ) : null}
-                      </td>
-                    ))}
-                    <td className="p-4">
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => handleEditRole(role)}>
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleDeleteRole(role.id)}>
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+          {/* Mobile Card View */}
+          {isMobile ? (
+            <div className="space-y-3">
+              {filteredRoles.map((role) => (
+                <Card key={role.id} className="border border-ike-neutral-light/50">
+                  <CardContent className="p-3">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-sm truncate">{role.roleType}</h3>
+                        <p className="text-xs text-ike-neutral truncate">{role.municipality || 'No municipality'}</p>
                       </div>
-                    </td>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                            <MoreVertical className="w-3 h-3" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-white" align="end">
+                          <DropdownMenuItem onClick={() => handleEditRole(role)}>
+                            <Edit className="w-3 h-3 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                <Trash2 className="w-3 h-3 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="w-[90vw] max-w-md mx-auto">
+                              <AlertDialogHeader>
+                                <AlertDialogTitle className="text-base">Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription className="text-sm">
+                                  This action cannot be undone. This will permanently delete the role
+                                  "{role.roleType}" and remove all associated data.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+                                <AlertDialogCancel className="text-sm h-9">Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteRole(role.id)} className="text-sm h-9">
+                                  Delete Role
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="text-xs">{role.permissions.length} permissions</Badge>
+                        <Badge className={role.isActive ? 'bg-green-100 text-green-800 text-xs' : 'bg-red-100 text-red-800 text-xs'}>
+                          {role.isActive ? 'Active' : 'Inactive'}
+                        </Badge>
+                      </div>
+                      {role.schoolUnit && (
+                        <p className="text-xs text-ike-neutral/70 truncate">{role.schoolUnit}</p>
+                      )}
+                      <p className="text-xs text-ike-neutral/60">Start: {role.startDate}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            /* Desktop Table View */
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    {columns.filter(col => col.visible).map((column) => (
+                      <th key={column.key} className="text-left p-4 font-medium text-ike-neutral-dark text-sm">
+                        {column.label}
+                      </th>
+                    ))}
+                    <th className="text-left p-4 font-medium text-ike-neutral-dark text-sm">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filteredRoles.map((role) => (
+                    <tr key={role.id} className="border-b hover:bg-ike-neutral-light/50">
+                      {columns.filter(col => col.visible).map((column) => (
+                        <td key={column.key} className="p-4 text-sm">
+                          {column.key === 'roleType' ? (
+                            <span className="font-medium">{role.roleType}</span>
+                          ) : column.key === 'municipality' ? (
+                            <span className="text-ike-neutral">{role.municipality || '-'}</span>
+                          ) : column.key === 'schoolUnit' ? (
+                            <span className="text-ike-neutral">{role.schoolUnit || '-'}</span>
+                          ) : column.key === 'principal' ? (
+                            <span className="text-ike-neutral">{role.principal || '-'}</span>
+                          ) : column.key === 'group' ? (
+                            <span className="text-ike-neutral">{role.group || '-'}</span>
+                          ) : column.key === 'permissions' ? (
+                            <Badge variant="outline" className="text-xs">{role.permissions.length} permissions</Badge>
+                          ) : column.key === 'status' ? (
+                            <Badge className={role.isActive ? 'bg-green-100 text-green-800 text-xs' : 'bg-red-100 text-red-800 text-xs'}>
+                              {role.isActive ? 'Active' : 'Inactive'}
+                            </Badge>
+                          ) : null}
+                        </td>
+                      ))}
+                      <td className="p-4">
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm" onClick={() => handleEditRole(role)} className="text-sm h-8">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="outline" size="sm" className="text-sm h-8">
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="w-[95vw] max-w-md sm:max-w-lg mx-auto">
+                              <AlertDialogHeader>
+                                <AlertDialogTitle className="text-base sm:text-lg">Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription className="text-sm">
+                                  This action cannot be undone. This will permanently delete the role
+                                  "{role.roleType}" and remove all associated data.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+                                <AlertDialogCancel className="text-sm h-9">Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteRole(role.id)} className="text-sm h-9">
+                                  Delete Role
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {filteredRoles.length === 0 && (
+            <div className="text-center py-8">
+              <Shield className="w-8 h-8 sm:w-12 sm:h-12 text-ike-neutral mx-auto mb-4" />
+              <p className="text-ike-neutral text-sm">No roles found matching your search criteria.</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
       {/* Create Role Dialog */}
       <Dialog open={showCreateRole} onOpenChange={setShowCreateRole}>
-        <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Create Organizational Role</DialogTitle>
-            <DialogDescription>
+        <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-[600px] max-h-[95vh] sm:max-h-[80vh] overflow-y-auto mx-auto">
+          <DialogHeader className="space-y-2 pb-2">
+            <DialogTitle className="text-base sm:text-lg font-semibold">Create Organizational Role</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm text-muted-foreground">
               Define a new role with organizational context and specific permissions.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="roleType" className="text-right">Role Type</Label>
+          <div className="grid gap-3 sm:gap-4 py-2 sm:py-4 max-h-[60vh] sm:max-h-[50vh] overflow-y-auto px-1">
+            <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <Label htmlFor="roleType" className="text-xs sm:text-sm font-medium sm:text-right">Role Type</Label>
               <Select value={newRole.roleType} onValueChange={(value) => setNewRole({...newRole, roleType: value})}>
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9">
                   <SelectValue placeholder="Select role type" />
                 </SelectTrigger>
                 <SelectContent>
                   {ROLE_TEMPLATES.map((template) => (
-                    <SelectItem key={template.id} value={template.name}>
+                    <SelectItem key={template.id} value={template.name} className="text-xs sm:text-sm">
                       {template.name}
                     </SelectItem>
                   ))}
@@ -393,15 +552,15 @@ const RoleManagement = () => {
               </Select>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="municipality" className="text-right">Municipality</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <Label htmlFor="municipality" className="text-xs sm:text-sm font-medium sm:text-right">Municipality</Label>
               <Select value={newRole.municipality} onValueChange={(value) => setNewRole({...newRole, municipality: value})}>
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9">
                   <SelectValue placeholder="Select municipality" />
                 </SelectTrigger>
                 <SelectContent>
                   {municipalities.map((municipality) => (
-                    <SelectItem key={municipality} value={municipality}>
+                    <SelectItem key={municipality} value={municipality} className="text-xs sm:text-sm">
                       {municipality}
                     </SelectItem>
                   ))}
@@ -409,15 +568,15 @@ const RoleManagement = () => {
               </Select>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="schoolUnit" className="text-right">School Unit</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <Label htmlFor="schoolUnit" className="text-xs sm:text-sm font-medium sm:text-right">School Unit</Label>
               <Select value={newRole.schoolUnit} onValueChange={(value) => setNewRole({...newRole, schoolUnit: value})}>
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9">
                   <SelectValue placeholder="Select school unit" />
                 </SelectTrigger>
                 <SelectContent>
                   {schoolUnits.map((school) => (
-                    <SelectItem key={school} value={school}>
+                    <SelectItem key={school} value={school} className="text-xs sm:text-sm">
                       {school}
                     </SelectItem>
                   ))}
@@ -425,22 +584,22 @@ const RoleManagement = () => {
               </Select>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="startDate" className="text-right">Start Date</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <Label htmlFor="startDate" className="text-xs sm:text-sm font-medium sm:text-right">Start Date</Label>
               <Input 
                 id="startDate" 
                 type="date" 
-                className="col-span-3"
+                className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9"
                 value={newRole.startDate}
                 onChange={(e) => setNewRole({...newRole, startDate: e.target.value})}
               />
             </div>
 
-            <div className="space-y-4">
-              <Label className="text-sm font-medium">Permissions</Label>
+            <div className="space-y-3 sm:space-y-4">
+              <Label className="text-xs sm:text-sm font-medium">Permissions</Label>
               {['student_data', 'financial', 'administration', 'reports'].map(category => (
                 <div key={category} className="space-y-2">
-                  <h4 className="font-medium text-sm capitalize">{category.replace('_', ' ')}</h4>
+                  <h4 className="font-medium text-xs sm:text-sm capitalize">{category.replace('_', ' ')}</h4>
                   <div className="grid grid-cols-1 gap-2 pl-4">
                     {getPermissionsByCategory(category).map(permission => (
                       <div key={permission.id} className="flex items-center space-x-2">
@@ -455,7 +614,7 @@ const RoleManagement = () => {
                             }
                           }}
                         />
-                        <Label htmlFor={permission.id} className="text-sm">
+                        <Label htmlFor={permission.id} className="text-xs sm:text-sm">
                           {permission.name}
                         </Label>
                       </div>
@@ -465,32 +624,36 @@ const RoleManagement = () => {
               ))}
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCreateRole(false)}>Cancel</Button>
-            <Button onClick={handleCreateRole}>Create Role</Button>
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0 pt-2 sm:pt-4">
+            <Button variant="outline" onClick={() => setShowCreateRole(false)} className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9">
+              Cancel
+            </Button>
+            <Button onClick={handleCreateRole} className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9">
+              Create Role
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Edit Role Dialog */}
       <Dialog open={showEditRole} onOpenChange={setShowEditRole}>
-        <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Organizational Role</DialogTitle>
-            <DialogDescription>
+        <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-[600px] max-h-[95vh] sm:max-h-[80vh] overflow-y-auto mx-auto">
+          <DialogHeader className="space-y-2 pb-2">
+            <DialogTitle className="text-base sm:text-lg font-semibold">Edit Organizational Role</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm text-muted-foreground">
               Update role details, organizational context and permissions.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="editRoleType" className="text-right">Role Type</Label>
+          <div className="grid gap-3 sm:gap-4 py-2 sm:py-4 max-h-[60vh] sm:max-h-[50vh] overflow-y-auto px-1">
+            <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <Label htmlFor="editRoleType" className="text-xs sm:text-sm font-medium sm:text-right">Role Type</Label>
               <Select value={editRole.roleType} onValueChange={(value) => setEditRole({...editRole, roleType: value})}>
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9">
                   <SelectValue placeholder="Select role type" />
                 </SelectTrigger>
                 <SelectContent>
                   {ROLE_TEMPLATES.map((template) => (
-                    <SelectItem key={template.id} value={template.name}>
+                    <SelectItem key={template.id} value={template.name} className="text-xs sm:text-sm">
                       {template.name}
                     </SelectItem>
                   ))}
@@ -498,15 +661,15 @@ const RoleManagement = () => {
               </Select>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="editMunicipality" className="text-right">Municipality</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <Label htmlFor="editMunicipality" className="text-xs sm:text-sm font-medium sm:text-right">Municipality</Label>
               <Select value={editRole.municipality} onValueChange={(value) => setEditRole({...editRole, municipality: value})}>
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9">
                   <SelectValue placeholder="Select municipality" />
                 </SelectTrigger>
                 <SelectContent>
                   {municipalities.map((municipality) => (
-                    <SelectItem key={municipality} value={municipality}>
+                    <SelectItem key={municipality} value={municipality} className="text-xs sm:text-sm">
                       {municipality}
                     </SelectItem>
                   ))}
@@ -514,15 +677,15 @@ const RoleManagement = () => {
               </Select>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="editSchoolUnit" className="text-right">School Unit</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <Label htmlFor="editSchoolUnit" className="text-xs sm:text-sm font-medium sm:text-right">School Unit</Label>
               <Select value={editRole.schoolUnit} onValueChange={(value) => setEditRole({...editRole, schoolUnit: value})}>
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9">
                   <SelectValue placeholder="Select school unit" />
                 </SelectTrigger>
                 <SelectContent>
                   {schoolUnits.map((school) => (
-                    <SelectItem key={school} value={school}>
+                    <SelectItem key={school} value={school} className="text-xs sm:text-sm">
                       {school}
                     </SelectItem>
                   ))}
@@ -530,46 +693,46 @@ const RoleManagement = () => {
               </Select>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="editStartDate" className="text-right">Start Date</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <Label htmlFor="editStartDate" className="text-xs sm:text-sm font-medium sm:text-right">Start Date</Label>
               <Input 
                 id="editStartDate" 
                 type="date" 
-                className="col-span-3"
+                className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9"
                 value={editRole.startDate}
                 onChange={(e) => setEditRole({...editRole, startDate: e.target.value})}
               />
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="editEndDate" className="text-right">End Date</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <Label htmlFor="editEndDate" className="text-xs sm:text-sm font-medium sm:text-right">End Date</Label>
               <Input 
                 id="editEndDate" 
                 type="date" 
-                className="col-span-3"
+                className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9"
                 value={editRole.endDate}
                 onChange={(e) => setEditRole({...editRole, endDate: e.target.value})}
               />
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="editActive" className="text-right">Status</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <Label htmlFor="editActive" className="text-xs sm:text-sm font-medium sm:text-right">Status</Label>
               <Select value={editRole.isActive ? "active" : "inactive"} onValueChange={(value) => setEditRole({...editRole, isActive: value === "active"})}>
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="active" className="text-xs sm:text-sm">Active</SelectItem>
+                  <SelectItem value="inactive" className="text-xs sm:text-sm">Inactive</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="space-y-4">
-              <Label className="text-sm font-medium">Permissions</Label>
+            <div className="space-y-3 sm:space-y-4">
+              <Label className="text-xs sm:text-sm font-medium">Permissions</Label>
               {['student_data', 'financial', 'administration', 'reports'].map(category => (
                 <div key={category} className="space-y-2">
-                  <h4 className="font-medium text-sm capitalize">{category.replace('_', ' ')}</h4>
+                  <h4 className="font-medium text-xs sm:text-sm capitalize">{category.replace('_', ' ')}</h4>
                   <div className="grid grid-cols-1 gap-2 pl-4">
                     {getPermissionsByCategory(category).map(permission => (
                       <div key={permission.id} className="flex items-center space-x-2">
@@ -584,7 +747,7 @@ const RoleManagement = () => {
                             }
                           }}
                         />
-                        <Label htmlFor={`edit-${permission.id}`} className="text-sm">
+                        <Label htmlFor={`edit-${permission.id}`} className="text-xs sm:text-sm">
                           {permission.name}
                         </Label>
                       </div>
@@ -594,9 +757,13 @@ const RoleManagement = () => {
               ))}
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowEditRole(false)}>Cancel</Button>
-            <Button onClick={handleUpdateRole}>Update Role</Button>
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0 pt-2 sm:pt-4">
+            <Button variant="outline" onClick={() => setShowEditRole(false)} className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9">
+              Cancel
+            </Button>
+            <Button onClick={handleUpdateRole} className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9">
+              Update Role
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
