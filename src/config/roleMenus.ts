@@ -168,6 +168,11 @@ export const regionalAdminMenu: MenuItem[] = [
         icon: TrendingUp,
       },
       {
+        title: "Price Lists Analysis",
+        url: "/analysis/price-lists",
+        icon: Euro,
+      },
+      {
         title: "Change Lists",
         url: "/reports/change-lists",
         icon: FileText,

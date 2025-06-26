@@ -89,6 +89,7 @@ import ErrorLists from "./pages/reports/ErrorLists";
 import StatisticsDashboard from "./pages/reports/StatisticsDashboard";
 import PaymentStreamsAnalysis from "./pages/analysis/PaymentStreamsAnalysis";
 import KAAStatisticsAnalysis from "./pages/kaa/KAAStatisticsAnalysis";
+import PriceListsAnalysis from "./pages/analysis/PriceListsAnalysis";
 
 const queryClient = new QueryClient();
 
@@ -172,6 +173,11 @@ const AppContent = () => {
               <Route path="/analysis/payment-streams" element={
                 <ProtectedRoute>
                   <PaymentStreamsAnalysis />
+                </ProtectedRoute>
+              } />
+              <Route path="/analysis/price-lists" element={
+                <ProtectedRoute>
+                  <PriceListsAnalysis />
                 </ProtectedRoute>
               } />
               
