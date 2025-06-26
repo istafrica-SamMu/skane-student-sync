@@ -1,3 +1,4 @@
+
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,12 +22,15 @@ import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { user, logout } = useAuth();
+  const isMobile = useIsMobile();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [notifications, setNotifications] = useState([
     {
       id: 1,
@@ -107,139 +111,170 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="flex h-16 items-center px-4">
-        <SidebarTrigger className="mr-4" />
+      <div className="flex h-14 sm:h-16 items-center px-2 sm:px-4">
+        <SidebarTrigger className="mr-2 sm:mr-4" />
         
-        {/* Breadcrumb */}
-        <div className="flex-1">
-          <nav className="text-sm text-ike-neutral">
+        {/* Breadcrumb - Hidden on mobile when search is open */}
+        <div className={`flex-1 min-w-0 ${isMobile && isSearchOpen ? 'hidden' : 'block'}`}>
+          <nav className="text-xs sm:text-sm text-ike-neutral truncate">
             {getBreadcrumb()}
           </nav>
         </div>
 
-        {/* Search */}
-        <div className="relative mr-4 w-96">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ike-neutral" />
-          <Input
-            placeholder={t('header.search.placeholder')}
-            className="pl-10 border-ike-primary/20 focus:border-ike-primary"
-          />
-        </div>
+        {/* Mobile Search Toggle */}
+        {isMobile && (
+          <Button
+            variant="ghost" 
+            size="sm"
+            onClick={() => setIsSearchOpen(!isSearchOpen)}
+            className="mr-1"
+          >
+            <Search className="h-4 w-4" />
+          </Button>
+        )}
 
-        {/* Language Toggle */}
-        <LanguageToggle />
+        {/* Desktop Search or Mobile Search when open */}
+        {(!isMobile || isSearchOpen) && (
+          <div className={`relative ${isMobile ? 'flex-1 mx-2' : 'mr-4 w-64 lg:w-96'}`}>
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ike-neutral" />
+            <Input
+              placeholder={t('header.search.placeholder')}
+              className="pl-10 border-ike-primary/20 focus:border-ike-primary text-sm"
+              onBlur={() => isMobile && setIsSearchOpen(false)}
+              autoFocus={isMobile && isSearchOpen}
+            />
+          </div>
+        )}
 
-        {/* Notifications */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="ghost" size="sm" className="mr-2 relative">
-              <Bell className="h-4 w-4" />
-              {unreadCount > 0 && (
-                <Badge 
-                  className="absolute -top-1 -right-1 h-5 w-5 p-0 bg-ike-error text-white text-xs flex items-center justify-center"
-                >
-                  {unreadCount}
-                </Badge>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80 p-0 mr-4" align="end">
-            <div className="border-b border-ike-neutral-light p-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-ike-neutral-dark">Notifications</h3>
+        {/* Right side actions - Hidden on mobile when search is open */}
+        <div className={`flex items-center space-x-1 sm:space-x-2 ${isMobile && isSearchOpen ? 'hidden' : 'flex'}`}>
+          {/* Language Toggle - Hidden on small mobile */}
+          <div className="hidden xs:block">
+            <LanguageToggle />
+          </div>
+
+          {/* Notifications */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="sm" className="relative p-2">
+                <Bell className="h-4 w-4" />
                 {unreadCount > 0 && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={markAllAsRead}
-                    className="text-xs text-ike-primary hover:text-ike-primary-dark"
+                  <Badge 
+                    className="absolute -top-1 -right-1 h-4 w-4 p-0 bg-ike-error text-white text-xs flex items-center justify-center min-w-[16px]"
                   >
-                    Mark all as read
-                  </Button>
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </Badge>
                 )}
-              </div>
-            </div>
-            <ScrollArea className="h-80">
-              {notifications.length === 0 ? (
-                <div className="p-4 text-center text-ike-neutral">
-                  No notifications
-                </div>
-              ) : (
-                <div className="space-y-1">
-                  {notifications.map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={`p-4 border-b border-ike-neutral-light/50 hover:bg-ike-neutral-light/30 transition-colors ${
-                        !notification.isRead ? 'bg-ike-primary/5' : ''
-                      }`}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 sm:w-96 p-0 mr-2 sm:mr-4" align="end">
+              <div className="border-b border-ike-neutral-light p-3 sm:p-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-ike-neutral-dark text-sm sm:text-base">Notifications</h3>
+                  {unreadCount > 0 && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={markAllAsRead}
+                      className="text-xs text-ike-primary hover:text-ike-primary-dark h-auto p-1"
                     >
-                      <div className="flex items-start justify-between space-x-2">
-                        <div className="flex-1 space-y-1">
-                          <div className="flex items-center space-x-2">
-                            <h4 className={`text-sm font-medium ${
-                              !notification.isRead ? 'text-ike-neutral-dark' : 'text-ike-neutral'
-                            }`}>
-                              {notification.title}
-                            </h4>
-                            {!notification.isRead && (
-                              <div className="w-2 h-2 bg-ike-primary rounded-full"></div>
-                            )}
+                      Mark all as read
+                    </Button>
+                  )}
+                </div>
+              </div>
+              <ScrollArea className="h-80">
+                {notifications.length === 0 ? (
+                  <div className="p-4 text-center text-ike-neutral text-sm">
+                    No notifications
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    {notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        className={`p-3 sm:p-4 border-b border-ike-neutral-light/50 hover:bg-ike-neutral-light/30 transition-colors ${
+                          !notification.isRead ? 'bg-ike-primary/5' : ''
+                        }`}
+                      >
+                        <div className="flex items-start justify-between space-x-2">
+                          <div className="flex-1 space-y-1 min-w-0">
+                            <div className="flex items-center space-x-2">
+                              <h4 className={`text-sm font-medium truncate ${
+                                !notification.isRead ? 'text-ike-neutral-dark' : 'text-ike-neutral'
+                              }`}>
+                                {notification.title}
+                              </h4>
+                              {!notification.isRead && (
+                                <div className="w-2 h-2 bg-ike-primary rounded-full flex-shrink-0"></div>
+                              )}
+                            </div>
+                            <p className="text-xs text-ike-neutral leading-relaxed">
+                              {notification.message}
+                            </p>
+                            <p className="text-xs text-ike-neutral/70">
+                              {notification.timestamp}
+                            </p>
                           </div>
-                          <p className="text-xs text-ike-neutral leading-relaxed">
-                            {notification.message}
-                          </p>
-                          <p className="text-xs text-ike-neutral/70">
-                            {notification.timestamp}
-                          </p>
-                        </div>
-                        <div className="flex space-x-1">
-                          {!notification.isRead && (
+                          <div className="flex space-x-1 flex-shrink-0">
+                            {!notification.isRead && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => markAsRead(notification.id)}
+                                className="h-6 w-6 p-0 hover:bg-ike-primary/10"
+                              >
+                                <CheckCheck className="h-3 w-3 text-ike-primary" />
+                              </Button>
+                            )}
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => markAsRead(notification.id)}
-                              className="h-6 w-6 p-0 hover:bg-ike-primary/10"
+                              onClick={() => deleteNotification(notification.id)}
+                              className="h-6 w-6 p-0 hover:bg-red-50 hover:text-red-600"
                             >
-                              <CheckCheck className="h-3 w-3 text-ike-primary" />
+                              <Trash2 className="h-3 w-3" />
                             </Button>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteNotification(notification.id)}
-                            className="h-6 w-6 p-0 hover:bg-red-50 hover:text-red-600"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+              {notifications.length > 0 && (
+                <div className="border-t border-ike-neutral-light p-3">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="w-full text-ike-primary hover:text-ike-primary-dark hover:bg-ike-primary/5 text-sm"
+                  >
+                    View all notifications
+                  </Button>
                 </div>
               )}
-            </ScrollArea>
-            {notifications.length > 0 && (
-              <div className="border-t border-ike-neutral-light p-3">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="w-full text-ike-primary hover:text-ike-primary-dark hover:bg-ike-primary/5"
-                >
-                  View all notifications
-                </Button>
-              </div>
-            )}
-          </PopoverContent>
-        </Popover>
+            </PopoverContent>
+          </Popover>
 
-        {/* User Menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-ike-primary rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-white" />
-              </div>
-              <div className="text-left">
+          {/* User Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center space-x-1 sm:space-x-2 p-1 sm:p-2">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-ike-primary rounded-full flex items-center justify-center flex-shrink-0">
+                  <User className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                </div>
+                <div className="text-left hidden sm:block">
+                  <div className="text-sm font-medium truncate max-w-[120px]">{user?.name || 'User'}</div>
+                  <div className="text-xs text-ike-neutral truncate max-w-[120px]">
+                    {user?.role === 'regional-admin' && 'Regional Admin'}
+                    {user?.role === 'municipality-admin' && 'Municipality Admin'}
+                    {user?.role === 'school-admin' && 'School Admin'}
+                  </div>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 sm:w-56">
+              <div className="sm:hidden px-3 py-2 border-b">
                 <div className="text-sm font-medium">{user?.name || 'User'}</div>
                 <div className="text-xs text-ike-neutral">
                   {user?.role === 'regional-admin' && 'Regional Admin'}
@@ -247,24 +282,22 @@ export function Header() {
                   {user?.role === 'school-admin' && 'School Admin'}
                 </div>
               </div>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              <span>Profil</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Inställningar</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Logga ut</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <DropdownMenuItem>
+                <User className="mr-2 h-4 w-4" />
+                <span>Profil</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Inställningar</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Logga ut</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </header>
   );
