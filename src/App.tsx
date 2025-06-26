@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -88,6 +87,7 @@ import ReportsDashboard from "./pages/reports/ReportsDashboard";
 import ChangeLists from "./pages/reports/ChangeLists";
 import ErrorLists from "./pages/reports/ErrorLists";
 import StatisticsDashboard from "./pages/reports/StatisticsDashboard";
+import PaymentStreamsAnalysis from "./pages/analysis/PaymentStreamsAnalysis";
 
 const queryClient = new QueryClient();
 
@@ -166,6 +166,11 @@ const AppContent = () => {
               <Route path="/analysis/geographical" element={
                 <ProtectedRoute>
                   <GeographicalAnalysis />
+                </ProtectedRoute>
+              } />
+              <Route path="/analysis/payment-streams" element={
+                <ProtectedRoute>
+                  <PaymentStreamsAnalysis />
                 </ProtectedRoute>
               } />
               

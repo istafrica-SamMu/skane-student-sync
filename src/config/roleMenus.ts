@@ -163,6 +163,11 @@ export const regionalAdminMenu: MenuItem[] = [
         icon: BarChart3,
       },
       {
+        title: "Payment Streams Analysis",
+        url: "/analysis/payment-streams",
+        icon: TrendingUp,
+      },
+      {
         title: "Change Lists",
         url: "/reports/change-lists",
         icon: FileText,
@@ -383,6 +388,11 @@ export const municipalityAdminMenu: MenuItem[] = [
         icon: BarChart3,
       },
       {
+        title: "Payment Streams Analysis",
+        url: "/analysis/payment-streams",
+        icon: TrendingUp,
+      },
+      {
         title: "Reports Dashboard",
         url: "/reports/dashboard",
         icon: BarChart3,
@@ -539,6 +549,11 @@ export const schoolAdminMenu: MenuItem[] = [
         title: "Regional Statistics",
         url: "/reports/regional-statistics",
         icon: BarChart3,
+      },
+      {
+        title: "Payment Streams Analysis",
+        url: "/analysis/payment-streams",
+        icon: TrendingUp,
       },
       {
         title: "Reports Dashboard",
