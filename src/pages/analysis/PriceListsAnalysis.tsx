@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -338,12 +337,17 @@ const PriceListsAnalysis = () => {
                             size="sm" 
                             variant="outline"
                             onClick={() => {
-                              setSelectedMunicipality({
-                                id: 0,
+                              const referenceMunicipality = {
+                                id: 999,
                                 name: 'Reference List',
                                 code: 'REF',
-                                ...mockReferenceList
-                              });
+                                basicEducation: mockReferenceList.basicEducation,
+                                specialEducation: mockReferenceList.specialEducation,
+                                gymProgram: mockReferenceList.gymProgram,
+                                vocationalProgram: mockReferenceList.vocationalProgram,
+                                preparatoryProgram: mockReferenceList.preparatoryProgram
+                              };
+                              setSelectedMunicipality(referenceMunicipality);
                               setDetailsModalOpen(true);
                             }}
                           >
