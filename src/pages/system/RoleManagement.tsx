@@ -305,8 +305,8 @@ const RoleManagement = () => {
         </Button>
       </div>
 
-      {/* View Management Component - Hidden on mobile */}
-      <div className="hidden sm:block">
+      {/* View Management Component - Now visible on all screen sizes */}
+      <div className="w-full">
         <RoleManagementViewManagement
           views={savedViews}
           currentView={currentView}
