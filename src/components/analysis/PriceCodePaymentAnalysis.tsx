@@ -199,9 +199,9 @@ export const PriceCodePaymentAnalysis = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Prices</SelectItem>
-                <SelectItem value="low">< 12,000 SEK</SelectItem>
+                <SelectItem value="low">&lt; 12,000 SEK</SelectItem>
                 <SelectItem value="medium">12,000 - 14,000 SEK</SelectItem>
-                <SelectItem value="high">> 14,000 SEK</SelectItem>
+                <SelectItem value="high">&gt; 14,000 SEK</SelectItem>
               </SelectContent>
             </Select>
 
