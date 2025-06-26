@@ -2,7 +2,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { QueryClient } from 'react-query';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
@@ -33,11 +33,14 @@ import { RoleBasedSidebar } from '@/components/RoleBasedSidebar';
 import KAAStatisticsAnalysis from "@/pages/kaa/KAAStatisticsAnalysis";
 import PriceListsAnalysis from "@/pages/analysis/PriceListsAnalysis";
 
+// Create a QueryClient instance
+const queryClient = new QueryClient();
+
 function App() {
   return (
     <AuthProvider>
       <LanguageProvider>
-        <QueryClient>
+        <QueryClientProvider client={queryClient}>
           <SidebarProvider>
             <div className="min-h-screen flex w-full">
               <RoleBasedSidebar />
@@ -75,7 +78,7 @@ function App() {
             </div>
           </SidebarProvider>
           <Toaster />
-        </QueryClient>
+        </QueryClientProvider>
       </LanguageProvider>
     </AuthProvider>
   );
