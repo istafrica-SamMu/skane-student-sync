@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -48,29 +49,30 @@ const Dashboard = () => {
   // School Admin specific dashboard
   if (user?.role === 'school-admin') {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6 p-4 sm:p-0">
         {/* Welcome Header - School Admin */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-ike-neutral-dark">
+            <h1 className="text-2xl sm:text-3xl font-bold text-ike-neutral-dark">
               Independent School Dashboard
             </h1>
-            <p className="text-ike-neutral mt-2">
+            <p className="text-ike-neutral mt-2 text-sm sm:text-base">
               {currentDate} • {user.organization || 'Independent School'} Management
             </p>
           </div>
-          <div className="flex space-x-3">
-            <Button asChild className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+            <Button asChild className="bg-ike-primary hover:bg-ike-primary-dark text-white w-full sm:w-auto">
               <Link to="/reports/students">
                 <Download className="w-4 h-4 mr-2" />
-                Export Student Data
+                <span className="hidden sm:inline">Export Student Data</span>
+                <span className="sm:hidden">Export Data</span>
               </Link>
             </Button>
           </div>
         </div>
 
         {/* School Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <Card className="border-l-4 border-l-ike-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-ike-neutral">
@@ -102,7 +104,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-green-500">
+          <Card className="border-l-4 border-l-green-500 sm:col-span-2 lg:col-span-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-ike-neutral">
                 Monthly Revenue
@@ -119,11 +121,11 @@ const Dashboard = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* School Information */}
           <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle className="flex items-center text-ike-neutral-dark">
+              <CardTitle className="flex items-center text-ike-neutral-dark text-lg sm:text-xl">
                 <School className="w-5 h-5 mr-2 text-ike-primary" />
                 Independent School Information
               </CardTitle>
@@ -132,25 +134,25 @@ const Dashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-ike-neutral">School Name</label>
-                  <p className="text-lg font-semibold text-ike-neutral-dark">{user?.organization || 'Independent School'}</p>
+                  <p className="text-base sm:text-lg font-semibold text-ike-neutral-dark break-words">{user?.organization || 'Independent School'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-ike-neutral">School Code</label>
-                  <p className="text-lg font-semibold text-ike-neutral-dark">IS-001</p>
+                  <p className="text-base sm:text-lg font-semibold text-ike-neutral-dark">IS-001</p>
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-ike-neutral">School Type</label>
-                  <p className="text-lg font-semibold text-ike-neutral-dark">Independent School</p>
+                  <p className="text-base sm:text-lg font-semibold text-ike-neutral-dark">Independent School</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-ike-neutral">Accreditation</label>
-                  <p className="text-lg font-semibold text-ike-neutral-dark">Approved</p>
+                  <p className="text-base sm:text-lg font-semibold text-ike-neutral-dark">Approved</p>
                 </div>
               </div>
 
@@ -164,7 +166,7 @@ const Dashboard = () => {
                     "Language Studies",
                     "Arts & Creative"
                   ].map((program, index) => (
-                    <Badge key={index} variant="secondary" className="bg-ike-primary/10 text-ike-primary">
+                    <Badge key={index} variant="secondary" className="bg-ike-primary/10 text-ike-primary text-xs">
                       {program}
                     </Badge>
                   ))}
@@ -176,7 +178,7 @@ const Dashboard = () => {
           {/* School Actions */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-ike-neutral-dark">School Management</CardTitle>
+              <CardTitle className="text-ike-neutral-dark text-lg sm:text-xl">School Management</CardTitle>
               <CardDescription>
                 Quick access to key school functions
               </CardDescription>
@@ -208,7 +210,7 @@ const Dashboard = () => {
         {/* Programs & Enrollment Overview */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-ike-neutral-dark">Programs & Enrollment Overview</CardTitle>
+            <CardTitle className="text-ike-neutral-dark text-lg sm:text-xl">Programs & Enrollment Overview</CardTitle>
             <CardDescription>
               Current enrollment status across all educational programs
             </CardDescription>
@@ -247,20 +249,20 @@ const Dashboard = () => {
                   statusColor: "success"
                 }
               ].map((program, index) => (
-                <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-4">
                   <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-ike-primary/10 rounded-lg flex items-center justify-center">
+                    <div className="w-12 h-12 bg-ike-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
                       <BookOpen className="w-6 h-6 text-ike-primary" />
                     </div>
-                    <div>
-                      <h3 className="font-medium text-ike-neutral-dark">{program.program}</h3>
-                      <p className="text-sm text-ike-neutral">{program.students}/{program.capacity} students enrolled</p>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-medium text-ike-neutral-dark text-sm sm:text-base break-words">{program.program}</h3>
+                      <p className="text-xs sm:text-sm text-ike-neutral">{program.students}/{program.capacity} students enrolled</p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-4 justify-between sm:justify-end">
                     <Progress 
                       value={(program.students / program.capacity) * 100} 
-                      className="w-24 h-2"
+                      className="w-20 sm:w-24 h-2"
                     />
                     <Badge 
                       className={
@@ -284,35 +286,37 @@ const Dashboard = () => {
   // Municipal Admin specific dashboard
   if (user?.role === 'municipality-admin') {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6 p-4 sm:p-0">
         {/* Welcome Header - Municipal Admin */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-ike-neutral-dark">
+            <h1 className="text-2xl sm:text-3xl font-bold text-ike-neutral-dark">
               Municipal Administration Dashboard
             </h1>
-            <p className="text-ike-neutral mt-2">
+            <p className="text-ike-neutral mt-2 text-sm sm:text-base">
               {currentDate} • {user.organization || 'Municipality'} Overview
             </p>
           </div>
-          <div className="flex space-x-3">
-            <Button asChild className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+            <Button asChild className="bg-ike-primary hover:bg-ike-primary-dark text-white w-full sm:w-auto">
               <Link to="/reports/municipal-statistics">
                 <Download className="w-4 h-4 mr-2" />
-                Export Municipal Report
+                <span className="hidden sm:inline">Export Municipal Report</span>
+                <span className="sm:hidden">Export Report</span>
               </Link>
             </Button>
-            <Button asChild variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+            <Button asChild variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10 w-full sm:w-auto">
               <Link to="/reports/financial-export">
                 <FileText className="w-4 h-4 mr-2" />
-                Financial Export
+                <span className="hidden sm:inline">Financial Export</span>
+                <span className="sm:hidden">Financial</span>
               </Link>
             </Button>
           </div>
         </div>
 
         {/* Municipal Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <Card className="border-l-4 border-l-ike-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-ike-neutral">
@@ -378,7 +382,7 @@ const Dashboard = () => {
         {/* Municipal Schools Overview - Full Width */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-ike-neutral-dark">Municipal Schools Overview</CardTitle>
+            <CardTitle className="text-ike-neutral-dark text-lg sm:text-xl">Municipal Schools Overview</CardTitle>
             <CardDescription>
               Status and metrics for municipal school units
             </CardDescription>
@@ -419,17 +423,17 @@ const Dashboard = () => {
                   statusColor: "success"
                 }
               ].map((school, index) => (
-                <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-4">
                   <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-ike-primary/10 rounded-lg flex items-center justify-center">
+                    <div className="w-12 h-12 bg-ike-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
                       <School className="w-6 h-6 text-ike-primary" />
                     </div>
-                    <div>
-                      <h3 className="font-medium text-ike-neutral-dark">{school.name}</h3>
-                      <p className="text-sm text-ike-neutral">{school.students} students • Grade {school.grade}</p>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-medium text-ike-neutral-dark text-sm sm:text-base break-words">{school.name}</h3>
+                      <p className="text-xs sm:text-sm text-ike-neutral">{school.students} students • Grade {school.grade}</p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center justify-between sm:justify-end space-x-4">
                     <Badge 
                       className={
                         school.statusColor === "success" ? "bg-ike-success text-white" :
@@ -450,10 +454,10 @@ const Dashboard = () => {
         </Card>
 
         {/* Financial Summary & Quick Actions - Side by side */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-ike-neutral-dark">Inter-Municipal Compensation</CardTitle>
+              <CardTitle className="text-ike-neutral-dark text-lg sm:text-xl">Inter-Municipal Compensation</CardTitle>
               <CardDescription>
                 Current month financial overview
               </CardDescription>
@@ -468,22 +472,24 @@ const Dashboard = () => {
                 <span className="font-medium">312 students</span>
               </div>
               <div className="border-t pt-4">
-                <div className="flex justify-between items-center text-lg">
+                <div className="flex justify-between items-center text-base sm:text-lg">
                   <span className="font-medium">Net compensation:</span>
                   <span className="font-bold text-ike-warning">-1.4M SEK</span>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2 mt-4">
-                <Button asChild variant="outline" size="sm">
+                <Button asChild variant="outline" size="sm" className="text-xs sm:text-sm">
                   <Link to="/reports/money-to-receive">
                     <TrendingUp className="w-4 h-4 mr-1" />
-                    To Receive
+                    <span className="hidden sm:inline">To Receive</span>
+                    <span className="sm:hidden">Receive</span>
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="sm">
+                <Button asChild variant="outline" size="sm" className="text-xs sm:text-sm">
                   <Link to="/reports/money-to-pay">
                     <DollarSign className="w-4 h-4 mr-1" />
-                    To Pay
+                    <span className="hidden sm:inline">To Pay</span>
+                    <span className="sm:hidden">Pay</span>
                   </Link>
                 </Button>
               </div>
@@ -492,40 +498,44 @@ const Dashboard = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-ike-neutral-dark">Municipal Management</CardTitle>
+              <CardTitle className="text-ike-neutral-dark text-lg sm:text-xl">Municipal Management</CardTitle>
               <CardDescription>
                 Essential municipal functions
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button asChild className="w-full justify-start bg-ike-primary hover:bg-ike-primary-dark text-white">
+              <Button asChild className="w-full justify-start bg-ike-primary hover:bg-ike-primary-dark text-white text-sm">
                 <Link to="/students">
                   <Users className="w-4 h-4 mr-2" />
                   Student Management
                 </Link>
               </Button>
-              <Button asChild className="w-full justify-start" variant="outline">
+              <Button asChild className="w-full justify-start text-sm" variant="outline">
                 <Link to="/students/municipal">
                   <School className="w-4 h-4 mr-2" />
-                  Municipal School Students
+                  <span className="hidden sm:inline">Municipal School Students</span>
+                  <span className="sm:hidden">Municipal Students</span>
                 </Link>
               </Button>
-              <Button asChild className="w-full justify-start" variant="outline">
+              <Button asChild className="w-full justify-start text-sm" variant="outline">
                 <Link to="/students/external">
                   <ArrowUpDown className="w-4 h-4 mr-2" />
-                  External School Students
+                  <span className="hidden sm:inline">External School Students</span>
+                  <span className="sm:hidden">External Students</span>
                 </Link>
               </Button>
-              <Button asChild className="w-full justify-start" variant="outline">
+              <Button asChild className="w-full justify-start text-sm" variant="outline">
                 <Link to="/financial/pricelists">
                   <Euro className="w-4 h-4 mr-2" />
-                  Municipal Price Lists
+                  <span className="hidden sm:inline">Municipal Price Lists</span>
+                  <span className="sm:hidden">Price Lists</span>
                 </Link>
               </Button>
-              <Button asChild className="w-full justify-start" variant="outline">
+              <Button asChild className="w-full justify-start text-sm" variant="outline">
                 <Link to="/operations/municipal-users">
                   <Users className="w-4 h-4 mr-2" />
-                  Municipal User Admin
+                  <span className="hidden sm:inline">Municipal User Admin</span>
+                  <span className="sm:hidden">User Admin</span>
                 </Link>
               </Button>
             </CardContent>
@@ -538,21 +548,21 @@ const Dashboard = () => {
   // Regional Admin specific dashboard
   if (user?.role === 'regional-admin') {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6 p-4 sm:p-0">
         {/* Welcome Header - Regional Admin */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-ike-neutral-dark">
+            <h1 className="text-2xl sm:text-3xl font-bold text-ike-neutral-dark">
               Regional Administration Dashboard
             </h1>
-            <p className="text-ike-neutral mt-2">
+            <p className="text-ike-neutral mt-2 text-sm sm:text-base">
               {currentDate} • System Overview for Region Skåne
             </p>
           </div>
         </div>
 
         {/* Regional Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <Card className="border-l-4 border-l-ike-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-ike-neutral">
@@ -585,7 +595,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-ike-warning">
+          <Card className="border-l-4 border-l-ike-warning sm:col-span-2 lg:col-span-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-ike-neutral">
                 System Issues
@@ -604,50 +614,54 @@ const Dashboard = () => {
         {/* Regional Operations - Full Width */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-ike-neutral-dark">Regional Operations</CardTitle>
+            <CardTitle className="text-ike-neutral-dark text-lg sm:text-xl">Regional Operations</CardTitle>
             <CardDescription>
               System administration and oversight
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <Button 
                 asChild
-                className="justify-start bg-ike-primary hover:bg-ike-primary-dark text-white"
+                className="justify-start bg-ike-primary hover:bg-ike-primary-dark text-white text-sm"
               >
                 <Link to="/system/municipalities">
                   <Building className="w-4 h-4 mr-2" />
-                  Manage Municipalities
+                  <span className="hidden sm:inline">Manage Municipalities</span>
+                  <span className="sm:hidden">Municipalities</span>
                 </Link>
               </Button>
               <Button 
                 asChild
                 variant="outline" 
-                className="justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
+                className="justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10 text-sm"
               >
                 <Link to="/system/schools">
                   <School className="w-4 h-4 mr-2" />
-                  School Unit Overview
+                  <span className="hidden sm:inline">School Unit Overview</span>
+                  <span className="sm:hidden">Schools</span>
                 </Link>
               </Button>
               <Button 
                 asChild
                 variant="outline" 
-                className="justify-start"
+                className="justify-start text-sm"
               >
                 <Link to="/system/users">
                   <Users className="w-4 h-4 mr-2" />
-                  User Management
+                  <span className="hidden sm:inline">User Management</span>
+                  <span className="sm:hidden">Users</span>
                 </Link>
               </Button>
               <Button 
                 asChild
                 variant="outline" 
-                className="justify-start"
+                className="justify-start text-sm"
               >
                 <Link to="/settings">
                   <Shield className="w-4 h-4 mr-2" />
-                  System Settings
+                  <span className="hidden sm:inline">System Settings</span>
+                  <span className="sm:hidden">Settings</span>
                 </Link>
               </Button>
             </div>
@@ -657,7 +671,7 @@ const Dashboard = () => {
         {/* Municipality Overview */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-ike-neutral-dark">Municipality Status Overview</CardTitle>
+            <CardTitle className="text-ike-neutral-dark text-lg sm:text-xl">Municipality Status Overview</CardTitle>
             <CardDescription>
               Real-time status of municipalities in the region
             </CardDescription>
@@ -698,17 +712,17 @@ const Dashboard = () => {
                   statusColor: "error"
                 }
               ].map((municipality, index) => (
-                <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-4">
                   <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-ike-primary/10 rounded-lg flex items-center justify-center">
+                    <div className="w-12 h-12 bg-ike-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Building className="w-6 h-6 text-ike-primary" />
                     </div>
-                    <div>
-                      <h3 className="font-medium text-ike-neutral-dark">{municipality.name}</h3>
-                      <p className="text-sm text-ike-neutral">{municipality.students} students • Last sync: {municipality.lastSync}</p>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-medium text-ike-neutral-dark text-sm sm:text-base">{municipality.name}</h3>
+                      <p className="text-xs sm:text-sm text-ike-neutral">{municipality.students} students • Last sync: {municipality.lastSync}</p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center justify-between sm:justify-end space-x-4">
                     <Badge 
                       className={
                         municipality.statusColor === "success" ? "bg-ike-success text-white" :
@@ -731,23 +745,23 @@ const Dashboard = () => {
 
   // Keep existing dashboard for other roles
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-0">
       {/* Welcome Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-ike-neutral-dark">
+          <h1 className="text-2xl sm:text-3xl font-bold text-ike-neutral-dark">
             {t('dashboard.welcome')}
           </h1>
-          <p className="text-ike-neutral mt-2">
+          <p className="text-ike-neutral mt-2 text-sm sm:text-base">
             {currentDate} • {t('dashboard.date')}
           </p>
         </div>
-        <div className="flex space-x-3">
-          <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+          <Button className="bg-ike-primary hover:bg-ike-primary-dark text-white w-full sm:w-auto">
             <Download className="w-4 h-4 mr-2" />
             {t('dashboard.export')}
           </Button>
-          <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10">
+          <Button variant="outline" className="border-ike-primary text-ike-primary hover:bg-ike-primary/10 w-full sm:w-auto">
             <FileText className="w-4 h-4 mr-2" />
             {t('dashboard.generate')}
           </Button>
@@ -755,7 +769,7 @@ const Dashboard = () => {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <Card className="border-l-4 border-l-ike-primary">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-ike-neutral">
@@ -819,11 +833,11 @@ const Dashboard = () => {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Current Calculation Status */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="flex items-center text-ike-neutral-dark">
+            <CardTitle className="flex items-center text-ike-neutral-dark text-lg sm:text-xl">
               <Calculator className="w-5 h-5 mr-2 text-ike-primary" />
               {t('dashboard.calculation.status')}
             </CardTitle>
@@ -874,35 +888,35 @@ const Dashboard = () => {
         {/* Quick Actions */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-ike-neutral-dark">{t('dashboard.quick.actions')}</CardTitle>
+            <CardTitle className="text-ike-neutral-dark text-lg sm:text-xl">{t('dashboard.quick.actions')}</CardTitle>
             <CardDescription>
               {t('dashboard.common.tasks')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <Button 
-              className="w-full justify-start bg-ike-primary hover:bg-ike-primary-dark text-white"
+              className="w-full justify-start bg-ike-primary hover:bg-ike-primary-dark text-white text-sm"
             >
               <Users className="w-4 h-4 mr-2" />
               {t('dashboard.new.student')}
             </Button>
             <Button 
               variant="outline" 
-              className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10"
+              className="w-full justify-start border-ike-primary text-ike-primary hover:bg-ike-primary/10 text-sm"
             >
               <Calculator className="w-4 h-4 mr-2" />
               {t('dashboard.new.calculation')}
             </Button>
             <Button 
               variant="outline" 
-              className="w-full justify-start"
+              className="w-full justify-start text-sm"
             >
               <AlertTriangle className="w-4 h-4 mr-2" />
               {t('dashboard.resolve.conflicts')}
             </Button>
             <Button 
               variant="outline" 
-              className="w-full justify-start"
+              className="w-full justify-start text-sm"
             >
               <FileText className="w-4 h-4 mr-2" />
               {t('dashboard.generate')}
@@ -914,7 +928,7 @@ const Dashboard = () => {
       {/* Recent Activity */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-ike-neutral-dark">{t('dashboard.recent.activity')}</CardTitle>
+          <CardTitle className="text-ike-neutral-dark text-lg sm:text-xl">{t('dashboard.recent.activity')}</CardTitle>
           <CardDescription>
             {t('dashboard.system.events')}
           </CardDescription>
@@ -947,13 +961,13 @@ const Dashboard = () => {
                 status: "success"
               }
             ].map((activity, index) => (
-              <div key={index} className="flex items-center space-x-4 p-3 rounded-lg bg-ike-neutral-light">
+              <div key={index} className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 p-3 rounded-lg bg-ike-neutral-light">
                 <div className="text-sm text-ike-neutral font-mono">{activity.time}</div>
                 <div className="flex-1">
                   <div className="text-sm font-medium text-ike-neutral-dark">
                     {activity.action}
                   </div>
-                  <div className="text-xs text-ike-neutral">{activity.details}</div>
+                  <div className="text-xs text-ike-neutral break-words">{activity.details}</div>
                 </div>
                 <Badge 
                   variant="secondary" 
