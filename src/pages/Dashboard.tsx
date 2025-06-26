@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -731,6 +732,22 @@ const Dashboard = () => {
             </div>
           </CardContent>
         </Card>
+      </div>
+    );
+  }
+
+  // Default fallback dashboard
+  return (
+    <div className="space-y-3 sm:space-y-4 lg:space-y-6 p-3 sm:p-4 lg:p-0">
+      <div className="flex flex-col gap-3 sm:gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-ike-neutral-dark leading-tight">
+            Dashboard
+          </h1>
+          <p className="text-ike-neutral mt-1 sm:mt-2 text-xs sm:text-sm lg:text-base leading-relaxed">
+            Welcome to the IKE System
+          </p>
+        </div>
       </div>
     </div>
   );
