@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -50,9 +49,11 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { SystemUsersViewManagement } from "@/components/system/SystemUsersViewManagement";
 import { SavedView, ViewColumn, ViewFilter } from "@/types/viewManagement";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const UserManagement = () => {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isEditUserOpen, setIsEditUserOpen] = useState(false);
@@ -68,12 +69,12 @@ const UserManagement = () => {
   const [columns, setColumns] = useState<ViewColumn[]>([
     { key: 'username', label: 'Username', visible: true },
     { key: 'name', label: 'Name', visible: true },
-    { key: 'email', label: 'Email', visible: true },
-    { key: 'socialSecurityNumber', label: 'SSN', visible: true },
+    { key: 'email', label: 'Email', visible: !isMobile },
+    { key: 'socialSecurityNumber', label: 'SSN', visible: false },
     { key: 'role', label: 'Role', visible: true },
     { key: 'status', label: 'Status', visible: true },
-    { key: 'startDate', label: 'Start Date', visible: true },
-    { key: 'lastLogin', label: 'Last Login', visible: true },
+    { key: 'startDate', label: 'Start Date', visible: !isMobile },
+    { key: 'lastLogin', label: 'Last Login', visible: !isMobile },
   ]);
   const [filters, setFilters] = useState<ViewFilter[]>([]);
 
@@ -237,125 +238,134 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-ike-primary">User Management</h1>
-          <p className="text-ike-neutral">Manage system users and their permissions</p>
+    <div className="space-y-3 sm:space-y-4 lg:space-y-6 p-3 sm:p-4 lg:p-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-ike-primary leading-tight truncate">
+            User Management
+          </h1>
+          <p className="text-ike-neutral mt-1 sm:mt-2 text-xs sm:text-sm lg:text-base leading-relaxed">
+            Manage system users and their permissions
+          </p>
         </div>
         
         <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-ike-primary hover:bg-ike-primary/90">
+            <Button className="bg-ike-primary hover:bg-ike-primary/90 w-full sm:w-auto text-sm sm:text-base h-9 sm:h-10">
               <UserPlus className="w-4 h-4 mr-2" />
-              Add User
+              <span className="hidden xs:inline">Add User</span>
+              <span className="xs:hidden">Add</span>
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Add New User</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-base sm:text-lg">Add New User</DialogTitle>
+              <DialogDescription className="text-sm">
                 Add a new user to the system. Fill in all the required information.
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4 max-h-[400px] overflow-y-auto">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="username" className="text-right">
+            <div className="grid gap-3 sm:gap-4 py-4 max-h-[50vh] overflow-y-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                <Label htmlFor="username" className="sm:text-right text-sm">
                   Username
                 </Label>
-                <Input id="username" placeholder="Enter username" className="col-span-3" />
+                <Input id="username" placeholder="Enter username" className="sm:col-span-3 text-sm h-9" />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="ssn" className="text-right">
+              <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                <Label htmlFor="ssn" className="sm:text-right text-sm">
                   SSN
                 </Label>
-                <Input id="ssn" placeholder="YYYY-MM-DD-XXXX" className="col-span-3" />
+                <Input id="ssn" placeholder="YYYY-MM-DD-XXXX" className="sm:col-span-3 text-sm h-9" />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
+              <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                <Label htmlFor="name" className="sm:text-right text-sm">
                   Name
                 </Label>
-                <Input id="name" placeholder="Enter full name" className="col-span-3" />
+                <Input id="name" placeholder="Enter full name" className="sm:col-span-3 text-sm h-9" />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="email" className="text-right">
+              <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                <Label htmlFor="email" className="sm:text-right text-sm">
                   Email
                 </Label>
-                <Input id="email" type="email" placeholder="Enter email address" className="col-span-3" />
+                <Input id="email" type="email" placeholder="Enter email address" className="sm:col-span-3 text-sm h-9" />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="startDate" className="text-right">
+              <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                <Label htmlFor="startDate" className="sm:text-right text-sm">
                   Start Date
                 </Label>
-                <Input id="startDate" type="date" className="col-span-3" />
+                <Input id="startDate" type="date" className="sm:col-span-3 text-sm h-9" />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="endDate" className="text-right">
+              <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                <Label htmlFor="endDate" className="sm:text-right text-sm">
                   End Date
                 </Label>
-                <Input id="endDate" type="date" className="col-span-3" />
+                <Input id="endDate" type="date" className="sm:col-span-3 text-sm h-9" />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="role" className="text-right">
+              <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                <Label htmlFor="role" className="sm:text-right text-sm">
                   Role
                 </Label>
                 <Select value={newUserRole} onValueChange={setNewUserRole}>
-                  <SelectTrigger className="col-span-3">
+                  <SelectTrigger className="sm:col-span-3 text-sm h-9">
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent>
                     {roles.map((role) => (
-                      <SelectItem key={role} value={role}>
+                      <SelectItem key={role} value={role} className="text-sm">
                         {role}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="organization" className="text-right">
+              <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                <Label htmlFor="organization" className="sm:text-right text-sm">
                   Organization
                 </Label>
-                <Input id="organization" placeholder="Enter organization" className="col-span-3" />
+                <Input id="organization" placeholder="Enter organization" className="sm:col-span-3 text-sm h-9" />
               </div>
             </div>
-            <DialogFooter>
-              <Button type="submit" onClick={handleAddUser}>Add User</Button>
+            <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+              <Button type="submit" onClick={handleAddUser} className="w-full sm:w-auto text-sm h-9">
+                Add User
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
 
       {/* View Management Component */}
-      <SystemUsersViewManagement
-        views={savedViews}
-        currentView={currentView}
-        onSaveView={handleSaveView}
-        onLoadView={handleLoadView}
-        onDeleteView={handleDeleteView}
-        columns={columns}
-        filters={filters}
-        onColumnsChange={setColumns}
-        onFiltersChange={setFilters}
-      />
+      <div className="hidden sm:block">
+        <SystemUsersViewManagement
+          views={savedViews}
+          currentView={currentView}
+          onSaveView={handleSaveView}
+          onLoadView={handleLoadView}
+          onDeleteView={handleDeleteView}
+          columns={columns}
+          filters={filters}
+          onColumnsChange={setColumns}
+          onFiltersChange={setFilters}
+        />
+      </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="w-5 h-5" />
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Users className="w-4 h-4 sm:w-5 sm:h-5" />
             System Users
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             Manage user accounts with complete profile information and role assignments
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex gap-4 mb-6">
+        <CardContent className="p-3 sm:p-6">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-4 sm:mb-6">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ike-neutral" />
+              <Search className="absolute left-3 top-1/2 h-3 w-3 sm:h-4 sm:w-4 -translate-y-1/2 text-ike-neutral" />
               <Input
                 placeholder="Search users..."
-                className="pl-10"
+                className="pl-8 sm:pl-10 text-sm h-9 sm:h-10"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -363,110 +373,88 @@ const UserManagement = () => {
             
             <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline">
-                  <Filter className="w-4 h-4 mr-2" />
+                <Button variant="outline" className="w-full sm:w-auto text-sm h-9 sm:h-10">
+                  <Filter className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   Filter
                 </Button>
               </SheetTrigger>
-              <SheetContent>
+              <SheetContent className="w-[90vw] sm:w-96">
                 <SheetHeader>
-                  <SheetTitle>Filter Users</SheetTitle>
-                  <SheetDescription>
+                  <SheetTitle className="text-base sm:text-lg">Filter Users</SheetTitle>
+                  <SheetDescription className="text-sm">
                     Apply filters to find specific users in the system.
                   </SheetDescription>
                 </SheetHeader>
-                <div className="grid gap-4 py-4">
+                <div className="grid gap-3 sm:gap-4 py-4">
                   <div className="space-y-2">
-                    <Label htmlFor="filter-role">Role</Label>
-                    <Input id="filter-role" placeholder="Filter by role" />
+                    <Label htmlFor="filter-role" className="text-sm">Role</Label>
+                    <Input id="filter-role" placeholder="Filter by role" className="text-sm h-9" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="filter-org">Organization</Label>
-                    <Input id="filter-org" placeholder="Filter by organization" />
+                    <Label htmlFor="filter-org" className="text-sm">Organization</Label>
+                    <Input id="filter-org" placeholder="Filter by organization" className="text-sm h-9" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="filter-status">Status</Label>
-                    <Input id="filter-status" placeholder="Filter by status" />
+                    <Label htmlFor="filter-status" className="text-sm">Status</Label>
+                    <Input id="filter-status" placeholder="Filter by status" className="text-sm h-9" />
                   </div>
-                  <div className="flex gap-2 pt-4">
-                    <Button onClick={() => setIsFilterOpen(false)}>Apply Filters</Button>
-                    <Button variant="outline" onClick={() => setIsFilterOpen(false)}>Clear</Button>
+                  <div className="flex flex-col sm:flex-row gap-2 pt-4">
+                    <Button onClick={() => setIsFilterOpen(false)} className="text-sm h-9">Apply Filters</Button>
+                    <Button variant="outline" onClick={() => setIsFilterOpen(false)} className="text-sm h-9">Clear</Button>
                   </div>
                 </div>
               </SheetContent>
             </Sheet>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  {columns.filter(col => col.visible).map((column) => (
-                    <th key={column.key} className="text-left p-4 font-medium text-ike-neutral-dark">
-                      {column.label}
-                    </th>
-                  ))}
-                  <th className="text-left p-4 font-medium text-ike-neutral-dark">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map((user) => (
-                  <tr key={user.id} className="border-b hover:bg-ike-neutral-light/50">
-                    {columns.filter(col => col.visible).map((column) => (
-                      <td key={column.key} className="p-4">
-                        {column.key === 'role' ? (
-                          <Badge variant="outline">{user[column.key]}</Badge>
-                        ) : column.key === 'status' ? (
-                          <Badge className={user.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-                            {user.status}
-                          </Badge>
-                        ) : column.key === 'username' || column.key === 'name' ? (
-                          <span className="font-medium">{user[column.key]}</span>
-                        ) : (
-                          <span className={['email', 'socialSecurityNumber', 'startDate', 'lastLogin'].includes(column.key) ? 'text-ike-neutral' : ''}>
-                            {user[column.key]}
-                          </span>
-                        )}
-                      </td>
-                    ))}
-                    <td className="p-4">
+          {/* Mobile Card View */}
+          {isMobile ? (
+            <div className="space-y-3">
+              {filteredUsers.map((user) => (
+                <Card key={user.id} className="border border-ike-neutral-light/50">
+                  <CardContent className="p-3">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-sm truncate">{user.name}</h3>
+                        <p className="text-xs text-ike-neutral truncate">@{user.username}</p>
+                      </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="sm">
-                            <MoreVertical className="w-4 h-4" />
+                          <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                            <MoreVertical className="w-3 h-3" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="bg-white">
+                        <DropdownMenuContent className="bg-white" align="end">
                           <DropdownMenuItem onClick={() => handleEditUser(user)}>
-                            <Edit className="w-4 h-4 mr-2" />
+                            <Edit className="w-3 h-3 mr-2" />
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleViewRoles(user)}>
-                            <Shield className="w-4 h-4 mr-2" />
+                            <Shield className="w-3 h-3 mr-2" />
                             View Roles
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleSendEmail(user)}>
-                            <Mail className="w-4 h-4 mr-2" />
+                            <Mail className="w-3 h-3 mr-2" />
                             Email
                           </DropdownMenuItem>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                <Trash2 className="w-4 h-4 mr-2" />
+                                <Trash2 className="w-3 h-3 mr-2" />
                                 Delete
                               </DropdownMenuItem>
                             </AlertDialogTrigger>
-                            <AlertDialogContent>
+                            <AlertDialogContent className="w-[90vw] max-w-md">
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
+                                <AlertDialogTitle className="text-base">Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription className="text-sm">
                                   This action cannot be undone. This will permanently delete the user
                                   account for {user.name} and remove all associated data.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDeleteUser(user.id)}>
+                              <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+                                <AlertDialogCancel className="text-sm h-9">Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteUser(user.id)} className="text-sm h-9">
                                   Delete User
                                 </AlertDialogAction>
                               </AlertDialogFooter>
@@ -474,177 +462,284 @@ const UserManagement = () => {
                           </AlertDialog>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </td>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="text-xs">{user.role}</Badge>
+                        <Badge className={user.status === 'Active' ? 'bg-green-100 text-green-800 text-xs' : 'bg-red-100 text-red-800 text-xs'}>
+                          {user.status}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-ike-neutral truncate">{user.email}</p>
+                      <p className="text-xs text-ike-neutral/70 truncate">{user.organization}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            /* Desktop Table View */
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    {columns.filter(col => col.visible).map((column) => (
+                      <th key={column.key} className="text-left p-4 font-medium text-ike-neutral-dark text-sm">
+                        {column.label}
+                      </th>
+                    ))}
+                    <th className="text-left p-4 font-medium text-ike-neutral-dark text-sm">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filteredUsers.map((user) => (
+                    <tr key={user.id} className="border-b hover:bg-ike-neutral-light/50">
+                      {columns.filter(col => col.visible).map((column) => (
+                        <td key={column.key} className="p-4 text-sm">
+                          {column.key === 'role' ? (
+                            <Badge variant="outline" className="text-xs">{user[column.key]}</Badge>
+                          ) : column.key === 'status' ? (
+                            <Badge className={user.status === 'Active' ? 'bg-green-100 text-green-800 text-xs' : 'bg-red-100 text-red-800 text-xs'}>
+                              {user.status}
+                            </Badge>
+                          ) : column.key === 'username' || column.key === 'name' ? (
+                            <span className="font-medium">{user[column.key]}</span>
+                          ) : (
+                            <span className={['email', 'socialSecurityNumber', 'startDate', 'lastLogin'].includes(column.key) ? 'text-ike-neutral' : ''}>
+                              {user[column.key]}
+                            </span>
+                          )}
+                        </td>
+                      ))}
+                      <td className="p-4">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="text-sm h-8">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="bg-white">
+                            <DropdownMenuItem onClick={() => handleEditUser(user)}>
+                              <Edit className="w-4 h-4 mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleViewRoles(user)}>
+                              <Shield className="w-4 h-4 mr-2" />
+                              View Roles
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleSendEmail(user)}>
+                              <Mail className="w-4 h-4 mr-2" />
+                              Email
+                            </DropdownMenuItem>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete the user
+                                    account for {user.name} and remove all associated data.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDeleteUser(user.id)}>
+                                    Delete User
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {filteredUsers.length === 0 && (
+            <div className="text-center py-8">
+              <Users className="w-8 h-8 sm:w-12 sm:h-12 text-ike-neutral mx-auto mb-4" />
+              <p className="text-ike-neutral text-sm">No users found matching your search criteria.</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
       {/* Edit User Dialog */}
       <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-base sm:text-lg">Edit User</DialogTitle>
+            <DialogDescription className="text-sm">
               Update user information and permissions.
             </DialogDescription>
           </DialogHeader>
           {selectedUser && (
-            <div className="grid gap-4 py-4 max-h-[400px] overflow-y-auto">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-username" className="text-right">
+            <div className="grid gap-3 sm:gap-4 py-4 max-h-[50vh] overflow-y-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                <Label htmlFor="edit-username" className="sm:text-right text-sm">
                   Username
                 </Label>
                 <Input 
                   id="edit-username" 
                   defaultValue={selectedUser.username} 
-                  className="col-span-3" 
+                  className="sm:col-span-3 text-sm h-9" 
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-name" className="text-right">
+              <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                <Label htmlFor="edit-name" className="sm:text-right text-sm">
                   Name
                 </Label>
                 <Input 
                   id="edit-name" 
                   defaultValue={selectedUser.name} 
-                  className="col-span-3" 
+                  className="sm:col-span-3 text-sm h-9" 
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-email" className="text-right">
+              <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                <Label htmlFor="edit-email" className="sm:text-right text-sm">
                   Email
                 </Label>
                 <Input 
                   id="edit-email" 
                   type="email" 
                   defaultValue={selectedUser.email} 
-                  className="col-span-3" 
+                  className="sm:col-span-3 text-sm h-9" 
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-ssn" className="text-right">
+              <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                <Label htmlFor="edit-ssn" className="sm:text-right text-sm">
                   SSN
                 </Label>
                 <Input 
                   id="edit-ssn" 
                   defaultValue={selectedUser.socialSecurityNumber} 
-                  className="col-span-3" 
+                  className="sm:col-span-3 text-sm h-9" 
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-role" className="text-right">
+              <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                <Label htmlFor="edit-role" className="sm:text-right text-sm">
                   Role
                 </Label>
                 <Select value={editUserRole} onValueChange={setEditUserRole}>
-                  <SelectTrigger className="col-span-3">
+                  <SelectTrigger className="sm:col-span-3 text-sm h-9">
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent>
                     {roles.map((role) => (
-                      <SelectItem key={role} value={role}>
+                      <SelectItem key={role} value={role} className="text-sm">
                         {role}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-startDate" className="text-right">
+              <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                <Label htmlFor="edit-startDate" className="sm:text-right text-sm">
                   Start Date
                 </Label>
                 <Input 
                   id="edit-startDate" 
                   type="date" 
                   defaultValue={selectedUser.startDate} 
-                  className="col-span-3" 
+                  className="sm:col-span-3 text-sm h-9" 
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-endDate" className="text-right">
+              <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                <Label htmlFor="edit-endDate" className="sm:text-right text-sm">
                   End Date
                 </Label>
                 <Input 
                   id="edit-endDate" 
                   type="date" 
                   defaultValue={selectedUser.endDate || ""} 
-                  className="col-span-3" 
+                  className="sm:col-span-3 text-sm h-9" 
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-organization" className="text-right">
+              <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+                <Label htmlFor="edit-organization" className="sm:text-right text-sm">
                   Organization
                 </Label>
                 <Input 
                   id="edit-organization" 
                   defaultValue={selectedUser.organization} 
-                  className="col-span-3" 
+                  className="sm:col-span-3 text-sm h-9" 
                 />
               </div>
             </div>
           )}
-          <DialogFooter>
-            <Button type="submit" onClick={handleUpdateUser}>Update User</Button>
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+            <Button type="submit" onClick={handleUpdateUser} className="w-full sm:w-auto text-sm h-9">
+              Update User
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* View Roles Dialog */}
       <Dialog open={isViewRolesOpen} onOpenChange={setIsViewRolesOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5" />
+            <DialogTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Shield className="w-4 h-4 sm:w-5 sm:h-5" />
               Role Assignments - {selectedUser?.name}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-sm">
               View active and inactive role assignments for this user.
             </DialogDescription>
           </DialogHeader>
           {selectedUser && (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <div>
-                <h4 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
+                <h4 className="font-semibold text-green-800 mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                   Active Roles
                 </h4>
                 <div className="space-y-2">
                   {selectedUser.activeRoles.map((role, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-green-50 rounded-lg border">
-                      <Badge className="bg-green-100 text-green-800">{role}</Badge>
-                      <span className="text-sm text-green-600">Active</span>
+                    <div key={index} className="flex items-center justify-between p-2 sm:p-3 bg-green-50 rounded-lg border">
+                      <Badge className="bg-green-100 text-green-800 text-xs">{role}</Badge>
+                      <span className="text-xs sm:text-sm text-green-600">Active</span>
                     </div>
                   ))}
                   {selectedUser.activeRoles.length === 0 && (
-                    <p className="text-ike-neutral italic">No active roles assigned</p>
+                    <p className="text-ike-neutral italic text-sm">No active roles assigned</p>
                   )}
                 </div>
               </div>
               
               <div>
-                <h4 className="font-semibold text-red-800 mb-3 flex items-center gap-2">
-                  <IdCard className="w-4 h-4" />
+                <h4 className="font-semibold text-red-800 mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
+                  <IdCard className="w-3 h-3 sm:w-4 sm:h-4" />
                   Inactive Roles
                 </h4>
                 <div className="space-y-2">
                   {selectedUser.inactiveRoles.map((role, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-red-50 rounded-lg border">
-                      <Badge variant="outline" className="text-red-700 border-red-200">{role}</Badge>
-                      <span className="text-sm text-red-600">Inactive</span>
+                    <div key={index} className="flex items-center justify-between p-2 sm:p-3 bg-red-50 rounded-lg border">
+                      <Badge variant="outline" className="text-red-700 border-red-200 text-xs">{role}</Badge>
+                      <span className="text-xs sm:text-sm text-red-600">Inactive</span>
                     </div>
                   ))}
                   {selectedUser.inactiveRoles.length === 0 && (
-                    <p className="text-ike-neutral italic">No inactive roles</p>
+                    <p className="text-ike-neutral italic text-sm">No inactive roles</p>
                   )}
                 </div>
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsViewRolesOpen(false)}>Close</Button>
+            <Button variant="outline" onClick={() => setIsViewRolesOpen(false)} className="w-full sm:w-auto text-sm h-9">
+              Close
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
