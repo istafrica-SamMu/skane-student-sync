@@ -168,6 +168,11 @@ export const regionalAdminMenu: MenuItem[] = [
         icon: TrendingUp,
       },
       {
+        title: "Price Lists Analysis",
+        url: "/analysis/price-lists",
+        icon: Euro,
+      },
+      {
         title: "Change Lists",
         url: "/reports/change-lists",
         icon: FileText,
@@ -396,6 +401,11 @@ export const municipalityAdminMenu: MenuItem[] = [
         title: "Payment Streams Analysis",
         url: "/analysis/payment-streams",
         icon: TrendingUp,
+      },
+      {
+        title: "Price Lists Analysis",
+        url: "/analysis/price-lists",
+        icon: Euro,
       },
       {
         title: "Reports Dashboard",
