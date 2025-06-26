@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -257,61 +258,61 @@ const UserManagement = () => {
               <span className="xs:hidden">Add</span>
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-base sm:text-lg">Add New User</DialogTitle>
-              <DialogDescription className="text-sm">
+          <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-[500px] max-h-[95vh] sm:max-h-[90vh] overflow-y-auto mx-auto">
+            <DialogHeader className="space-y-2 pb-2">
+              <DialogTitle className="text-base sm:text-lg font-semibold">Add New User</DialogTitle>
+              <DialogDescription className="text-xs sm:text-sm text-muted-foreground">
                 Add a new user to the system. Fill in all the required information.
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-3 sm:gap-4 py-4 max-h-[50vh] overflow-y-auto">
+            <div className="grid gap-3 sm:gap-4 py-2 sm:py-4 max-h-[60vh] sm:max-h-[50vh] overflow-y-auto px-1">
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
-                <Label htmlFor="username" className="sm:text-right text-sm">
+                <Label htmlFor="username" className="text-xs sm:text-sm font-medium sm:text-right">
                   Username
                 </Label>
-                <Input id="username" placeholder="Enter username" className="sm:col-span-3 text-sm h-9" />
+                <Input id="username" placeholder="Enter username" className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
-                <Label htmlFor="ssn" className="sm:text-right text-sm">
+                <Label htmlFor="ssn" className="text-xs sm:text-sm font-medium sm:text-right">
                   SSN
                 </Label>
-                <Input id="ssn" placeholder="YYYY-MM-DD-XXXX" className="sm:col-span-3 text-sm h-9" />
+                <Input id="ssn" placeholder="YYYY-MM-DD-XXXX" className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
-                <Label htmlFor="name" className="sm:text-right text-sm">
+                <Label htmlFor="name" className="text-xs sm:text-sm font-medium sm:text-right">
                   Name
                 </Label>
-                <Input id="name" placeholder="Enter full name" className="sm:col-span-3 text-sm h-9" />
+                <Input id="name" placeholder="Enter full name" className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
-                <Label htmlFor="email" className="sm:text-right text-sm">
+                <Label htmlFor="email" className="text-xs sm:text-sm font-medium sm:text-right">
                   Email
                 </Label>
-                <Input id="email" type="email" placeholder="Enter email address" className="sm:col-span-3 text-sm h-9" />
+                <Input id="email" type="email" placeholder="Enter email address" className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
-                <Label htmlFor="startDate" className="sm:text-right text-sm">
+                <Label htmlFor="startDate" className="text-xs sm:text-sm font-medium sm:text-right">
                   Start Date
                 </Label>
-                <Input id="startDate" type="date" className="sm:col-span-3 text-sm h-9" />
+                <Input id="startDate" type="date" className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
-                <Label htmlFor="endDate" className="sm:text-right text-sm">
+                <Label htmlFor="endDate" className="text-xs sm:text-sm font-medium sm:text-right">
                   End Date
                 </Label>
-                <Input id="endDate" type="date" className="sm:col-span-3 text-sm h-9" />
+                <Input id="endDate" type="date" className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
-                <Label htmlFor="role" className="sm:text-right text-sm">
+                <Label htmlFor="role" className="text-xs sm:text-sm font-medium sm:text-right">
                   Role
                 </Label>
                 <Select value={newUserRole} onValueChange={setNewUserRole}>
-                  <SelectTrigger className="sm:col-span-3 text-sm h-9">
+                  <SelectTrigger className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9">
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent>
                     {roles.map((role) => (
-                      <SelectItem key={role} value={role} className="text-sm">
+                      <SelectItem key={role} value={role} className="text-xs sm:text-sm">
                         {role}
                       </SelectItem>
                     ))}
@@ -319,14 +320,14 @@ const UserManagement = () => {
                 </Select>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
-                <Label htmlFor="organization" className="sm:text-right text-sm">
+                <Label htmlFor="organization" className="text-xs sm:text-sm font-medium sm:text-right">
                   Organization
                 </Label>
-                <Input id="organization" placeholder="Enter organization" className="sm:col-span-3 text-sm h-9" />
+                <Input id="organization" placeholder="Enter organization" className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9" />
               </div>
             </div>
-            <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
-              <Button type="submit" onClick={handleAddUser} className="w-full sm:w-auto text-sm h-9">
+            <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0 pt-2 sm:pt-4">
+              <Button type="submit" onClick={handleAddUser} className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9">
                 Add User
               </Button>
             </DialogFooter>
@@ -444,7 +445,7 @@ const UserManagement = () => {
                                 Delete
                               </DropdownMenuItem>
                             </AlertDialogTrigger>
-                            <AlertDialogContent className="w-[90vw] max-w-md">
+                            <AlertDialogContent className="w-[90vw] max-w-md mx-auto">
                               <AlertDialogHeader>
                                 <AlertDialogTitle className="text-base">Are you sure?</AlertDialogTitle>
                                 <AlertDialogDescription className="text-sm">
@@ -539,17 +540,17 @@ const UserManagement = () => {
                                   Delete
                                 </DropdownMenuItem>
                               </AlertDialogTrigger>
-                              <AlertDialogContent>
+                              <AlertDialogContent className="w-[95vw] max-w-md sm:max-w-lg mx-auto">
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                  <AlertDialogDescription>
+                                  <AlertDialogTitle className="text-base sm:text-lg">Are you sure?</AlertDialogTitle>
+                                  <AlertDialogDescription className="text-sm">
                                     This action cannot be undone. This will permanently delete the user
                                     account for {user.name} and remove all associated data.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => handleDeleteUser(user.id)}>
+                                <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+                                  <AlertDialogCancel className="text-sm h-9">Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDeleteUser(user.id)} className="text-sm h-9">
                                     Delete User
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
@@ -576,67 +577,67 @@ const UserManagement = () => {
 
       {/* Edit User Dialog */}
       <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
-        <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-base sm:text-lg">Edit User</DialogTitle>
-            <DialogDescription className="text-sm">
+        <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-[500px] max-h-[95vh] sm:max-h-[90vh] overflow-y-auto mx-auto">
+          <DialogHeader className="space-y-2 pb-2">
+            <DialogTitle className="text-base sm:text-lg font-semibold">Edit User</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm text-muted-foreground">
               Update user information and permissions.
             </DialogDescription>
           </DialogHeader>
           {selectedUser && (
-            <div className="grid gap-3 sm:gap-4 py-4 max-h-[50vh] overflow-y-auto">
+            <div className="grid gap-3 sm:gap-4 py-2 sm:py-4 max-h-[60vh] sm:max-h-[50vh] overflow-y-auto px-1">
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
-                <Label htmlFor="edit-username" className="sm:text-right text-sm">
+                <Label htmlFor="edit-username" className="text-xs sm:text-sm font-medium sm:text-right">
                   Username
                 </Label>
                 <Input 
                   id="edit-username" 
                   defaultValue={selectedUser.username} 
-                  className="sm:col-span-3 text-sm h-9" 
+                  className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9" 
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
-                <Label htmlFor="edit-name" className="sm:text-right text-sm">
+                <Label htmlFor="edit-name" className="text-xs sm:text-sm font-medium sm:text-right">
                   Name
                 </Label>
                 <Input 
                   id="edit-name" 
                   defaultValue={selectedUser.name} 
-                  className="sm:col-span-3 text-sm h-9" 
+                  className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9" 
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
-                <Label htmlFor="edit-email" className="sm:text-right text-sm">
+                <Label htmlFor="edit-email" className="text-xs sm:text-sm font-medium sm:text-right">
                   Email
                 </Label>
                 <Input 
                   id="edit-email" 
                   type="email" 
                   defaultValue={selectedUser.email} 
-                  className="sm:col-span-3 text-sm h-9" 
+                  className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9" 
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
-                <Label htmlFor="edit-ssn" className="sm:text-right text-sm">
+                <Label htmlFor="edit-ssn" className="text-xs sm:text-sm font-medium sm:text-right">
                   SSN
                 </Label>
                 <Input 
                   id="edit-ssn" 
                   defaultValue={selectedUser.socialSecurityNumber} 
-                  className="sm:col-span-3 text-sm h-9" 
+                  className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9" 
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
-                <Label htmlFor="edit-role" className="sm:text-right text-sm">
+                <Label htmlFor="edit-role" className="text-xs sm:text-sm font-medium sm:text-right">
                   Role
                 </Label>
                 <Select value={editUserRole} onValueChange={setEditUserRole}>
-                  <SelectTrigger className="sm:col-span-3 text-sm h-9">
+                  <SelectTrigger className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9">
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent>
                     {roles.map((role) => (
-                      <SelectItem key={role} value={role} className="text-sm">
+                      <SelectItem key={role} value={role} className="text-xs sm:text-sm">
                         {role}
                       </SelectItem>
                     ))}
@@ -644,41 +645,41 @@ const UserManagement = () => {
                 </Select>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
-                <Label htmlFor="edit-startDate" className="sm:text-right text-sm">
+                <Label htmlFor="edit-startDate" className="text-xs sm:text-sm font-medium sm:text-right">
                   Start Date
                 </Label>
                 <Input 
                   id="edit-startDate" 
                   type="date" 
                   defaultValue={selectedUser.startDate} 
-                  className="sm:col-span-3 text-sm h-9" 
+                  className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9" 
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
-                <Label htmlFor="edit-endDate" className="sm:text-right text-sm">
+                <Label htmlFor="edit-endDate" className="text-xs sm:text-sm font-medium sm:text-right">
                   End Date
                 </Label>
                 <Input 
                   id="edit-endDate" 
                   type="date" 
                   defaultValue={selectedUser.endDate || ""} 
-                  className="sm:col-span-3 text-sm h-9" 
+                  className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9" 
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
-                <Label htmlFor="edit-organization" className="sm:text-right text-sm">
+                <Label htmlFor="edit-organization" className="text-xs sm:text-sm font-medium sm:text-right">
                   Organization
                 </Label>
                 <Input 
                   id="edit-organization" 
                   defaultValue={selectedUser.organization} 
-                  className="sm:col-span-3 text-sm h-9" 
+                  className="sm:col-span-3 text-xs sm:text-sm h-8 sm:h-9" 
                 />
               </div>
             </div>
           )}
-          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
-            <Button type="submit" onClick={handleUpdateUser} className="w-full sm:w-auto text-sm h-9">
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0 pt-2 sm:pt-4">
+            <Button type="submit" onClick={handleUpdateUser} className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9">
               Update User
             </Button>
           </DialogFooter>
@@ -687,18 +688,18 @@ const UserManagement = () => {
 
       {/* View Roles Dialog */}
       <Dialog open={isViewRolesOpen} onOpenChange={setIsViewRolesOpen}>
-        <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-base sm:text-lg">
+        <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-[500px] max-h-[95vh] sm:max-h-[90vh] overflow-y-auto mx-auto">
+          <DialogHeader className="space-y-2 pb-4">
+            <DialogTitle className="flex items-center gap-2 text-base sm:text-lg font-semibold">
               <Shield className="w-4 h-4 sm:w-5 sm:h-5" />
               Role Assignments - {selectedUser?.name}
             </DialogTitle>
-            <DialogDescription className="text-sm">
+            <DialogDescription className="text-xs sm:text-sm text-muted-foreground">
               View active and inactive role assignments for this user.
             </DialogDescription>
           </DialogHeader>
           {selectedUser && (
-            <div className="space-y-4 sm:space-y-6">
+            <div className="space-y-4 sm:space-y-6 px-1">
               <div>
                 <h4 className="font-semibold text-green-800 mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
                   <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -708,11 +709,11 @@ const UserManagement = () => {
                   {selectedUser.activeRoles.map((role, index) => (
                     <div key={index} className="flex items-center justify-between p-2 sm:p-3 bg-green-50 rounded-lg border">
                       <Badge className="bg-green-100 text-green-800 text-xs">{role}</Badge>
-                      <span className="text-xs sm:text-sm text-green-600">Active</span>
+                      <span className="text-xs sm:text-sm text-green-600 font-medium">Active</span>
                     </div>
                   ))}
                   {selectedUser.activeRoles.length === 0 && (
-                    <p className="text-ike-neutral italic text-sm">No active roles assigned</p>
+                    <p className="text-ike-neutral italic text-xs sm:text-sm">No active roles assigned</p>
                   )}
                 </div>
               </div>
@@ -726,18 +727,18 @@ const UserManagement = () => {
                   {selectedUser.inactiveRoles.map((role, index) => (
                     <div key={index} className="flex items-center justify-between p-2 sm:p-3 bg-red-50 rounded-lg border">
                       <Badge variant="outline" className="text-red-700 border-red-200 text-xs">{role}</Badge>
-                      <span className="text-xs sm:text-sm text-red-600">Inactive</span>
+                      <span className="text-xs sm:text-sm text-red-600 font-medium">Inactive</span>
                     </div>
                   ))}
                   {selectedUser.inactiveRoles.length === 0 && (
-                    <p className="text-ike-neutral italic text-sm">No inactive roles</p>
+                    <p className="text-ike-neutral italic text-xs sm:text-sm">No inactive roles</p>
                   )}
                 </div>
               </div>
             </div>
           )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsViewRolesOpen(false)} className="w-full sm:w-auto text-sm h-9">
+          <DialogFooter className="pt-4 sm:pt-6">
+            <Button variant="outline" onClick={() => setIsViewRolesOpen(false)} className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9">
               Close
             </Button>
           </DialogFooter>
