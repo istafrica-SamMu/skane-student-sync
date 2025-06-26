@@ -254,7 +254,7 @@ export const IntermunicipalPriceAnalysis = () => {
               <ul className="space-y-2 text-sm text-ike-neutral">
                 <li>• <strong>Positive values</strong> indicate additional compensation required</li>
                 <li>• <strong>Negative values</strong> indicate cost savings (receiving municipality has lower prices)</li>
-                <li>• <strong>High Risk</strong> cases have >5,000 SEK per student impact</li>
+                <li>• <strong>High Risk</strong> cases have {'>'}5,000 SEK per student impact</li>
                 <li>• Total compensation shows net regional money flow for intermunicipal student placements</li>
                 <li>• Analysis based on current price lists and actual student placement data</li>
               </ul>
