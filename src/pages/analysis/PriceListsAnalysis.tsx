@@ -38,54 +38,24 @@ import {
   Eye,
   Edit
 } from 'lucide-react';
+import { CreateReferenceListModal } from '@/components/modals/CreateReferenceListModal';
+import { MunicipalityDetailsModal } from '@/components/modals/MunicipalityDetailsModal';
+import { EditReferenceListModal } from '@/components/modals/EditReferenceListModal';
+import { useToast } from "@/hooks/use-toast";
 
 // Mock data for municipalities
 const municipalities = [
-  { id: 1, name: "Malmö", code: "1280" },
-  { id: 2, name: "Lund", code: "1281" },
-  { id: 3, name: "Helsingborg", code: "1283" },
-  { id: 4, name: "Kristianstad", code: "1290" },
-  { id: 5, name: "Landskrona", code: "1282" },
+  { id: 1, name: "Malmö", code: "1280", basicEducation: 85000, specialEducation: 125000, gymProgram: 95000, vocationalProgram: 105000, preparatoryProgram: 75000 },
+  { id: 2, name: "Lund", code: "1281", basicEducation: 82000, specialEducation: 120000, gymProgram: 92000, vocationalProgram: 102000, preparatoryProgram: 72000 },
+  { id: 3, name: "Helsingborg", code: "1283", basicEducation: 83000, specialEducation: 122000, gymProgram: 93000, vocationalProgram: 103000, preparatoryProgram: 73000 },
+  { id: 4, name: "Kristianstad", code: "1290", basicEducation: 81000, specialEducation: 118000, gymProgram: 91000, vocationalProgram: 101000, preparatoryProgram: 71000 },
+  { id: 5, name: "Landskrona", code: "1282", basicEducation: 80000, specialEducation: 115000, gymProgram: 90000, vocationalProgram: 100000, preparatoryProgram: 70000 },
 ];
 
 // Mock data for reconciliation periods
 const reconciliationPeriods = [
   "2024-Q1", "2024-Q2", "2024-Q3", "2024-Q4",
   "2023-Q1", "2023-Q2", "2023-Q3", "2023-Q4"
-];
-
-// Mock price list data
-const mockPriceListData = [
-  {
-    municipality: "Malmö",
-    period: "2024-Q3",
-    basicEducation: 85000,
-    specialEducation: 125000,
-    gymProgram: 95000,
-    vocationalProgram: 105000,
-    preparatoryProgram: 75000,
-    reference: false
-  },
-  {
-    municipality: "Lund",
-    period: "2024-Q3", 
-    basicEducation: 82000,
-    specialEducation: 120000,
-    gymProgram: 92000,
-    vocationalProgram: 102000,
-    preparatoryProgram: 72000,
-    reference: false
-  },
-  {
-    municipality: "Reference List",
-    period: "2024-Q3",
-    basicEducation: 80000,
-    specialEducation: 115000,
-    gymProgram: 90000,
-    vocationalProgram: 100000,
-    preparatoryProgram: 70000,
-    reference: true
-  }
 ];
 
 // Chart data for trends
@@ -97,11 +67,47 @@ const trendData = [
   { period: "2024-Q1", Malmö: 85000, Lund: 82000, Reference: 80000 },
 ];
 
+const mockReferenceList = {
+  id: 'ref-1',
+  name: 'Skåne Standard Reference 2024',
+  basicEducation: 80000,
+  specialEducation: 115000,
+  gymProgram: 90000,
+  vocationalProgram: 100000,
+  preparatoryProgram: 70000
+};
+
 const PriceListsAnalysis = () => {
   const [selectedMunicipalities, setSelectedMunicipalities] = useState<string[]>(['Malmö', 'Lund']);
   const [selectedPeriods, setSelectedPeriods] = useState<string[]>(['2024-Q3', '2024-Q2', '2024-Q1']);
   const [showReferenceList, setShowReferenceList] = useState(true);
-  const [newReferenceName, setNewReferenceName] = useState('');
+  
+  // Modal states
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedMunicipality, setSelectedMunicipality] = useState<typeof municipalities[0] | null>(null);
+  
+  const { toast } = useToast();
+
+  const handleViewDetails = (municipality: typeof municipalities[0]) => {
+    setSelectedMunicipality(municipality);
+    setDetailsModalOpen(true);
+  };
+
+  const handleExportAnalysis = () => {
+    toast({
+      title: "Export Started",
+      description: "Your price list analysis export will be ready shortly.",
+    });
+  };
+
+  const handleApplyFilters = () => {
+    toast({
+      title: "Filters Applied",
+      description: "Price list data has been updated with your selected filters.",
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -113,11 +119,11 @@ const PriceListsAnalysis = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleExportAnalysis}>
             <Download className="w-4 h-4 mr-2" />
             Export Analysis
           </Button>
-          <Button>
+          <Button onClick={() => setCreateModalOpen(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Create Reference List
           </Button>
@@ -176,7 +182,7 @@ const PriceListsAnalysis = () => {
                   </Select>
                 </div>
                 <div className="flex items-end">
-                  <Button className="w-full">
+                  <Button className="w-full" onClick={handleApplyFilters}>
                     <Filter className="w-4 h-4 mr-2" />
                     Apply Filters
                   </Button>
@@ -267,18 +273,23 @@ const PriceListsAnalysis = () => {
                     <CardContent className="space-y-3">
                       <div className="flex justify-between items-center">
                         <span className="text-sm">Basic Education:</span>
-                        <span className="font-medium">85,000 SEK</span>
+                        <span className="font-medium">{muni.basicEducation.toLocaleString()} SEK</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-sm">Special Education:</span>
-                        <span className="font-medium">125,000 SEK</span>
+                        <span className="font-medium">{muni.specialEducation.toLocaleString()} SEK</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-sm">Gym Program:</span>
-                        <span className="font-medium">95,000 SEK</span>
+                        <span className="font-medium">{muni.gymProgram.toLocaleString()} SEK</span>
                       </div>
                       <div className="flex gap-2 mt-4">
-                        <Button size="sm" variant="outline" className="flex-1">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="flex-1"
+                          onClick={() => handleViewDetails(muni)}
+                        >
                           <Eye className="w-4 h-4 mr-1" />
                           View Details
                         </Button>
@@ -303,51 +314,6 @@ const PriceListsAnalysis = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <Label>Reference List Name</Label>
-                  <Input 
-                    placeholder="e.g., Skåne Standard 2024"
-                    value={newReferenceName}
-                    onChange={(e) => setNewReferenceName(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label>Period</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select period" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {reconciliationPeriods.map(period => (
-                        <SelectItem key={period} value={period}>
-                          {period}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Based On</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Municipality average" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="average">Municipal Average</SelectItem>
-                      <SelectItem value="median">Municipal Median</SelectItem>
-                      <SelectItem value="custom">Custom Values</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-end">
-                  <Button className="w-full">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Reference
-                  </Button>
-                </div>
-              </div>
-
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold">Existing Reference Lists</h3>
                 <div className="grid gap-3">
@@ -360,11 +326,27 @@ const PriceListsAnalysis = () => {
                           <p className="text-sm text-gray-600">Period: 2024-Q1 to 2024-Q4</p>
                         </div>
                         <div className="flex gap-2">
-                          <Button size="sm" variant="outline">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => setEditModalOpen(true)}
+                          >
                             <Edit className="w-4 h-4 mr-1" />
                             Edit
                           </Button>
-                          <Button size="sm" variant="outline">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedMunicipality({
+                                id: 0,
+                                name: 'Reference List',
+                                code: 'REF',
+                                ...mockReferenceList
+                              });
+                              setDetailsModalOpen(true);
+                            }}
+                          >
                             <Eye className="w-4 h-4 mr-1" />
                             View
                           </Button>
@@ -438,6 +420,29 @@ const PriceListsAnalysis = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Modals */}
+      <CreateReferenceListModal
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        reconciliationPeriods={reconciliationPeriods}
+      />
+
+      <MunicipalityDetailsModal
+        isOpen={detailsModalOpen}
+        onClose={() => {
+          setDetailsModalOpen(false);
+          setSelectedMunicipality(null);
+        }}
+        municipality={selectedMunicipality}
+        period="2024-Q3"
+      />
+
+      <EditReferenceListModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        referenceList={mockReferenceList}
+      />
     </div>
   );
 };
