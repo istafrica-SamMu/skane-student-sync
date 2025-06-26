@@ -88,6 +88,7 @@ import ChangeLists from "./pages/reports/ChangeLists";
 import ErrorLists from "./pages/reports/ErrorLists";
 import StatisticsDashboard from "./pages/reports/StatisticsDashboard";
 import PaymentStreamsAnalysis from "./pages/analysis/PaymentStreamsAnalysis";
+import KAAStatisticsAnalysis from "./pages/kaa/KAAStatisticsAnalysis";
 
 const queryClient = new QueryClient();
 
@@ -187,31 +188,13 @@ const AppContent = () => {
               } />
 
               {/* KAA Management Routes */}
-              <Route path="/kaa/dashboard" element={
-                <ProtectedRoute>
-                  <KAADashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/kaa/registry" element={
-                <ProtectedRoute>
-                  <KAARegistry />
-                </ProtectedRoute>
-              } />
-              <Route path="/kaa/contacts" element={
-                <ProtectedRoute>
-                  <ContactOccasions />
-                </ProtectedRoute>
-              } />
-              <Route path="/kaa/measures" element={
-                <ProtectedRoute>
-                  <MeasuresAndActions />
-                </ProtectedRoute>
-              } />
-              <Route path="/kaa/scb-reports" element={
-                <ProtectedRoute>
-                  <StatisticsSwedenReports />
-                </ProtectedRoute>
-              } />
+              <Route path="/kaa" element={<KAARegistry />} />
+              <Route path="/kaa/dashboard" element={<KAADashboard />} />
+              <Route path="/kaa/registry" element={<KAARegistry />} />
+              <Route path="/kaa/contacts" element={<ContactOccasions />} />
+              <Route path="/kaa/measures" element={<MeasuresAndActions />} />
+              <Route path="/kaa/scb-reports" element={<StatisticsSwedenReports />} />
+              <Route path="/kaa/statistics-analysis" element={<KAAStatisticsAnalysis />} />
               
               {/* System Management Routes */}
               <Route path="/system/users" element={

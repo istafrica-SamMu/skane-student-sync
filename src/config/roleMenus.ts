@@ -289,6 +289,11 @@ export const municipalityAdminMenu: MenuItem[] = [
         icon: MessageSquare,
       },
       {
+        title: "KAA Statistics Analysis",
+        url: "/kaa/statistics-analysis",
+        icon: LineChart,
+      },
+      {
         title: "Statistics Sweden Reports",
         url: "/kaa/scb-reports",
         icon: FileText,
