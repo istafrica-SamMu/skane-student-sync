@@ -1,9 +1,16 @@
-
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Bell, Search, User, LogOut, Settings, CheckCheck, Archive, Trash2 } from "lucide-react";
+import { Bell, Search, User, LogOut, Settings, CheckCheck, Archive, Trash2, Home } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -85,29 +92,141 @@ export function Header() {
 
   const unreadCount = notifications.filter(notif => !notif.isRead).length;
 
-  const getBreadcrumb = () => {
+  const getBreadcrumbItems = () => {
     const path = location.pathname;
-    if (path === "/" || path === "/dashboard") return t('header.breadcrumb.dashboard');
-    if (path.startsWith("/students")) {
-      if (path === "/students") return t('header.breadcrumb.students');
-      if (path.includes("placements")) return t('header.breadcrumb.students.placements');
-      if (path.includes("conflicts")) return t('header.breadcrumb.students.conflicts');
-      if (path.includes("bulk")) return t('header.breadcrumb.students.bulk');
+    const items = [];
+
+    // Always start with Dashboard
+    items.push({ label: "Dashboard", url: "/" });
+
+    if (path === "/" || path === "/dashboard") {
+      return items;
     }
-    if (path.startsWith("/financial")) {
-      if (path.includes("calculations")) return t('header.breadcrumb.financial');
-      if (path.includes("pricelists")) return t('header.breadcrumb.financial.pricelists');
+
+    // System pages
+    if (path.startsWith("/system")) {
+      items.push({ label: "System", url: "/system" });
+      
+      if (path === "/system/users") {
+        items.push({ label: "User Management", url: "/system/users" });
+      } else if (path === "/system/roles") {
+        items.push({ label: "Role Management", url: "/system/roles" });
+      } else if (path === "/system/groups") {
+        items.push({ label: "Group Management", url: "/system/groups" });
+      } else if (path === "/system/municipalities") {
+        items.push({ label: "Municipality Management", url: "/system/municipalities" });
+      } else if (path === "/system/principals") {
+        items.push({ label: "Principal Management", url: "/system/principals" });
+      } else if (path === "/system/school-units") {
+        items.push({ label: "School Units", url: "/system/school-units" });
+      } else if (path === "/system/school-years") {
+        items.push({ label: "School Years", url: "/system/school-years" });
+      } else if (path === "/system/support") {
+        items.push({ label: "Support", url: "/system/support" });
+      }
     }
-    if (path.startsWith("/reports")) {
-      if (path.includes("standard")) return t('header.breadcrumb.reports');
-      if (path.includes("contributions")) return t('header.breadcrumb.reports.contributions');
-      if (path.includes("statistics")) return t('header.breadcrumb.reports.statistics');
-      if (path.includes("follow-up")) return t('header.breadcrumb.reports.follow-up');
+    
+    // Students pages
+    else if (path.startsWith("/students")) {
+      items.push({ label: "Students", url: "/students" });
+      
+      if (path === "/students/placements") {
+        items.push({ label: "Student Placements", url: "/students/placements" });
+      } else if (path === "/students/conflicts") {
+        items.push({ label: "Student Conflicts", url: "/students/conflicts" });
+      } else if (path === "/students/bulk") {
+        items.push({ label: "Bulk Operations", url: "/students/bulk" });
+      } else if (path === "/students/municipal") {
+        items.push({ label: "Municipal Students", url: "/students/municipal" });
+      } else if (path === "/students/external") {
+        items.push({ label: "External Students", url: "/students/external" });
+      } else if (path === "/students/tf-registration") {
+        items.push({ label: "TF Registration", url: "/students/tf-registration" });
+      } else if (path === "/students/travel-cards") {
+        items.push({ label: "Travel Card Documents", url: "/students/travel-cards" });
+      } else if (path === "/students/by-class") {
+        items.push({ label: "Students by Class", url: "/students/by-class" });
+      } else if (path === "/students/conflict-resolution") {
+        items.push({ label: "Conflict Resolution", url: "/students/conflict-resolution" });
+      }
     }
-    if (path.startsWith("/integration")) return t('header.breadcrumb.integration');
-    if (path.startsWith("/settings")) return t('header.breadcrumb.settings');
-    return "IKE 2.0";
+    
+    // Financial pages
+    else if (path.startsWith("/financial")) {
+      items.push({ label: "Financial", url: "/financial" });
+      
+      if (path === "/financial/pricelists") {
+        items.push({ label: "Price Lists", url: "/financial/pricelists" });
+      } else if (path === "/financial/additional-amounts") {
+        items.push({ label: "Additional Amounts", url: "/financial/additional-amounts" });
+      } else if (path === "/financial/compensation") {
+        items.push({ label: "Inter-Municipal Compensation", url: "/financial/compensation" });
+      } else if (path === "/financial/payment-blocks") {
+        items.push({ label: "Payment Blocks", url: "/financial/payment-blocks" });
+      } else if (path === "/financial/payment-documents") {
+        items.push({ label: "Payment Documents", url: "/financial/payment-documents" });
+      } else if (path === "/financial/accounting-configuration") {
+        items.push({ label: "Accounting Configuration", url: "/financial/accounting-configuration" });
+      } else if (path === "/financial/municipal-reports") {
+        items.push({ label: "Municipal Financial Reports", url: "/financial/municipal-reports" });
+      }
+    }
+    
+    // Reports pages
+    else if (path.startsWith("/reports")) {
+      items.push({ label: "Reports", url: "/reports" });
+      
+      if (path === "/reports/contributions") {
+        items.push({ label: "Contribution Reports", url: "/reports/contributions" });
+      } else if (path === "/reports/statistics") {
+        items.push({ label: "Statistics", url: "/reports/statistics" });
+      } else if (path === "/reports/follow-up") {
+        items.push({ label: "Follow-up Reports", url: "/reports/follow-up" });
+      } else if (path === "/reports/change-lists") {
+        items.push({ label: "Change Lists", url: "/reports/change-lists" });
+      } else if (path === "/reports/error-lists") {
+        items.push({ label: "Error Lists", url: "/reports/error-lists" });
+      } else if (path === "/reports/change-tracking") {
+        items.push({ label: "Change Tracking", url: "/reports/change-tracking" });
+      } else if (path === "/reports/student-lists") {
+        items.push({ label: "Student Lists", url: "/reports/student-lists" });
+      } else if (path === "/reports/financial-analysis") {
+        items.push({ label: "Financial Analysis", url: "/reports/financial-analysis" });
+      } else if (path === "/reports/financial-export") {
+        items.push({ label: "Financial Export", url: "/reports/financial-export" });
+      } else if (path === "/reports/money-to-pay") {
+        items.push({ label: "Money to Pay", url: "/reports/money-to-pay" });
+      } else if (path === "/reports/money-to-receive") {
+        items.push({ label: "Money to Receive", url: "/reports/money-to-receive" });
+      } else if (path === "/reports/monthly-compilation") {
+        items.push({ label: "Monthly Compilation", url: "/reports/monthly-compilation" });
+      } else if (path === "/reports/municipal-statistics") {
+        items.push({ label: "Municipal Statistics", url: "/reports/municipal-statistics" });
+      } else if (path === "/reports/regional-statistics") {
+        items.push({ label: "Regional Statistics", url: "/reports/regional-statistics" });
+      } else if (path === "/reports/school-statistics") {
+        items.push({ label: "School Statistics", url: "/reports/school-statistics" });
+      } else if (path === "/reports/school-financial-reports") {
+        items.push({ label: "School Financial Reports", url: "/reports/school-financial-reports" });
+      } else if (path === "/reports/statistics-dashboard") {
+        items.push({ label: "Statistics Dashboard", url: "/reports/statistics-dashboard" });
+      }
+    }
+    
+    // Integration pages
+    else if (path.startsWith("/integration")) {
+      items.push({ label: "Integration", url: "/integration" });
+    }
+    
+    // Settings pages
+    else if (path.startsWith("/settings")) {
+      items.push({ label: "Settings", url: "/settings" });
+    }
+
+    return items;
   };
+
+  const breadcrumbItems = getBreadcrumbItems();
 
   return (
     <header className="sticky top-0 z-40 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
@@ -116,9 +235,29 @@ export function Header() {
         
         {/* Breadcrumb - Hidden on mobile when search is open */}
         <div className={`flex-1 min-w-0 ${isMobile && isSearchOpen ? 'hidden' : 'block'}`}>
-          <nav className="text-xs sm:text-sm text-ike-neutral truncate">
-            {getBreadcrumb()}
-          </nav>
+          <Breadcrumb>
+            <BreadcrumbList className="flex-wrap">
+              {breadcrumbItems.map((item, index) => (
+                <div key={item.url} className="flex items-center">
+                  {index > 0 && <BreadcrumbSeparator className="mx-1 sm:mx-2" />}
+                  <BreadcrumbItem>
+                    {index === breadcrumbItems.length - 1 ? (
+                      <BreadcrumbPage className="text-xs sm:text-sm font-medium text-ike-primary">
+                        {item.label}
+                      </BreadcrumbPage>
+                    ) : (
+                      <BreadcrumbLink 
+                        href={item.url}
+                        className="text-xs sm:text-sm text-ike-neutral hover:text-ike-primary transition-colors"
+                      >
+                        {item.label}
+                      </BreadcrumbLink>
+                    )}
+                  </BreadcrumbItem>
+                </div>
+              ))}
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
 
         {/* Mobile Search Toggle */}

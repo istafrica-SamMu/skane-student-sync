@@ -1,3 +1,4 @@
+
 import {
   Sidebar,
   SidebarContent,
@@ -14,12 +15,13 @@ import {
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, BarChart3 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { regionalAdminMenu, municipalityAdminMenu, schoolAdminMenu, orgAdminMenu, devAdminMenu } from "@/config/roleMenus";
 
 export function RoleBasedSidebar() {
   const { user } = useAuth();
+  const location = useLocation();
 
   const getMenuItems = () => {
     switch (user?.role) {
@@ -53,6 +55,14 @@ export function RoleBasedSidebar() {
       default:
         return 'IKE 2.0';
     }
+  };
+
+  const isActiveItem = (url: string) => {
+    return location.pathname === url;
+  };
+
+  const isActiveGroup = (items: any[]) => {
+    return items.some(item => isActiveItem(item.url || ''));
   };
 
   const menuItems = getMenuItems();
@@ -89,9 +99,15 @@ export function RoleBasedSidebar() {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   {item.items ? (
-                    <Collapsible>
+                    <Collapsible defaultOpen={isActiveGroup(item.items)}>
                       <CollapsibleTrigger asChild>
-                        <SidebarMenuButton className="w-full hover:bg-ike-primary/10 hover:text-ike-primary">
+                        <SidebarMenuButton 
+                          className={`w-full hover:bg-ike-primary/10 hover:text-ike-primary ${
+                            isActiveGroup(item.items) 
+                              ? 'bg-ike-primary/5 text-ike-primary font-medium' 
+                              : ''
+                          }`}
+                        >
                           <item.icon className="w-4 h-4" />
                           <span>{item.title}</span>
                           <ChevronDown className="ml-auto w-4 h-4" />
@@ -103,7 +119,11 @@ export function RoleBasedSidebar() {
                             <SidebarMenuSubItem key={subItem.title}>
                               <SidebarMenuSubButton 
                                 asChild 
-                                className="hover:bg-ike-primary/10 hover:text-ike-primary"
+                                className={`hover:bg-ike-primary/10 hover:text-ike-primary ${
+                                  isActiveItem(subItem.url || '') 
+                                    ? 'bg-ike-primary text-white font-medium' 
+                                    : ''
+                                }`}
                               >
                                 <Link to={subItem.url || '#'}>
                                   <subItem.icon className="w-4 h-4" />
@@ -118,7 +138,11 @@ export function RoleBasedSidebar() {
                   ) : (
                     <SidebarMenuButton 
                       asChild 
-                      className="hover:bg-ike-primary/10 hover:text-ike-primary"
+                      className={`hover:bg-ike-primary/10 hover:text-ike-primary ${
+                        isActiveItem(item.url || '') 
+                          ? 'bg-ike-primary text-white font-medium' 
+                          : ''
+                      }`}
                     >
                       <Link to={item.url || '#'}>
                         <item.icon className="w-4 h-4" />
