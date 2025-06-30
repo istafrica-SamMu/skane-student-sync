@@ -1,0 +1,243 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 199 42% 53%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 199 42% 61%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 199 42% 53%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 199 42% 53%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 199 42% 96%;
+    --sidebar-accent-foreground: 199 42% 15%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 199 42% 53%;
+
+    /* Custom IKE colors */
+    --ike-primary: 199 42% 53%; /* #5E98B3 */
+    --ike-primary-light: 199 42% 61%; /* #7BA8C1 */
+    --ike-primary-dark: 199 42% 45%; /* #4A7A94 */
+    --ike-success: 160 84% 39%; /* #10B981 */
+    --ike-warning: 32 95% 44%; /* #F59E0B */
+    --ike-error: 0 72% 51%; /* #DC2626 */
+    --ike-neutral-light: 220 14% 96%; /* #F9FAFB */
+    --ike-neutral: 217 10% 47%; /* #6B7280 */
+    --ike-neutral-dark: 217 33% 17%; /* #1F2937 */
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 199 42% 53%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 199 42% 53%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+/* Custom utilities for IKE colors */
+.bg-ike-primary {
+  background-color: hsl(var(--ike-primary));
+}
+
+.bg-ike-primary-light {
+  background-color: hsl(var(--ike-primary-light));
+}
+
+.bg-ike-primary-dark {
+  background-color: hsl(var(--ike-primary-dark));
+}
+
+.text-ike-primary {
+  color: hsl(var(--ike-primary));
+}
+
+.border-ike-primary {
+  border-color: hsl(var(--ike-primary));
+}
+
+.hover\:bg-ike-primary-light:hover {
+  background-color: hsl(var(--ike-primary-light));
+}
+
+.bg-ike-success {
+  background-color: hsl(var(--ike-success));
+}
+
+.bg-ike-warning {
+  background-color: hsl(var(--ike-warning));
+}
+
+.bg-ike-error {
+  background-color: hsl(var(--ike-error));
+}
+
+.text-ike-success {
+  color: hsl(var(--ike-success));
+}
+
+.text-ike-warning {
+  color: hsl(var(--ike-warning));
+}
+
+.text-ike-error {
+  color: hsl(var(--ike-error));
+}
+
+/* PrimeVue Integration Styles */
+.p-component {
+  @apply font-sans;
+}
+
+.p-button {
+  @apply font-medium;
+}
+
+.p-button.p-button-primary {
+  @apply bg-ike-primary border-ike-primary hover:bg-ike-primary-dark;
+}
+
+.p-button.p-button-secondary {
+  @apply bg-secondary text-secondary-foreground border-border hover:bg-secondary/80;
+}
+
+.p-card {
+  @apply bg-card text-card-foreground border-border;
+}
+
+.p-card .p-card-header {
+  @apply border-b border-border;
+}
+
+.p-inputtext {
+  @apply bg-background text-foreground border-input;
+}
+
+.p-inputtext:focus {
+  @apply ring-2 ring-ring border-ring;
+}
+
+.p-dropdown {
+  @apply bg-background text-foreground border-input;
+}
+
+.p-dropdown:focus {
+  @apply ring-2 ring-ring border-ring;
+}
+
+.p-sidebar {
+  @apply bg-sidebar text-sidebar-foreground border-sidebar-border;
+}
+
+.p-menu {
+  @apply bg-sidebar text-sidebar-foreground;
+}
+
+.p-menu .p-menuitem-link {
+  @apply text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground;
+}
+
+.p-menu .p-menuitem-link.p-highlight {
+  @apply bg-sidebar-primary text-sidebar-primary-foreground;
+}
+
+.p-datatable {
+  @apply bg-card text-card-foreground;
+}
+
+.p-datatable .p-datatable-header {
+  @apply bg-muted text-muted-foreground;
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+  @apply bg-muted text-muted-foreground border-border;
+}
+
+.p-datatable .p-datatable-tbody > tr {
+  @apply border-b border-border;
+}
+
+.p-datatable .p-datatable-tbody > tr:hover {
+  @apply bg-muted/50;
+}
+
+.p-dialog {
+  @apply bg-card text-card-foreground border-border;
+}
+
+.p-dialog .p-dialog-header {
+  @apply border-b border-border;
+}
+
+.p-toast {
+  @apply bg-card text-card-foreground border-border;
+}
+
+.p-toast .p-toast-message {
+  @apply border-border;
+}
+
+.p-toast .p-toast-message-success {
+  @apply bg-ike-success/10 border-ike-success text-ike-success;
+}
+
+.p-toast .p-toast-message-warn {
+  @apply bg-ike-warning/10 border-ike-warning text-ike-warning;
+}
+
+.p-toast .p-toast-message-error {
+  @apply bg-ike-error/10 border-ike-error text-ike-error;
+}
