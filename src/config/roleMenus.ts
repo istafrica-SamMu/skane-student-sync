@@ -132,6 +132,11 @@ export const regionalAdminMenu: MenuItem[] = [
     icon: Workflow,
     items: [
       {
+        title: "SIS Integrations Management",
+        url: "/integration/sis-management",
+        icon: Database,
+      },
+      {
         title: "Tax Agency Hub",
         url: "/integration/tax-agency-hub",
         icon: Database,

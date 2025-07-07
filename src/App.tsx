@@ -91,6 +91,7 @@ import PaymentStreamsAnalysis from "./pages/analysis/PaymentStreamsAnalysis";
 import KAAStatisticsAnalysis from "./pages/kaa/KAAStatisticsAnalysis";
 import PriceListsAnalysis from "./pages/analysis/PriceListsAnalysis";
 import PersonRegister from "./pages/system/PersonRegister";
+import SISIntegrationsManagement from "./pages/integration/SISIntegrationsManagement";
 
 const queryClient = new QueryClient();
 
@@ -141,6 +142,13 @@ const AppContent = () => {
               <Route path="/dashboard" element={
                 <ProtectedRoute>
                   {getDashboardComponent()}
+                </ProtectedRoute>
+              } />
+              
+              {/* SIS Integrations Management Route */}
+              <Route path="/integration/sis-management" element={
+                <ProtectedRoute>
+                  <SISIntegrationsManagement />
                 </ProtectedRoute>
               } />
               
