@@ -1,5 +1,6 @@
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/sonner';
@@ -71,7 +72,7 @@ import AddressUpdates from '@/pages/operations/AddressUpdates';
 import PopulationData from '@/pages/operations/PopulationData';
 
 // KAA Management
-import KAARoutes from '@/routes/kaaRoutes';
+import { KAARoutes } from '@/routes/kaaRoutes';
 
 // Reports
 import Reports from '@/pages/Reports';
@@ -108,11 +109,13 @@ import Settings from '@/pages/Settings';
 
 // School
 import SchoolInfo from '@/pages/my-school/SchoolInfo';
-import { useAuth } from './contexts/AuthContext';
+
+// Create a query client instance
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <QueryClient>
+    <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <AuthProvider>
           <BrowserRouter>
@@ -227,10 +230,11 @@ function App() {
               
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <Toaster />
           </BrowserRouter>
         </AuthProvider>
       </LanguageProvider>
-    </QueryClient>
+    </QueryClientProvider>
   );
 }
 
