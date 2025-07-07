@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LanguageProvider } from '@/contexts/LanguageContext';
@@ -72,7 +71,7 @@ import AddressUpdates from '@/pages/operations/AddressUpdates';
 import PopulationData from '@/pages/operations/PopulationData';
 
 // KAA Management
-import { KAARoutes } from '@/routes/kaaRoutes';
+import { kaaRoutes } from '@/routes/kaaRoutes';
 
 // Reports
 import Reports from '@/pages/Reports';
@@ -188,7 +187,7 @@ function App() {
                   <Route path="/operations/population-data" element={<PopulationData />} />
                   
                   {/* KAA Management Routes */}
-                  <Route path="/kaa/*" element={<KAARoutes />} />
+                  {kaaRoutes}
                   
                   {/* Reports Routes */}
                   <Route path="/reports" element={<Reports />} />
