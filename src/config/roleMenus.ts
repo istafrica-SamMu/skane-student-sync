@@ -75,6 +75,11 @@ export const regionalAdminMenu: MenuItem[] = [
         icon: Users,
       },
       {
+        title: "Person Register",
+        url: "/system/person-register",
+        icon: User,
+      },
+      {
         title: "Role Management",
         url: "/system/roles",
         icon: Shield,

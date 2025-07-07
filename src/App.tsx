@@ -90,6 +90,7 @@ import StatisticsDashboard from "./pages/reports/StatisticsDashboard";
 import PaymentStreamsAnalysis from "./pages/analysis/PaymentStreamsAnalysis";
 import KAAStatisticsAnalysis from "./pages/kaa/KAAStatisticsAnalysis";
 import PriceListsAnalysis from "./pages/analysis/PriceListsAnalysis";
+import PersonRegister from "./pages/system/PersonRegister";
 
 const queryClient = new QueryClient();
 
@@ -206,6 +207,11 @@ const AppContent = () => {
               <Route path="/system/users" element={
                 <ProtectedRoute>
                   <UserManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/system/person-register" element={
+                <ProtectedRoute>
+                  <PersonRegister />
                 </ProtectedRoute>
               } />
               <Route path="/system/roles" element={

@@ -109,6 +109,8 @@ export function Header() {
       
       if (path === "/system/users") {
         items.push({ label: "User Management", url: "/system/users" });
+      } else if (path === "/system/person-register") {
+        items.push({ label: "Person Register", url: "/system/person-register" });
       } else if (path === "/system/roles") {
         items.push({ label: "Role Management", url: "/system/roles" });
       } else if (path === "/system/groups") {
