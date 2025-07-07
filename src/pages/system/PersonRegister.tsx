@@ -27,17 +27,37 @@ import {
   DialogTrigger 
 } from "@/components/ui/dialog";
 import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { 
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { 
   Search, 
   Plus, 
   Edit, 
   Eye, 
-  Filter, 
-  Download, 
-  Upload,
+  Trash2,
   User,
   MapPin,
   Phone,
-  Mail
+  Mail,
+  Calendar,
+  Shield,
+  Database
 } from "lucide-react";
 
 interface Person {
@@ -133,6 +153,11 @@ export default function PersonRegister() {
   const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [showPersonDialog, setShowPersonDialog] = useState(false);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editingPerson, setEditingPerson] = useState<Person | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [personToDelete, setPersonToDelete] = useState<Person | null>(null);
 
   const filteredPersons = persons.filter(person => {
     const matchesSearch = 
@@ -170,6 +195,28 @@ export default function PersonRegister() {
     setShowPersonDialog(true);
   };
 
+  const handleEditPerson = (person: Person) => {
+    setEditingPerson(person);
+    setShowEditDialog(true);
+  };
+
+  const handleDeletePerson = (person: Person) => {
+    setPersonToDelete(person);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeletePerson = () => {
+    if (personToDelete) {
+      setPersons(prev => prev.filter(p => p.id !== personToDelete.id));
+      setPersonToDelete(null);
+      setShowDeleteDialog(false);
+    }
+  };
+
+  const handleAddPerson = () => {
+    setShowAddDialog(true);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -181,15 +228,11 @@ export default function PersonRegister() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm">
-            <Upload className="w-4 h-4 mr-2" />
-            Import from Tax Agency
-          </Button>
-          <Button variant="outline" size="sm">
-            <Download className="w-4 h-4 mr-2" />
-            Export
-          </Button>
-          <Button size="sm" className="bg-ike-primary hover:bg-ike-primary-dark">
+          <Button 
+            size="sm" 
+            className="bg-ike-primary hover:bg-ike-primary-dark"
+            onClick={handleAddPerson}
+          >
             <Plus className="w-4 h-4 mr-2" />
             Add Person
           </Button>
@@ -379,8 +422,20 @@ export default function PersonRegister() {
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleEditPerson(person)}
+                        >
                           <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleDeletePerson(person)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </TableCell>
@@ -392,25 +447,37 @@ export default function PersonRegister() {
         </CardContent>
       </Card>
 
-      {/* Person Details Dialog */}
-      <Dialog open={showPersonDialog} onOpenChange={setShowPersonDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Person Details</DialogTitle>
-          </DialogHeader>
+      {/* Person Details Sheet */}
+      <Sheet open={showPersonDialog} onOpenChange={setShowPersonDialog}>
+        <SheetContent className="sm:max-w-[600px]">
+          <SheetHeader>
+            <SheetTitle>Person Details</SheetTitle>
+            <SheetDescription>
+              Complete information for this person
+            </SheetDescription>
+          </SheetHeader>
           {selectedPerson && (
-            <div className="space-y-6">
+            <div className="space-y-6 mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <h3 className="font-semibold text-ike-neutral-dark">Personal Information</h3>
+                  <h3 className="font-semibold text-ike-neutral-dark flex items-center gap-2">
+                    <User className="w-4 h-4" />
+                    Personal Information
+                  </h3>
                   <div className="space-y-1 text-sm">
                     <p><span className="font-medium">Name:</span> {selectedPerson.firstName} {selectedPerson.lastName}</p>
                     <p><span className="font-medium">Personal Number:</span> {selectedPerson.personalNumber}</p>
-                    <p><span className="font-medium">Date of Birth:</span> {selectedPerson.dateOfBirth}</p>
+                    <p className="flex items-center gap-2">
+                      <Calendar className="w-3 h-3" />
+                      <span className="font-medium">Date of Birth:</span> {selectedPerson.dateOfBirth}
+                    </p>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <h3 className="font-semibold text-ike-neutral-dark">Status & Source</h3>
+                  <h3 className="font-semibold text-ike-neutral-dark flex items-center gap-2">
+                    <Shield className="w-4 h-4" />
+                    Status & Source
+                  </h3>
                   <div className="space-y-2">
                     <Badge className={getStatusBadge(selectedPerson.status)}>
                       {selectedPerson.status}
@@ -453,7 +520,10 @@ export default function PersonRegister() {
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-semibold text-ike-neutral-dark">System Information</h3>
+                <h3 className="font-semibold text-ike-neutral-dark flex items-center gap-2">
+                  <Database className="w-4 h-4" />
+                  System Information
+                </h3>
                 <div className="text-sm space-y-1">
                   <p><span className="font-medium">Has System User:</span> {selectedPerson.hasSystemUser ? "Yes" : "No"}</p>
                   <p><span className="font-medium">Last Updated:</span> {selectedPerson.lastUpdated}</p>
@@ -461,8 +531,146 @@ export default function PersonRegister() {
               </div>
             </div>
           )}
+        </SheetContent>
+      </Sheet>
+
+      {/* Add Person Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Add New Person</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">First Name</label>
+                <Input placeholder="Enter first name" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Last Name</label>
+                <Input placeholder="Enter last name" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Personal Number</label>
+              <Input placeholder="YYYYMMDD-XXXX" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Email</label>
+              <Input type="email" placeholder="Enter email address" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Phone</label>
+              <Input placeholder="Enter phone number" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Street Address</label>
+              <Input placeholder="Enter street address" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Postal Code</label>
+                <Input placeholder="Enter postal code" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">City</label>
+                <Input placeholder="Enter city" />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+                Cancel
+              </Button>
+              <Button className="bg-ike-primary hover:bg-ike-primary-dark">
+                Add Person
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Person Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Person</DialogTitle>
+          </DialogHeader>
+          {editingPerson && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">First Name</label>
+                  <Input defaultValue={editingPerson.firstName} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Last Name</label>
+                  <Input defaultValue={editingPerson.lastName} />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Personal Number</label>
+                <Input defaultValue={editingPerson.personalNumber} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Email</label>
+                <Input type="email" defaultValue={editingPerson.contact.email} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Phone</label>
+                <Input defaultValue={editingPerson.contact.phone} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Street Address</label>
+                <Input defaultValue={editingPerson.address.street} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Postal Code</label>
+                  <Input defaultValue={editingPerson.address.postalCode} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">City</label>
+                  <Input defaultValue={editingPerson.address.city} />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-4">
+                <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+                  Cancel
+                </Button>
+                <Button className="bg-ike-primary hover:bg-ike-primary-dark">
+                  Save Changes
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Person</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this person? This action cannot be undone.
+              {personToDelete && (
+                <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
+                  <strong>{personToDelete.firstName} {personToDelete.lastName}</strong> ({personToDelete.personalNumber})
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDeletePerson}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
