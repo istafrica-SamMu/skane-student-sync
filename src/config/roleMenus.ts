@@ -319,21 +319,6 @@ export const municipalityAdminMenu: MenuItem[] = [
         url: "/integration/import",
         icon: Database,
       },
-      {
-        title: "Tax Agency Hub",
-        url: "/integration/tax-agency-hub",
-        icon: Database,
-      },
-      {
-        title: "UHR BEDA Integration",
-        url: "/integration/uhr-beda",
-        icon: GraduationCap,
-      },
-      {
-        title: "Admission Integration",
-        url: "/integration/admission",
-        icon: UserPlus,
-      },
     ],
   },
   {
