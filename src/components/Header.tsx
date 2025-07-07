@@ -218,6 +218,10 @@ export function Header() {
     // Integration pages
     else if (path.startsWith("/integration")) {
       items.push({ label: "Integration", url: "/integration" });
+      
+      if (path === "/integration/sis-management") {
+        items.push({ label: "SIS Integrations Management", url: "/integration/sis-management" });
+      }
     }
     
     // Settings pages
